@@ -1,0 +1,71 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+
+  "entry": [
+    "apps/desktop/main.ts",
+    "apps/**/*_test.ts",
+    "packages/**/*_test.ts"
+  ],
+
+  "ignorePatterns": [
+    "docs/**",
+    "spikes/**",
+    "dist/**",
+    ".fallow/**"
+  ],
+
+  "ignoreUnresolvedImports": [
+    "jsr:*",
+    "npm:*",
+    "node:*"
+  ],
+
+  "duplicates": {
+    "mode": "mild",
+    "minTokens": 40,
+    "minLines": 5,
+    "minOccurrences": 2,
+    "ignoreImports": true
+  },
+
+  "health": {
+    "maxCyclomatic": 20,
+    "maxCognitive": 15,
+    "maxUnitSize": 60
+  },
+
+  "audit": {
+    "gate": "new-only"
+  },
+
+  "boundaries": {
+    "zones": [
+      { "name": "desktop", "patterns": ["apps/desktop/**"] },
+      { "name": "ai", "patterns": ["packages/ai/**"] },
+      { "name": "runtime", "patterns": ["packages/runtime/**"] }
+    ],
+    "rules": [
+      { "from": "desktop", "allow": ["ai", "runtime"] },
+      { "from": "ai", "allow": [] },
+      { "from": "runtime", "allow": ["ai"] }
+    ],
+    "coverage": {
+      "requireAllFiles": true,
+      "allowUnmatched": [
+        "docs/**",
+        "spikes/**",
+        ".fallow/**",
+        "deno.json",
+        "**/deno.json",
+        "mise.toml",
+        "AGENTS.md",
+        "README.md",
+        ".gitignore",
+        ".pi/**",
+        ".fallowrc.jsonc"
+      ]
+    }
+  },
+
+  "rules": {}
+}

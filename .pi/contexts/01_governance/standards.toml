@@ -1,0 +1,27 @@
+name = "Project standards"
+description = "Repository guidance and Pi enforcement for boundary-specific engineering standards"
+
+[standards-guidance]
+description = "Maintain contributor instructions, boundary standards, and the repository static-analysis policy"
+read = [
+  "AGENTS.md",
+  ".fallowrc.jsonc",
+  "docs/standards/ai.md",
+  "docs/standards/desktop.md",
+  "docs/standards/runtime.md",
+]
+show = []
+outline = []
+references = []
+
+[standards-extension]
+description = "Maintain the Pi extension that nudges agents to read the applicable boundary standard before changes"
+read = [
+  ".pi/extensions/standards.ts",
+  "docs/standards/ai.md",
+  "docs/standards/desktop.md",
+  "docs/standards/runtime.md",
+]
+show = []
+outline = []
+references = []

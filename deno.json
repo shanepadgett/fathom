@@ -1,0 +1,18 @@
+{
+  "workspace": [
+    "apps/desktop",
+    "packages/ai",
+    "packages/runtime"
+  ],
+  "imports": {
+    "marked": "npm:marked@18.0.7"
+  },
+  "lock": true,
+  "nodeModulesDir": "none",
+  "tasks": {
+    "check": "deno fmt --check deno.json README.md apps packages && deno lint apps packages && deno check apps/desktop/main.ts packages/ai/mod.ts packages/runtime/mod.ts"
+  },
+  "fmt": {
+    "lineWidth": 100
+  }
+}

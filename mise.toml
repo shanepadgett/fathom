@@ -1,2 +1,55 @@
 [tools]
+"aqua:fallow-rs/fallow" = "3.11.0"
 deno = "2.9.4"
+
+[tasks.docs]
+description = "Serve docs app on http://127.0.0.1:4173"
+run = "deno run -A --frozen docs/_app/serve.ts"
+
+[tasks.plans]
+description = "Alias for mise docs"
+run = "deno run -A --frozen docs/_app/serve.ts"
+
+[tasks.check]
+description = "Run Deno code-quality checks"
+run = "deno task check"
+
+[tasks.fallow]
+description = "Run full Fallow analysis in compact format"
+run = "fallow --format compact --quiet"
+
+[tasks."fallow:dead-code"]
+description = "Check unused code, dependencies, cycles, and boundaries"
+run = "fallow dead-code --format compact --quiet"
+
+[tasks."fallow:dupes"]
+description = "Check code duplication"
+run = "fallow dupes --format compact --quiet"
+
+[tasks."fallow:health"]
+description = "Check complexity, hotspots, and maintainability"
+run = "fallow health --hotspots --targets --format compact --quiet"
+
+[tasks."fallow:audit"]
+description = "Check changed files for new quality issues"
+run = "fallow audit --format compact --quiet"
+
+[tasks."fallow:list"]
+description = "Show Fallow discovery and architecture configuration"
+run = "fallow list --entry-points --workspaces --boundaries --plugins --format compact --quiet"
+
+[tasks."fallow:guard"]
+description = "Check architecture boundaries for selected paths"
+run = "fallow guard --format compact --quiet"
+
+[tasks."fallow:json"]
+description = "Run full Fallow analysis as JSON"
+run = "fallow --format json --quiet"
+
+[tasks."fallow:human"]
+description = "Run full Fallow analysis for humans"
+run = "fallow --format human"
+
+[tasks.quality]
+description = "Run Deno checks and full Fallow analysis"
+depends = ["check", "fallow"]
