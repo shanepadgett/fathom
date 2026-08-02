@@ -1,0 +1,45 @@
+<div class="measure plan-prose">
+  <h2>Build the runtime</h2>
+  <p>
+    Build the engine before either host gets far. Hosts can grow against a stable
+    <code>runtime.run</code> and event stream. Do not let desktop UI or web thread
+    mapping invent session rules while the runtime is still unfinished.
+  </p>
+
+  <h3>Phase 1 — prove the loop</h3>
+  <p>
+    Throwaway Deno spike with the exact Pi AI version. One prompt through our own
+    loop stub calling AI Core. One of our tools. Try tool calls, steer, cancel,
+    and event order. Build the model prompt in our code. Write down every Node
+    compatibility problem with Pi AI.
+  </p>
+  <p>
+    Done when our loop drives Pi AI in Deno and the behaviors we need (single run,
+    cancel, tool order, stream pieces) are covered by tests.
+  </p>
+
+  <h3>Phase 2 — settle how sessions are saved</h3>
+  <p>
+    Write concrete examples for a normal run, tool approval, retry, abort, branch,
+    and history trim. Decide whether the main structure is an event log, a graph,
+    or both. Design the smallest SQLite schema that fits those examples. Prove we
+    can recover after a crash mid-stream or mid-tool.
+  </p>
+  <p>
+    Done when session and branch state rebuild cleanly from SQLite alone.
+  </p>
+
+  <h3>Phase 3 — headless runtime</h3>
+  <p>
+    Add <code>AgentSession</code> (or whatever we name it). Load agent state from
+    the database. Save loop events through one internal listener. Add prompt
+    building and our own history trim. Add model, credential, tool, permission,
+    and workspace services. Run it all in a replaceable Deno worker. Expose
+    generation-tagged commands and events with no desktop UI yet. Support clean
+    reload and force-kill recovery.
+  </p>
+  <p>
+    Done when a test can create, run, close, reopen, branch, trim, and continue a
+    session.
+  </p>
+</div>

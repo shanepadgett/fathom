@@ -1,0 +1,33 @@
+<div class="measure plan-prose">
+  <h2>Open decisions</h2>
+  <p>
+    Biggest open question: what is the main saved shape of a session — an event
+    log, a message tree, a run graph, or a mix? Answer that with worked examples
+    before drawing a big schema. That choice drives SQLite, history trim, crash
+    recovery, desktop snapshots, and extension events.
+  </p>
+  <p>
+    Runtime questions still open: which events must be saved before the loop may
+    continue; how we recover an interrupted tool call after restart; whether a
+    summary applies to one branch, to child branches, or is a frozen snapshot;
+    how files and other artifacts are shared across branches; which tools need
+    approval and whether policy can approve without a person; whether one
+    <code>AgentSession</code> is per session, branch, window, or active run; how
+    our loop exposes steer/follow-up queues and parallel tool execution without
+    locking us into a bad API.
+  </p>
+  <p>
+    Desktop questions: whether two windows can use one session at once; which
+    desktop shell hosts Deno and the UI; how much of the spike’s reload design we
+    keep; whether the prototype keeps reading Pi’s <code>auth.json</code> or
+    moves straight to our own credential store; whether third-party extensions
+    are required for the first useful release; whether todos ship as a first-party
+    runtime module with an optional desktop panel (likely yes).
+  </p>
+  <p>
+    Chat questions: exact session row shape and the list of
+    <code>RuntimeEvent</code> types; rules for building an @mention slice; which
+    tools exist on full desktop vs locked-down web; busy-session policy (queue vs
+    reject); whether mid-run steer ever appears on web.
+  </p>
+</div>

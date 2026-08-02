@@ -1,0 +1,45 @@
+<div class="measure plan-prose">
+  <h2>Persistence</h2>
+  <p>
+    We save sessions in SQLite ourselves. Pi’s JSONL session files are the wrong
+    shape for us.
+  </p>
+  <p>
+    History will probably be an append-only event log, with normal tables on top
+    for fast reads. Streaming, retries, tool calls, approvals, crashes, branches,
+    and extension data all have states that a single flat “messages” table tends
+    to lose.
+  </p>
+  <p>
+    Names we expect to show up somehow (not a finished schema):
+  </p>
+  <plan-terms>
+    <span>sessions</span>
+    <span>branches</span>
+    <span>runs</span>
+    <span>turns</span>
+    <span>events</span>
+    <span>messages</span>
+    <span>content_blocks</span>
+    <span>tool_executions</span>
+    <span>artifacts</span>
+    <span>context_snapshots</span>
+    <span>summaries</span>
+    <span>attachments</span>
+  </plan-terms>
+  <p>
+    Before locking a schema, a small spike should answer plain questions with
+    examples. Is the main structure an event log, a message tree, a run graph, or
+    a mix? What counts as the tip of a branch? Can one message show up on two
+    branches without copying the row? How much of a half-finished stream do we
+    keep after a crash? Is a retry a new run, a new turn, or another attempt on
+    the same turn? How do we store “user approved this tool” or “user said no”?
+    Which rows can change after write, and which never do?
+  </p>
+  <p>
+    A few rules hold either way. Every saved event has a stable id and order. A
+    finished model or tool event is never lost. Branch history can be rebuilt the
+    same way every time. After restart we can tell a run was interrupted. The UI
+    can be rebuilt from the database alone. Secrets never go into session rows.
+  </p>
+</div>

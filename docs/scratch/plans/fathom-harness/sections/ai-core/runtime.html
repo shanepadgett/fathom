@@ -1,0 +1,161 @@
+<div class="measure plan-prose">
+  <h2>Runtime</h2>
+  <p>
+    What Pi agent-core pulls from <code>@earendil-works/pi-ai</code> for the model
+    turn. Source check: <code>packages/agent/src/types.ts</code>,
+    <code>agent-loop.ts</code>, <code>agent.ts</code>, and harness compaction
+    helpers. Import path is the package root unless noted.
+  </p>
+
+  <h3>Call boundary</h3>
+  <p>
+    Agent-core defines <code>StreamFn</code> against these Pi AI types:
+  </p>
+  <plan-code lang="ts">
+// packages/agent/src/types.ts — satisfied by Models.streamSimple
+type StreamFn = (
+  model: Model&lt;Api&gt;,
+  context: Context,
+  options?: SimpleStreamOptions,
+) => AssistantMessageEventStream | Promise&lt;AssistantMessageEventStream&gt;;
+  </plan-code>
+  <p>
+    Failures stay in the stream (<code>error</code> / <code>done</code> events and
+    a final <code>AssistantMessage</code> with <code>stopReason</code>
+    <code>"error"</code> or <code>"aborted"</code>), not thrown from
+    <code>StreamFn</code>.
+  </p>
+
+  <h3>Types</h3>
+  <plan-defs>
+    <plan-def term="Model&lt;Api&gt;">
+      id, name, api, provider, baseUrl, reasoning, input modalities, cost,
+      contextWindow, maxTokens, optional thinking levels / headers.
+    </plan-def>
+    <plan-def term="Api">
+      Wire protocol id string (<code>"anthropic-messages"</code>,
+      <code>"openai-responses"</code>, <code>"openai-completions"</code>,
+      <code>"openai-codex-responses"</code>, …).
+    </plan-def>
+    <plan-def term="Context">
+      <code>systemPrompt?</code>, <code>messages</code>, <code>tools?</code>.
+    </plan-def>
+    <plan-def term="Message">
+      <code>UserMessage | AssistantMessage | ToolResultMessage</code>.
+    </plan-def>
+    <plan-def term="AssistantMessage">
+      role, content blocks, stopReason, usage, errorMessage?, provider metadata.
+    </plan-def>
+    <plan-def term="ToolResultMessage">
+      toolCallId, toolName, content, isError, timestamp.
+    </plan-def>
+    <plan-def term="Tool">
+      name, description, TypeBox <code>parameters</code>.
+    </plan-def>
+    <plan-def term="ToolCall">
+      id, name, arguments (on assistant content).
+    </plan-def>
+    <plan-def term="TextContent / ImageContent / ThinkingContent">
+      Content block shapes on user/assistant/tool messages.
+    </plan-def>
+    <plan-def term="Usage">
+      input/output/cache tokens and cost fields on assistant turns.
+    </plan-def>
+    <plan-def term="StopReason">
+      <code>stop | length | toolUse | error | aborted | pending</code>.
+    </plan-def>
+    <plan-def term="ThinkingLevel / ModelThinkingLevel">
+      <code>minimal | low | medium | high | xhigh | max</code>; model side adds
+      <code>off</code>.
+    </plan-def>
+    <plan-def term="SimpleStreamOptions">
+      Extends stream options with portable reasoning settings (thinking level,
+      budgets, abort signal, sessionId, cacheRetention, transport, …).
+    </plan-def>
+    <plan-def term="AssistantMessageEvent">
+      Stream protocol: <code>start</code>, text/thinking/toolcall
+      start|delta|end, <code>done</code>, <code>error</code>. Deltas carry
+      <code>partial</code> assistant snapshot.
+    </plan-def>
+    <plan-def term="AssistantMessageEventStream">
+      Async iterable of events; <code>result()</code> → final
+      <code>AssistantMessage</code>.
+    </plan-def>
+    <plan-def term="ThinkingBudgets / Transport">
+      Used on agent options when wiring stream calls (token budgets; sse /
+      websocket / auto for Codex-style transports).
+    </plan-def>
+  </plan-defs>
+
+  <h3>Models collection API</h3>
+  <p>
+    Built with <code>createModels({ credentials?, authContext? })</code>.
+    Agent-core does not construct this; the host does. Methods a runtime host
+    needs:
+  </p>
+  <plan-defs>
+    <plan-def term="setProvider / getProvider / getProviders">
+      Register and inspect providers.
+    </plan-def>
+    <plan-def term="getModel(provider, id) / getModels(provider?)">
+      Sync catalog reads.
+    </plan-def>
+    <plan-def term="streamSimple(model, context, options?)">
+      Portable stream — the usual <code>StreamFn</code> binding.
+    </plan-def>
+    <plan-def term="stream(model, context, options?)">
+      Full provider-specific options when simple is not enough.
+    </plan-def>
+    <plan-def term="completeSimple / complete">
+      Non-streaming helpers (compaction / one-shot calls in harness code use
+      these via <code>Models</code>).
+    </plan-def>
+    <plan-def term="refresh(provider?)">
+      Dynamic model lists (OpenRouter later if needed).
+    </plan-def>
+  </plan-defs>
+  <p>
+    Also: <code>hasApi(model, api)</code>, <code>calculateCost</code>,
+    <code>getSupportedThinkingLevels</code>, <code>clampThinkingLevel</code> from
+    the root export.
+  </p>
+
+  <h3>Functions agent-core calls</h3>
+  <plan-defs>
+    <plan-def term="validateToolArguments(tool, toolCall)">
+      Parse/validate tool JSON against the TypeBox schema before execute
+      (<code>agent-loop.ts</code>).
+    </plan-def>
+    <plan-def term="EventStream">
+      Generic push/async-iterable stream; agent loop builds its own event stream
+      on this class.
+    </plan-def>
+    <plan-def term="contentText(content)">
+      Flatten text blocks to a string (compaction / summarization).
+    </plan-def>
+    <plan-def term="uuidv7()">
+      Ids for sessions/messages in harness code.
+    </plan-def>
+    <plan-def term="retryAssistantCall / RetryPolicy / RetryCallbacks">
+      Retried model calls in compaction paths.
+    </plan-def>
+    <plan-def term="Type / Static / TSchema">
+      Re-exported TypeBox bits for tool schemas (agent also depends on
+      <code>typebox</code> directly).
+    </plan-def>
+  </plan-defs>
+
+  <h3>TypeBox</h3>
+  <p>
+    Tool <code>parameters</code> are TypeBox schemas. Pi AI re-exports
+    <code>Type</code>, <code>Static</code>, <code>TSchema</code>. Validation is
+    <code>validateToolArguments</code>.
+  </p>
+
+  <h3>Not required for the loop boundary</h3>
+  <p>
+    Image generation APIs, <code>@earendil-works/pi-ai/compat</code> globals,
+    OAuth modules (host/auth concern), and every provider outside the five we
+    register. Harness session/JSONL types are agent-core, not pi-ai.
+  </p>
+</div>

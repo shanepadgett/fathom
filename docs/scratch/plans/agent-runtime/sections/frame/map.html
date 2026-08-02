@@ -1,0 +1,46 @@
+<div class="measure plan-prose">
+  <h2>Map</h2>
+  <p>
+    Chat and Desktop are the two products on top. Both call the same Agent
+    Runtime. Runtime talks to models only through AI Core — the one Pi package we
+    use.
+  </p>
+
+  <plan-stack>
+    <plan-row>
+      <plan-layer
+        label="Chat"
+        desc="Threads, @mentions, multiplayer product code, deploy-time host wiring"
+      ></plan-layer>
+      <plan-layer
+        label="Desktop"
+        desc="Coding-agent shell: UI, Deno worker, extensions, approvals, folder trust"
+      ></plan-layer>
+    </plan-row>
+    <plan-layer
+      label="Agent Runtime"
+      desc="Our loop, session, one-run lock, tools, hooks, history, events, SQLite"
+    ></plan-layer>
+    <plan-layer
+      label="AI Core"
+      desc="Providers, streaming, messages, credentials"
+    ></plan-layer>
+  </plan-stack>
+
+  <p>
+    Runtime runs with no UI. UIs send commands and listen for events. That stops
+    web and desktop from inventing their own agent rules. Multiplayer chat is web
+    only. Desktop is where plugins and a richer local UI live.
+  </p>
+  <p>
+    We do not use Pi’s <code>Agent</code>, <code>AgentHarness</code>, or
+    <code>pi-agent-core</code>. We build the loop. Pin Pi AI at
+    <code>0.83.0</code> when it becomes a real dependency. When the two markdown
+    notes disagree,
+    <a href="./owned-agent-runtime-plan.md">owned-agent-runtime-plan.md</a>
+    wins — except the Agent dependency, which this plan drops. Product and host
+    notes still come from
+    <a href="./agent-runtime-and-clients.md">agent-runtime-and-clients.md</a>
+    where they do not conflict.
+  </p>
+</div>

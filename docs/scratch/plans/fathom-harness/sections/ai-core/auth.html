@@ -1,0 +1,121 @@
+<div class="measure plan-prose">
+  <h2>Auth</h2>
+  <p>
+    Provider-owned. Resolved by the <code>Models</code> collection on each
+    stream. Agent-core never touches this layer — the host builds
+    <code>Models</code> with a <code>CredentialStore</code> and calls
+    <code>login</code> / <code>logout</code> / <code>getAuth</code>.
+  </p>
+  <p>
+    Types and helpers: <code>packages/ai/src/auth/</code>
+    (<code>types.ts</code>, <code>resolve.ts</code>,
+    <code>credential-store.ts</code>, <code>helpers.ts</code>,
+    <code>context.ts</code>). OAuth flows:
+    <code>packages/ai/src/auth/oauth/</code>.
+  </p>
+
+  <h3>Types</h3>
+  <plan-defs>
+    <plan-def term="CredentialStore">
+      <code>read</code>, <code>list</code>, <code>modify</code> (serialized
+      read-modify-write), <code>delete</code>. One credential per provider id.
+      Default: <code>InMemoryCredentialStore</code> — apps inject persistence.
+    </plan-def>
+    <plan-def term="Credential">
+      <code>{ type: "api_key"; key?; env? }</code> or
+      <code>{ type: "oauth"; access; refresh; expires }</code>.
+    </plan-def>
+    <plan-def term="AuthContext">
+      <code>env(name)</code>, <code>fileExists(path)</code>. Default reads
+      <code>process.env</code> / Node fs.
+    </plan-def>
+    <plan-def term="ModelAuth">
+      Resolved request auth: <code>apiKey?</code>, <code>headers?</code>,
+      <code>baseUrl?</code>.
+    </plan-def>
+    <plan-def term="AuthResult">
+      <code>auth</code> + optional <code>source</code> label for UI
+      (<code>"OAuth"</code>, <code>"OPENAI_API_KEY"</code>, …).
+    </plan-def>
+    <plan-def term="AuthInteraction">
+      Host callbacks for login: <code>prompt()</code>
+      (text/secret/select/manual_code), <code>notify()</code>
+      (info/auth_url/device_code/progress).
+    </plan-def>
+    <plan-def term="ProviderAuth">
+      Optional <code>apiKey: ApiKeyAuth</code> and/or
+      <code>oauth: OAuthAuth</code> on each provider.
+    </plan-def>
+    <plan-def term="OAuthAuth">
+      <code>login</code>, <code>refresh</code>, <code>toAuth</code>.
+    </plan-def>
+    <plan-def term="ModelsError">
+      Codes include <code>"auth"</code> and <code>"oauth"</code>.
+    </plan-def>
+  </plan-defs>
+
+  <h3>Models auth API</h3>
+  <plan-defs>
+    <plan-def term="login(providerId, type, interaction)">
+      Runs provider login; persists credential via the store.
+    </plan-def>
+    <plan-def term="logout(providerId)">
+      Deletes stored credential.
+    </plan-def>
+    <plan-def term="getAuth(providerId | model)">
+      Resolve without streaming; refreshes OAuth if needed.
+    </plan-def>
+  </plan-defs>
+
+  <h3>Resolve order</h3>
+  <plan-steps>
+    <plan-step label="Call override">
+      <code>options.apiKey</code> when the provider supports api-key auth.
+    </plan-step>
+    <plan-step label="Stored credential">
+      OAuth: refresh if expiring within five minutes (under
+      <code>modify</code> lock), then <code>toAuth</code>. API key: provider
+      <code>resolve</code>.
+    </plan-step>
+    <plan-step label="Ambient">
+      Env / files only if nothing is stored. Failed refresh does not fall back to
+      env.
+    </plan-step>
+  </plan-steps>
+
+  <h3>Per provider</h3>
+  <plan-map>
+    <plan-map-row from="anthropic" to="api_key + oauth">
+      Env: <code>ANTHROPIC_API_KEY</code>, <code>ANTHROPIC_OAUTH_TOKEN</code>,
+      <code>ANTHROPIC_AUTH_TOKEN</code> (Bearer). OAuth: Claude Pro/Max, PKCE,
+      loopback <code>:53692</code> or paste redirect. Refresh rotates tokens.
+    </plan-map-row>
+    <plan-map-row from="openai" to="api_key">
+      <code>OPENAI_API_KEY</code> only.
+    </plan-map-row>
+    <plan-map-row from="openai-codex" to="oauth">
+      ChatGPT Plus/Pro. Browser PKCE (<code>localhost:1455</code>) or device
+      code. Refresh rotates tokens. No platform API key path.
+    </plan-map-row>
+    <plan-map-row from="xai" to="api_key + oauth">
+      <code>XAI_API_KEY</code>. OAuth: device code against
+      <code>auth.x.ai</code> (no local HTTP server). Refresh supported.
+    </plan-map-row>
+    <plan-map-row from="openrouter" to="api_key + oauth">
+      <code>OPENROUTER_API_KEY</code>. OAuth PKCE mints a permanent user key
+      stored as type <code>oauth</code>; <code>refresh</code> is a no-op.
+    </plan-map-row>
+  </plan-map>
+
+  <p>
+    OAuth implementations load lazily
+    (<code>lazyOAuth</code> + <code>auth/oauth/load.ts</code>). Anthropic,
+    Codex, and OpenRouter use Node <code>http</code> callback servers — Deno
+    needs a compat check or the manual paste path. xAI is fetch + device poll
+    only.
+  </p>
+  <p>
+    <code>@earendil-works/pi-ai/oauth</code> is type-only compatibility for
+    extensions. Runtime login is <code>models.login(...)</code>.
+  </p>
+</div>

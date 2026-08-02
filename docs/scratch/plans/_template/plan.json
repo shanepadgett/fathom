@@ -1,0 +1,10 @@
+{
+  "id": "_template",
+  "title": "Plan title",
+  "summary": "One-line purpose. Replace this.",
+  "template": true,
+  "sections": [
+    { "id": "guide/overview", "title": "Overview", "group": "Guide" },
+    { "id": "guide/building-blocks", "title": "Building blocks", "group": "Guide" }
+  ]
+}

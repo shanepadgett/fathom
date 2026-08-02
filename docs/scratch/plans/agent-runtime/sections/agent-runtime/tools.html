@@ -1,0 +1,25 @@
+<div class="measure plan-prose">
+  <h2>Tools</h2>
+  <p>
+    We do not use Pi’s built-in tools or Pi’s tool type as our API. We register
+    our own tools on a Fathom registry. That layer owns the JSON schema the model
+    sees, descriptions, run context, folder limits, approval rules, progress,
+    cancel, output size limits, where big outputs go, structured details for
+    desktop UI, audit logs, and tools that extensions add.
+  </p>
+  <p>
+    Tools run inside our loop. Permission checks belong in a central before-tool
+    hook and inside the tool code next to the real file or command work. The hook
+    is the main yes/no. A UI popup alone is not enough.
+  </p>
+  <p>
+    After a tool returns, a policy hook may clean or redact a result before it
+    goes back into the model prompt. Keep a full unredacted copy in the audit log
+    only when policy allows storing it.
+  </p>
+  <p>
+    Hosts may narrow the tool set. Desktop can ship a full local tool pack. Chat
+    Host may ship a smaller set chosen at deploy time. The registry and permission
+    rules still live in the runtime.
+  </p>
+</div>

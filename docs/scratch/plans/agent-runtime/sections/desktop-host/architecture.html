@@ -1,0 +1,38 @@
+<div class="measure plan-prose">
+  <h2>Desktop architecture</h2>
+  <p>
+    The backend is in charge. The UI only gets plain data it can copy: commands,
+    events, and snapshots. It does not get live objects from inside the engine.
+  </p>
+  <plan-flow>
+    <plan-flow-step
+      label="Desktop UI"
+      desc="Chat transcript, editor, panels, approvals"
+    ></plan-flow-step>
+    <plan-flow-step label="Typed commands and events"></plan-flow-step>
+    <plan-flow-step
+      label="Desktop host"
+      desc="Windows, native integration, watches the engine"
+    ></plan-flow-step>
+    <plan-flow-step label="Typed commands and events"></plan-flow-step>
+    <plan-flow-step label="Deno worker" desc="Can be replaced on reload">
+      <div><code>AgentSession</code> + our execution loop</div>
+      <div>SQLite</div>
+      <div>AI Core (providers and credentials)</div>
+      <div>Tools and extensions</div>
+    </plan-flow-step>
+  </plan-flow>
+  <p>
+    Early commands stay simple: send a prompt, steer, abort, pick a model, set
+    thinking level, approve or reject a tool, trim history, create or open a
+    branch, turn tools on or off, open or close a workspace.
+  </p>
+  <p>
+    The engine runs in its own Deno worker from the start. That split is about
+    app lifecycle (reload, crash, restart), not sandbox security. Extensions are
+    trusted code we wrote or installed on purpose, and they load inside that same
+    worker. Everything crossing the worker boundary must be plain data. That also
+    makes it easier later to move the engine into another process or machine
+    without rewriting the UI contracts.
+  </p>
+</div>

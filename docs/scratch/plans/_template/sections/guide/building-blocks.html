@@ -1,0 +1,143 @@
+<div class="measure plan-prose">
+  <h2>Building blocks</h2>
+  <p>
+    Prefer these tags from <code>docs/_app/blocks.js</code>. Delete this section from
+    real plans (and drop it from <code>plan.json</code>).
+  </p>
+
+  <h3>Widths</h3>
+  <ul>
+    <li><code>.measure</code> — reading column (~52rem). Default for prose.</li>
+    <li><code>.wide</code> — full main column. Diagrams, wide tables.</li>
+  </ul>
+
+  <h3>Steps</h3>
+  <plan-steps>
+    <plan-step>Load canonical session state from SQLite.</plan-step>
+    <plan-step>Build the active transcript and context projection.</plan-step>
+    <plan-step>Start the run and persist lifecycle events.</plan-step>
+  </plan-steps>
+
+  <h3>Definitions</h3>
+  <plan-defs>
+    <plan-def term="Agent runtime">Shared engine above Pi: sessions, tools, hooks, compaction, events.</plan-def>
+    <plan-def term="Host">Process that embeds the runtime and bridges UI or network.</plan-def>
+  </plan-defs>
+
+  <h3>Flow</h3>
+  <p>
+    Sequence. Plain title: <code>label</code> + <code>desc</code>. HTML title:
+    child <code>&lt;plan-t&gt;</code>. Extra children become list lines. Arrows are inserted for you.
+  </p>
+  <plan-flow>
+    <plan-flow-step label="Desktop UI" desc="Transcript, editor, panels, approvals"></plan-flow-step>
+    <plan-flow-step label="Desktop host" desc="Windows, native integration, watches the engine"></plan-flow-step>
+    <plan-flow-step label="Deno worker" desc="Replaceable on reload">
+      <div><code>AgentSession</code></div>
+      <div>SQLite, tools, extensions</div>
+    </plan-flow-step>
+  </plan-flow>
+
+  <h3>Map</h3>
+  <plan-map>
+    <plan-map-row from="Web thread id" to="Agent session id" note="Created on first @agent"></plan-map-row>
+    <plan-map-row from="Desktop session id" to="Agent session id" note="One-to-one in the simple UI"></plan-map-row>
+  </plan-map>
+
+  <h3>Split</h3>
+  <plan-split>
+    <plan-pane label="Desktop host">
+      <div>Create, watch, and replace the engine worker</div>
+      <div>Keep windows and native UI alive</div>
+    </plan-pane>
+    <plan-pane label="Engine worker">
+      <div>Our <code>AgentSession</code> runtime</div>
+      <div>SQLite, tools, extensions</div>
+    </plan-pane>
+  </plan-split>
+</div>
+
+<div class="measure plan-prose mt-10">
+  <h3>Layer stack</h3>
+  <p>
+    Stacked cards in the reading column. Peer layers go in
+    <code>&lt;plan-row&gt;</code>. Optional <code>note</code> for a short side tag.
+    <code>accent</code> marks the band you want to stand out.
+  </p>
+  <plan-stack>
+    <plan-row>
+      <plan-layer label="Chat client" desc="Threads, @mention UX" note="Web"></plan-layer>
+      <plan-layer label="Desktop" desc="Host shell UI" note="Desktop"></plan-layer>
+    </plan-row>
+    <plan-layer label="Agent runtime" desc="Session, tools, hooks, events" accent></plan-layer>
+    <plan-layer desc="Providers, model/tool loop">
+      <plan-t>Pi AI + <code>Agent</code></plan-t>
+    </plan-layer>
+  </plan-stack>
+</div>
+
+<div class="measure plan-prose mt-10">
+  <h3>Code</h3>
+  <p>Real source only. Escape <code>&lt;</code> / <code>&gt;</code> in the HTML when needed.</p>
+  <plan-code lang="ts">
+interface EngineEnvelope&lt;T&gt; {
+  generation: number;
+  requestId?: string;
+  payload: T;
+}
+  </plan-code>
+
+  <h3>Term grid</h3>
+  <plan-terms>
+    <span>sessions</span>
+    <span>branches</span>
+    <span>runs</span>
+    <span>events</span>
+    <span>messages</span>
+    <span>artifacts</span>
+  </plan-terms>
+
+  <h3>Tag cheat sheet</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Need</th>
+        <th>Tag</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Sequence A → B → C</td>
+        <td><code>&lt;plan-flow&gt;</code> / <code>&lt;plan-flow-step&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Mapping id → id</td>
+        <td><code>&lt;plan-map&gt;</code> / <code>&lt;plan-map-row&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Side-by-side panes</td>
+        <td><code>&lt;plan-split&gt;</code> / <code>&lt;plan-pane&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Layered architecture</td>
+        <td><code>&lt;plan-stack&gt;</code> / <code>&lt;plan-row&gt;</code> / <code>&lt;plan-layer&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Numbered steps</td>
+        <td><code>&lt;plan-steps&gt;</code> / <code>&lt;plan-step&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Term + definition</td>
+        <td><code>&lt;plan-defs&gt;</code> / <code>&lt;plan-def&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Name inventory</td>
+        <td><code>&lt;plan-terms&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Real source code</td>
+        <td><code>&lt;plan-code lang="ts"&gt;</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

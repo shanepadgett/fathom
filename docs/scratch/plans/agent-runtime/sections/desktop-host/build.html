@@ -1,0 +1,48 @@
+<div class="measure plan-prose">
+  <h2>Build desktop</h2>
+  <p>
+    Desktop grows after the headless runtime can create, run, close, reopen,
+    branch, trim, and continue a session. The existing
+    <code>spikes/desktop-agent</code> is a starting point, not the end state.
+  </p>
+
+  <h3>Phase 4 — desktop client</h3>
+  <p>
+    Show streaming text and blocks. Prompt, steer, abort. Tool progress and
+    approvals. Model and account picking. Session and branch navigation. Make
+    save and recovery failures obvious.
+  </p>
+  <p>
+    Done when restarting the UI does not lose agent state and does not act like
+    the UI owns that state.
+  </p>
+
+  <h3>Phase 5 — use our extension APIs ourselves</h3>
+  <p>
+    Move selected first-party tools and views onto the same registration APIs
+    extensions will use. Define how hooks combine and how conflicts resolve. Test
+    shutdown, start order, worker reload, and ignoring old generation messages.
+    Prove reload for entry files, nested imports, add, and remove. Keep the API
+    private while requirements are still moving.
+  </p>
+  <p>
+    Done when first-party features can live on those APIs without special back
+    doors into the runtime.
+  </p>
+
+  <h3>Phase 6 — custom UI code in extensions, only if needed</h3>
+  <p>
+    Decide whether declared UI contributions are enough. If we need custom UI
+    code, pick either full page reload or disposable iframes so old UI code
+    really goes away. Keep UI messages generation-aware and separate from backend
+    objects.
+  </p>
+  <p>
+    Done when custom UI can update and unload without restarting the whole
+    desktop app or leaving old handlers alive.
+  </p>
+  <p>
+    Desktop multiplayer waits until identity, permissions, and sync are real.
+    Richer layout and editor embeds come as desktop matures.
+  </p>
+</div>

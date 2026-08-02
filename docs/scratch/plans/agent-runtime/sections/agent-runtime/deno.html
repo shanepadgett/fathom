@@ -1,0 +1,28 @@
+<div class="measure plan-prose">
+  <h2>Deno gate</h2>
+  <p>
+    Pi AI’s package files say they support Node, even though much of the code we
+    care about uses web APIs. Prove Pi AI works in Deno before treating this
+    design as settled. Desktop plans to run the engine in a Deno worker. Headless
+    tests should use the same runtime.
+  </p>
+  <p>
+    Make a small spike with Pi AI <code>0.83.0</code> and Deno
+    <code>2.9.4</code>. We are not importing <code>pi-agent-core</code>.
+  </p>
+  <plan-steps>
+    <plan-step label="Import Pi AI without Node-only startup failures"></plan-step>
+    <plan-step label="Stream Anthropic and OpenAI in Deno" desc="Text, reasoning, tool calls in pieces"></plan-step>
+    <plan-step label="Drive those streams from a tiny loop stub of ours"></plan-step>
+    <plan-step label="Run one of our tools with progress updates"></plan-step>
+    <plan-step label="Check sequential and parallel tools"></plan-step>
+    <plan-step label="Cancel during a model stream and during a tool"></plan-step>
+    <plan-step label="Confirm context rebuild and tool policy hooks we need"></plan-step>
+    <plan-step label="Save loop events to SQLite without deadlocks"></plan-step>
+  </plan-steps>
+  <p>
+    Later desktop checks: shell starts and replaces the engine worker, picks up a
+    change in a nested extension file after reload, and reopens SQLite with the
+    same session restored.
+  </p>
+</div>

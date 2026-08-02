@@ -1,0 +1,42 @@
+<div class="measure plan-prose">
+  <h2>Session and run</h2>
+  <p>
+    Hosts call one main method. Desktop sends a user message. Web sends a slice of
+    thread messages from an @mention. Optional fields cover tool limits, extra
+    system text, and a client-side run id so a flaky reconnect does not start the
+    same run twice. The return value is a stream of events.
+  </p>
+  <plan-code lang="ts">
+// Host entry (intent, not final API)
+runtime.run({
+  sessionId,
+  input:
+    | { kind: "user_message"; text: string; images?: unknown[]; actor?: Actor }
+    | { kind: "thread_slice"; messages: ThreadMessage[]; actor?: Actor },
+  toolPolicy?: ToolPolicy,
+  systemFragments?: string[],
+  clientRunId?: string,
+}): AsyncIterable&lt;RuntimeEvent&gt;;
+  </plan-code>
+  <p>
+    Each prompt follows the same path. Load the session and branch from SQLite.
+    Build the message list and the prompt the model will see. Pick the model,
+    system prompt, tools, credentials, and permissions. Hand that to our loop,
+    start the run, and save records as events arrive. Send safe events out. Save
+    the new branch tip and run status. If the process dies mid-run, clean up on
+    restart.
+  </p>
+  <plan-flow>
+    <plan-flow-step label="Load session and branch from SQLite"></plan-flow-step>
+    <plan-flow-step label="Build model prompt" desc="Branch, summaries, extras, token budget"></plan-flow-step>
+    <plan-flow-step label="Bind model, tools, credentials, permissions"></plan-flow-step>
+    <plan-flow-step label="Run our execution loop" desc="Stream via AI Core, tools, steer, cancel"></plan-flow-step>
+    <plan-flow-step label="Save events and publish RuntimeEvent stream"></plan-flow-step>
+  </plan-flow>
+  <p>
+    Only the runtime may change the in-memory messages for the active run. UI and
+    extensions go through runtime commands so the database and memory stay in
+    sync. One run per session at a time. If the session is busy, the host queues
+    or rejects.
+  </p>
+</div>

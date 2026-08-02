@@ -1,0 +1,36 @@
+<div class="measure plan-prose">
+  <h2>Mention run</h2>
+  <p>
+    When someone @mentions the agent, the chat product builds a short slice of
+    messages since the agent last spoke. The host makes sure no other run is
+    already active for that session, then calls <code>runtime.run</code> with
+    <code>kind: "thread_slice"</code>. Events stream back, and the chat product
+    posts the agent’s reply into the thread.
+  </p>
+  <plan-flow>
+    <plan-flow-step label="Humans chat in a thread"></plan-flow-step>
+    <plan-flow-step label="Someone @mentions the agent"></plan-flow-step>
+    <plan-flow-step
+      label="Chat product builds a message slice"
+      desc="Since the agent last replied"
+    ></plan-flow-step>
+    <plan-flow-step desc="Passes the session and the slice">
+      <plan-t>Host locks the session and calls <code>runtime.run</code></plan-t>
+    </plan-flow-step>
+    <plan-flow-step
+      label="Events stream back"
+      desc="Chat product posts the agent output into the thread"
+    ></plan-flow-step>
+  </plan-flow>
+  <p>
+    Slice rules are a product decision the host owns: which messages count, how
+    far back, whether system notes are included, how attachments become runtime
+    inputs. Runtime should get a clean slice, not a dump of the whole thread
+    database.
+  </p>
+  <p>
+    Use <code>clientRunId</code> so a flaky reconnect does not start the same run
+    twice. Pass <code>actor</code> when the person who mentioned the agent matters
+    for audit or permissions.
+  </p>
+</div>

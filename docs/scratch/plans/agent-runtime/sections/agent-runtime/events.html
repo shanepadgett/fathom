@@ -1,0 +1,23 @@
+<div class="measure plan-prose">
+  <h2>Events</h2>
+  <p>
+    The loop emits internal events for messages, turns, and tool work. Plugins do
+    not attach directly to that path. A slow or broken plugin must not stall the
+    whole run.
+  </p>
+  <p>
+    One internal runtime listener updates the state we need, writes anything that
+    must be saved before the loop continues, then publishes a clean event on our
+    own bus. On that bus we define who may block the loop, who is only watching,
+    order, timeouts, cancel, errors, and how the UI keeps up.
+  </p>
+  <p>
+    Saving to the database and tool permission checks may block. Metrics, most UI
+    updates, and optional extension listeners should not hold up the agent.
+  </p>
+  <p>
+    Hosts consume <code>RuntimeEvent</code>, not internal loop events. Desktop and
+    web share one contract, and we can change loop internals without rewriting
+    every client.
+  </p>
+</div>

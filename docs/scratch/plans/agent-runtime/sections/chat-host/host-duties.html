@@ -1,0 +1,26 @@
+<div class="measure plan-prose">
+  <h2>Host duties</h2>
+  <p>
+    Chat Host connects multiplayer product code to Agent Runtime. Keep it small.
+    If it grows a second session system, something went wrong.
+  </p>
+  <plan-steps>
+    <plan-step label="Map thread id to agent session id" desc="Create on first @agent, or by policy"></plan-step>
+    <plan-step label="Build the thread slice for this mention"></plan-step>
+    <plan-step label="Enforce one run at a time" desc="Queue or reject when busy"></plan-step>
+    <plan-step label="Call runtime.run with thread_slice input"></plan-step>
+    <plan-step label="Stream RuntimeEvent back into the thread UI"></plan-step>
+    <plan-step label="Handle retries and idempotency on reconnect"></plan-step>
+    <plan-step label="Apply deploy-time tool policy and modules"></plan-step>
+  </plan-steps>
+  <p>
+    Chat Host owns initiative membership, thread permissions, @mention parsing,
+    notifications, and typing indicators. Runtime owns session memory, tools, and
+    the model loop. Human conversation stays in chat storage. Agent working memory
+    stays in runtime SQLite.
+  </p>
+  <p>
+    The long human thread is never what we send the model unless it first goes
+    through an agent session as a deliberate slice.
+  </p>
+</div>

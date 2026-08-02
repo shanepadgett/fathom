@@ -1,0 +1,31 @@
+<div class="measure plan-prose">
+  <h2>Thread and session</h2>
+  <p>
+    Keep two histories separate. The human thread is owned by the chat product:
+    many people, long-lived, full history for humans. The agent session is owned
+    by the runtime: one saved working memory per thread (or per mapped id), with
+    tools and history trimming. Do not merge those into one list.
+  </p>
+  <plan-map>
+    <plan-map-row
+      from="Web thread id"
+      to="Agent session id"
+      note="Created on first @agent, or by policy"
+    ></plan-map-row>
+  </plan-map>
+  <p>
+    Later @mentions in the same thread reuse the same agent session, so the agent
+    keeps memory and can trim old history. The human thread can grow forever. The
+    model only sees the trimmed agent memory plus the latest slice.
+  </p>
+  <p>
+    People may keep typing while the agent runs. Those new messages are not part
+    of the current run unless we add that later. Only one run per session at a
+    time. If the session is busy, web should queue or reject. Steering mid-run
+    can wait.
+  </p>
+  <p>
+    Later we may add an id that links one web agent reply back to the exact
+    session rows it used, mainly so we can answer “what did the agent see?”
+  </p>
+</div>

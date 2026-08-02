@@ -1,0 +1,29 @@
+<div class="measure plan-prose">
+  <h2>Agent Runtime — what it is</h2>
+  <p>
+    Shared engine both hosts call. Runs sessions through our model/tool loop,
+    tools, hooks, prompt building, history trim, events, and SQLite. One active
+    run per session. Hosts talk to it with commands and get back an event stream.
+  </p>
+  <p>
+    First type can be named for the job, e.g. <code>AgentSession</code> or
+    <code>WorkspaceRuntime</code>. Sketch of the pieces, not a final API:
+  </p>
+  <plan-code lang="ts">
+interface AgentSessionDependencies {
+  repository: SessionRepository;
+  contextManager: ContextManager;
+  compactionStrategy: CompactionStrategy;
+  toolRegistry: ToolRegistry;
+  permissionService: PermissionService;
+  modelService: ModelService;
+  eventPublisher: RuntimeEventPublisher;
+  extensionHost: ExtensionHost;
+  loop: ExecutionLoop;
+}
+
+class AgentSession {
+  // load, prompt, steer, abort, switch model, compact, branch, close
+}
+  </plan-code>
+</div>

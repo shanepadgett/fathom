@@ -1,0 +1,13 @@
+{
+  "id": "fathom-harness",
+  "title": "Fathom harness",
+  "summary": "Pi AI for providers and auth. Fathom owns the agent loop, runtime, and desktop host.",
+  "sections": [
+    { "id": "frame/overview", "title": "Overview", "group": "Frame" },
+    { "id": "ai-core/overview", "title": "Overview", "group": "AI Core" },
+    { "id": "ai-core/runtime", "title": "Runtime", "group": "AI Core" },
+    { "id": "ai-core/auth", "title": "Auth", "group": "AI Core" },
+    { "id": "agent-runtime/overview", "title": "Overview", "group": "Agent Runtime" },
+    { "id": "desktop-host/overview", "title": "Overview", "group": "Desktop Host" }
+  ]
+}

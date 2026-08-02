@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Docs</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+/* __DOCS_THEME__ */
+  </script>
+  <script src="https://unpkg.com/lucide@0.511.0"></script>
+  <style type="text/tailwindcss">
+/* __DOCS_STYLES__ */
+  </style>
+</head>
+<body class="flex h-full flex-col overflow-hidden bg-canvas">
+  <header class="shrink-0 border-b border-line bg-panel px-4 py-3">
+    <h1 class="text-base font-semibold tracking-tight text-ink">Docs</h1>
+    <p id="status" class="mt-1 hidden text-sm text-mute"></p>
+  </header>
+
+  <main class="min-h-0 flex-1">
+    <div id="root" class="explorer h-full"></div>
+  </main>
+
+  <script>
+    (() => {
+      const root = document.getElementById("root");
+      const status = document.getElementById("status");
+
+      const escapeHtml = (value) =>
+        String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+
+      const showError = (msg) => {
+        status.textContent = msg;
+        status.classList.remove("hidden");
+      };
+
+      const hrefFor = (doc) => `./view.html?doc=${encodeURIComponent(doc)}`;
+
+      /** plan / html → site; markdown → md */
+      const markFor = (item) => {
+        if (item.kind === "plan") return "site";
+        const doc = item.doc || "";
+        if (doc.endsWith(".md")) return "md";
+        if (doc.endsWith(".html") || doc.endsWith(".htm")) return "site";
+        return item.kind === "page" ? "md" : "site";
+      };
+
+      /** @param {{ kind: string, doc: string, title: string, summary?: string, id?: string }} item */
+      const itemRow = (item) => {
+        const a = document.createElement("a");
+        a.href = hrefFor(item.doc);
+        a.className = "explorer-item";
+        const title = item.title || item.id || item.doc;
+        const mark = markFor(item);
+        const markHtml =
+          mark === "md"
+            ? `<span class="explorer-mark" title="Markdown" aria-label="Markdown">` +
+              `<span class="explorer-mark-md" aria-hidden="true">md</span>` +
+              `</span>`
+            : `<span class="explorer-mark" title="Site" aria-label="Site">` +
+              `<i data-lucide="globe" class="explorer-mark-icon"></i>` +
+              `</span>`;
+        a.innerHTML =
+          `<div class="explorer-item-main">` +
+          `<div class="explorer-item-title">${escapeHtml(title)}</div>` +
+          (item.summary
+            ? `<p class="explorer-item-summary">${escapeHtml(item.summary)}</p>`
+            : "") +
+          `</div>` +
+          markHtml;
+        return a;
+      };
+
+      /**
+       * Normalize every plan/page into a path under docs/.
+       * @returns {{ doc: string, title: string, summary: string, kind: string, id?: string }[]}
+       */
+      const flatten = (data) => {
+        const out = [];
+        for (const p of data.plans || []) {
+          out.push({
+            kind: "plan",
+            doc: p.doc,
+            title: p.title || p.id,
+            summary: p.summary || "",
+            id: p.id,
+          });
+        }
+        for (const p of data.pages || []) {
+          out.push({
+            kind: "page",
+            doc: p.doc,
+            title: p.title,
+            summary: p.summary || "",
+          });
+        }
+        return out;
+      };
+
+      /**
+       * Columns = first path segment. If only one top folder, promote its
+       * children so scratch/{plans,research} become the columns.
+       */
+      const columnRoots = (items) => {
+        const tops = new Set();
+        for (const it of items) {
+          const top = it.doc.split("/")[0];
+          if (top) tops.add(top);
+        }
+        const topList = [...tops].sort();
+        if (topList.length !== 1) {
+          return { prefix: "", columns: topList };
+        }
+        const only = topList[0];
+        const seconds = new Set();
+        let hasRootFiles = false;
+        for (const it of items) {
+          const parts = it.doc.split("/");
+          if (parts[0] !== only) continue;
+          if (parts.length === 1) {
+            hasRootFiles = true;
+            continue;
+          }
+          // plan folder or file under only/X/...
+          if (parts.length >= 2) seconds.add(parts[1]);
+        }
+        if (hasRootFiles || seconds.size === 0) {
+          return { prefix: "", columns: topList };
+        }
+        return { prefix: only + "/", columns: [...seconds].sort() };
+      };
+
+      /**
+       * Place item into column → section key ("" = column root).
+       * Plans are leaf folders (not sections). Pages nest by remaining dirs.
+       */
+      const place = (item, prefix, column) => {
+        const fullPrefix = prefix + column;
+        if (item.doc !== fullPrefix && !item.doc.startsWith(fullPrefix + "/")) {
+          return null;
+        }
+        const rel =
+          item.doc === fullPrefix ? "" : item.doc.slice(fullPrefix.length + 1);
+        const parts = rel.split("/").filter(Boolean);
+
+        if (item.kind === "plan") {
+          // scratch/plans/agent-runtime → leaf at column root
+          return { section: "", item };
+        }
+
+        // page: foo.md → root; api-catalogs/foo.md → section api-catalogs
+        // multi-level: a/b/c.md → section a/b
+        if (parts.length <= 1) return { section: "", item };
+        const file = parts[parts.length - 1];
+        if (!file.includes(".")) {
+          // shouldn't happen for pages
+          return { section: parts.join("/"), item };
+        }
+        const section = parts.slice(0, -1).join("/");
+        return { section, item };
+      };
+
+      const build = (data) => {
+        const items = flatten(data);
+        if (!items.length) {
+          showError("No docs found under docs/.");
+          return;
+        }
+
+        const { prefix, columns } = columnRoots(items);
+        const colData = new Map();
+        for (const col of columns) {
+          colData.set(col, new Map()); // section -> items[]
+        }
+
+        for (const it of items) {
+          let placed = false;
+          for (const col of columns) {
+            const hit = place(it, prefix, col);
+            if (!hit) continue;
+            const sections = colData.get(col);
+            if (!sections.has(hit.section)) sections.set(hit.section, []);
+            sections.get(hit.section).push(hit.item);
+            placed = true;
+            break;
+          }
+          if (!placed) {
+            // fallback bucket
+            const col = columns[0] || "docs";
+            if (!colData.has(col)) colData.set(col, new Map());
+            const sections = colData.get(col);
+            if (!sections.has("")) sections.set("", []);
+            sections.get("").push(it);
+          }
+        }
+
+        root.replaceChildren();
+        root.style.setProperty("--explorer-cols", String(Math.max(columns.length, 1)));
+
+        for (const col of columns) {
+          const panel = document.createElement("section");
+          panel.className = "explorer-col";
+
+          const head = document.createElement("header");
+          head.className = "explorer-col-head";
+          head.textContent = col;
+          panel.appendChild(head);
+
+          const body = document.createElement("div");
+          body.className = "explorer-col-body";
+
+          const sections = colData.get(col) || new Map();
+          const sectionKeys = [...sections.keys()].sort((a, b) => {
+            if (a === "") return -1;
+            if (b === "") return 1;
+            return a.localeCompare(b);
+          });
+
+          for (const key of sectionKeys) {
+            const list = sections.get(key) || [];
+            list.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+
+            if (key) {
+              const label = document.createElement("h3");
+              label.className = "explorer-section";
+              label.textContent = key;
+              body.appendChild(label);
+            }
+
+            const stack = document.createElement("div");
+            stack.className = "explorer-list";
+            for (const it of list) stack.appendChild(itemRow(it));
+            body.appendChild(stack);
+          }
+
+          panel.appendChild(body);
+          root.appendChild(panel);
+        }
+
+        if (window.lucide) lucide.createIcons({ attrs: { strokeWidth: 1.75 } });
+      };
+
+      const load = () =>
+        fetch("/manifest.json")
+          .then((r) => {
+            if (!r.ok) throw new Error("manifest.json missing — run mise docs");
+            return r.json();
+          })
+          .then(build)
+          .catch((err) => showError(String(err.message || err)));
+
+      load();
+
+      // Soft-refresh list on content changes; full reload only for app chrome.
+      try {
+        const es = new EventSource("/_events");
+        let reloadTimer;
+        let rebuildTimer;
+        es.onmessage = (ev) => {
+          let path = "";
+          try {
+            path = JSON.parse(ev.data).path || "";
+          } catch {
+            return;
+          }
+          if (!path) return;
+          if (path.startsWith("_app/")) {
+            clearTimeout(reloadTimer);
+            reloadTimer = setTimeout(() => location.reload(), 150);
+            return;
+          }
+          clearTimeout(rebuildTimer);
+          rebuildTimer = setTimeout(() => load(), 150);
+        };
+        es.onerror = () => {
+          // browser will reconnect; do not reload the page
+        };
+      } catch (_) {
+        /* optional */
+      }
+    })();
+  </script>
+</body>
+</html>
