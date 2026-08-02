@@ -1,0 +1,17 @@
+{
+  "imports": {
+    "@earendil-works/pi-ai": "npm:@earendil-works/pi-ai@0.83.0",
+    "@earendil-works/pi-ai/providers/openai-codex": "npm:@earendil-works/pi-ai@0.83.0/providers/openai-codex",
+    "effect": "npm:effect@3.22.1"
+  },
+  "nodeModulesDir": "none",
+  "tasks": {
+    "check": "deno fmt --check && deno lint && deno check plain/main.ts effect/main.ts verify.ts",
+    "plain": "deno run -A plain/main.ts",
+    "effect": "deno run -A effect/main.ts",
+    "verify": "deno run -A verify.ts"
+  },
+  "fmt": {
+    "lineWidth": 100
+  }
+}
