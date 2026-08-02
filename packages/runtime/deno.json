@@ -1,0 +1,6 @@
+{
+  "name": "@fathom/runtime",
+  "version": "0.0.0",
+  "exports": "./mod.ts",
+  "license": "MIT"
+}

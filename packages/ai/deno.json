@@ -1,0 +1,9 @@
+{
+  "name": "@fathom/ai",
+  "version": "0.0.0",
+  "exports": "./mod.ts",
+  "license": "MIT",
+  "imports": {
+    "@earendil-works/pi-ai": "npm:@earendil-works/pi-ai@0.83.0"
+  }
+}
