@@ -1,7 +1,0 @@
-{
-  "id": "fathom.workspace-kit",
-  "name": "Workspace kit",
-  "description": "Adds workspace statistics, custom tool blocks, and a replacement composer.",
-  "backend": "backend.ts",
-  "renderer": "renderer.js"
-}
