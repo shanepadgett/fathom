@@ -1,0 +1,23 @@
+{
+  "plugins": [
+    "desktop-window",
+    "session-memory",
+    "workspace-local",
+    "tool-registry",
+    "tool-read",
+    "tool-write",
+    "tool-edit",
+    "tool-bash",
+    "model-pi",
+    "context-default",
+    "runtime-agent",
+    "./clock-plugin.js"
+  ],
+  "uiPlugins": [
+    "/ui/plugins/viewport-scale.js",
+    "/ui/plugins/conversation.js",
+    "/ui/plugins/composition.js",
+    "/ui/plugins/shell.js",
+    "./ui/session-inspector.js"
+  ]
+}
