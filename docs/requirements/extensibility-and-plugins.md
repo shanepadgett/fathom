@@ -2,17 +2,20 @@
 
 ## 1. Kernel Architecture (Cordis IoC)
 
-Fathom is built 100% on a plugin-composed microkernel powered by Cordis. There
-is no hardcoded agent loop or monolithic runtime baked into the core host.
+Fathom composes its services and behavior through plugins powered by Cordis.
+The host supplies shared infrastructure, including Cordis and `pi-ai`. There
+is no hardcoded agent loop baked into the core host.
 
 ### Core Invariants
 
 - **Inversion of Control**: Every major subsystem is exposed as a typed service
   key in Cordis (`context`, `model`, `sessions`, `runtime`, `tools`,
   `workspace`).
-- **Complete Replaceability**: Any service—including the entire agent loop
-  (`RuntimeService`)—can be swapped out via configuration compositions without
-  modifying or rebuilding the host executable.
+- **Service Replaceability**: Service implementations—including the entire
+  agent loop (`RuntimeService`)—can be swapped through configuration compositions
+  without modifying or rebuilding the host executable. Replacements follow the
+  shared SDK contracts; this does not require replacing foundational libraries
+  such as `pi-ai`.
 - **Explicit Lifecycle**: Plugins declare dependencies (`requires`) and
   exclusive capabilities (`provides`). Setup and teardown are managed through
   scoped disposers (`ctx.effect()`), unwinding cleanly in reverse order on
@@ -203,6 +206,13 @@ To enable rapid developer iteration when authoring or modifying plugins:
 
 The agent is equipped to understand, build, and repair its own plugin ecosystem:
 
+- **Published SDK**: A versioned SDK on JSR exposes plugin manifests, service
+  contracts, hooks, and separate backend and browser-safe frontend entry points.
+  Authors use it for editor autocomplete and type checking in their own
+  repositories. The running host supplies service instances through activation;
+  importing SDK types does not start another host.
+- **Shared Contracts**: First-party and third-party plugins use the same SDK
+  contracts. Default service implementations do not belong in the SDK.
 - **Embedded Contracts & Schemas**: Standard plugin interfaces, manifest
   templates, and Cordis integration contracts are embedded in the server as
   native developer documentation.
@@ -214,6 +224,12 @@ The agent is equipped to understand, build, and repair its own plugin ecosystem:
 ---
 
 ## 8. Experience Packages & Native `deno.json` Manifests
+
+The Fathom download includes the host, default composition, and all default
+plugin code and assets. First launch does not download default plugins from
+JSR. Bundled plugins remain disableable and replaceable through compositions;
+being a plugin does not require a separate published package. JSR provides the
+SDK and optional plugins or experiences that users choose to install.
 
 To distribute complete, cohesive experiences (e.g. data science workflows,
 spatial canvas shells, or domain-specific coding harnesses), repositories define

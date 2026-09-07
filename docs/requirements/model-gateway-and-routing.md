@@ -5,6 +5,21 @@
 - **Unified Provider Abstraction**: All connections to upstream LLM providers
   (Anthropic, OpenAI, Google Gemini, xAI Grok, local models) are managed via the
   `pi-ai` package.
+- **Core Dependency**: `pi-ai` is part of the server foundation, not a removable
+  plugin. Fathom uses its model and streaming contracts rather than maintaining
+  a second provider abstraction.
+- **Plugin Contributions**: Plugins register providers and models through the
+  Fathom SDK's injected context, using `pi-ai` provider contracts. The server
+  owns the provider collection; Cordis cleanup removes a plugin's registrations
+  when it is unloaded.
+- **Custom Gateways**: Provider plugins can supply custom endpoints,
+  authentication, and static or dynamically fetched model catalogs. Compatible
+  gateways reuse `pi-ai`'s existing API implementations.
+- **Routing Policy**: Plugins can select models in the backend without a model
+  selector in the UI. Connections and routing policy are replaceable; the
+  underlying `pi-ai` foundation is not.
+- **No Configured Providers**: The server can start without providers, but model
+  requests are unavailable until a provider is configured.
 - **Credential Separation**: Credentials stay securely in the backend store
   (e.g. `~/.pi/agent/auth.json` or system keychain) and never cross to the
   frontend.
@@ -26,7 +41,9 @@
 - **Pure Plugin Construction**: Modes are not baked into the core runtime. They
   exist as an optional plugin (`plugin-modes`).
 - **Clean Disablement**: If the plugin is disabled or omitted, Fathom functions
-  as a straightforward, single-model coding harness with manual model selection.
+  as a straightforward, single-model coding harness by default. Other routing
+  plugins can supply backend model selection without the modes plugin or a UI
+  selector.
 - **Provider-Aware Auto-Assignment**:
   - When enabled, the modes plugin discovers the user's currently authenticated
     providers in `~/.pi/agent/auth.json`.

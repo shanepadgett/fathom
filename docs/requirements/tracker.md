@@ -55,7 +55,9 @@ during the conversational design process.
 ## 3. Model Gateway & Routing
 
 - [x] **Provider Integration**: Standardized on `pi-ai` for all upstream
-      providers (`docs/requirements/model-gateway-and-routing.md`).
+      providers as a core server dependency; SDK plugins contribute gateways,
+      model catalogs, and backend routing policy
+      (`docs/requirements/model-gateway-and-routing.md`).
 - [x] **Modes & Personas (Plugin Architecture)**: Pluggable `plugin-modes` with
       provider-aware auto-assignment; detailed persona workflow planning
       deferred post-scaffold (`docs/requirements/model-gateway-and-routing.md`).
@@ -96,8 +98,13 @@ during the conversational design process.
 
 ## 5. Extensibility & Compositions
 
-- [x] **100% Plugin-Based Construction**: Kernel plugin lifecycle (Cordis),
-      service injection (`docs/requirements/extensibility-and-plugins.md`).
+- [x] **Plugin-Composed Services**: Cordis lifecycle and service injection over
+      shared core infrastructure (`docs/requirements/extensibility-and-plugins.md`).
+- [x] **SDK & Bundled Defaults**: Published SDK contracts for plugin authors;
+      default plugins ship with the host without first-launch JSR downloads
+      (`docs/requirements/extensibility-and-plugins.md`).
+- [ ] **SDK Release & Compatibility Rules**: Define public exports, host/API
+      version compatibility, and published experience loading before SDK release.
 - [x] **Run Lifecycle Hooks & Interceptors**: Interceptor pipeline with bail
       semantics for guardrails
       (`docs/requirements/extensibility-and-plugins.md`).
