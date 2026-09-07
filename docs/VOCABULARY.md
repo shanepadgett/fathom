@@ -169,6 +169,11 @@ providing bounded head/tail slices to the model context.
 Long-lived pseudo-terminal process spawned via `bash(background: true)` and
 managed through the `pty` tool.
 
+### ExpertConsultation
+
+Autonomous model escalation invoking `consult_expert` to spawn or continue a
+persistent child session with an expert reasoning model for complex dilemmas.
+
 ### ToolCatalog
 
 Registry holding active baseline tools and deferred tool definitions.

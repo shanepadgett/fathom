@@ -6,18 +6,20 @@
 
 - The agent server is a headless, decoupled service containing the runtime,
   Cordis plugins, tool execution harness, and SQLite persistence.
-- Client applications (Desktop WebView, Web browser, Mobile companion) are
-  presentation and interaction layers that communicate with the server over
-  network protocols.
+- Client applications (Desktop WebView, CLI Terminal Client, Web browser, Mobile
+  companion) are presentation and interaction layers that communicate with the
+  server over network protocols.
 
 ### Process Modes
 
-1. **Managed Child Process (Desktop Default)**:
-   - When the Fathom desktop app launches, it probes for an existing daemon
-     (`localhost:4040` or `~/.fathom/fathom.sock`).
-   - If active, it attaches immediately; if not, the desktop app spawns the
-     local agent server as a background child process and manages its lifecycle.
-   - Tied to desktop app lifecycle with clean SIGTERM shutdown.
+1. **Managed Child Process (Desktop & CLI Default)**:
+   - When either the Fathom Desktop app or the CLI client (`fathom`) launches,
+     it probes for an existing daemon (`localhost:4040` or
+     `~/.fathom/fathom.sock`).
+   - If active, it attaches immediately; if not, it spawns the local agent
+     server as a background child process/daemon and manages its lifecycle.
+   - Tied to client lifecycle with clean SIGTERM shutdown (or continues running
+     if launched as an independent daemon).
 2. **Standalone Daemon (`fathom server`)**:
    - Can be run headlessly from the CLI on local or remote developer
      machines/VMs.
@@ -29,14 +31,14 @@
 
 ### Invariants
 
-- Communication between clients (Desktop UI, Web UI) and the Agent Server uses a
-  full-duplex **WebSocket** connection.
+- Communication between clients (Desktop UI, CLI Client, Web UI) and the Agent
+  Server uses a full-duplex **WebSocket** connection.
 - Upstream AI provider protocols (HTTPS/SSE) are completely decoupled from
   client transport. Clients never handle provider API keys or direct provider
   streaming.
 - Remote mobile companion and external tunneling are deferred to a post-v1
-  roadmap milestone. Initial focus is strictly local Desktop and Web over local
-  WebSocket.
+  roadmap milestone. Initial focus is strictly local Desktop, CLI, and Web over
+  local WebSocket.
 
 ### Protocol Features
 
@@ -167,9 +169,10 @@ entities:
 - **Aggregated Cost & Observability**: Parent sessions aggregate token usage and
   dollar cost from all descendant child sessions into their primary telemetry
   meter.
-- **Specialized Roles (e.g. `web_research`)**: Specialized capabilities (such as
-  web research in `plugin-web`) execute inside an isolated child session
-  container, preventing exploratory browsing noise from cluttering the primary
+- **Specialized Roles (e.g. `web_research`, `consult_expert`)**: Specialized
+  capabilities—such as web research in `plugin-web` or multi-turn expert model
+  consultations—execute inside isolated child session containers, preventing
+  exploratory browsing or heavy reasoning noise from cluttering the primary
   session's transcript, and returning only distilled findings to the parent.
 
 ### Git Worktree Isolation & Parallel Workspaces

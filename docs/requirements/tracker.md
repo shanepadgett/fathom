@@ -14,7 +14,10 @@ during the conversational design process.
   Invariants, Time Travel & Snapshots, Custom Entries, Active Hooks, Adaptive
   Concurrency, Output Bounds, Active Tools, Cordis Idle Primitives, Workspace
   Trust).
-- **Next Phase**: Architectural scaffolding & prototype graduation.
+- **Current Phase**: Technical planning: technologies and versions, architecture
+  and repository layout, then an ordered build plan. Track progress in
+  `docs/technical/tracker.md`. SDK release and compatibility rules remain open
+  and carry into that phase.
 
 ---
 
@@ -22,8 +25,9 @@ during the conversational design process.
 
 - [x] **Agent Server Topology**: Daemon vs. child process
       (`docs/requirements/architecture-and-persistence.md`).
-- [x] **Multi-Client Support**: Desktop app (primary), Web browser UI; remote
-      mobile deferred (`docs/requirements/architecture-and-persistence.md`).
+- [x] **Multi-Client Support**: Desktop app, CLI client (`fathom`), Web browser
+      UI; remote mobile deferred
+      (`docs/requirements/architecture-and-persistence.md`).
 - [x] **Session Persistence**: SQLite schema, periodic checkpointing, crash
       recovery (`docs/requirements/architecture-and-persistence.md`).
 - [x] **Session Tree & Branching**: Strict tree history with parent pointers,
@@ -51,6 +55,11 @@ during the conversational design process.
       Deterministic Safe Allow with pipe/compound matching, and Intent-Aware LLM
       Verification Gate auto-approving or escalating with plain-English
       explanation) (`docs/requirements/tools-and-execution.md`).
+- [x] **Expert Model Consultation (`consult_expert`)**: Autonomous model
+      escalation for complex dilemmas via persistent child sessions with
+      multi-turn continuity (`consultation_id`)
+      (`docs/requirements/tools-and-execution.md`,
+      `docs/requirements/model-gateway-and-routing.md`).
 
 ## 3. Model Gateway & Routing
 
@@ -73,6 +82,9 @@ during the conversational design process.
 - [x] **One-Off Model Invocations & TypeBox Schema Engine**: Unified
       `ModelService.complete()` for plugins/guardrails with TypeBox native JSON
       Schema validation, forced tools, and cost attribution
+      (`docs/requirements/model-gateway-and-routing.md`).
+- [x] **Expert Model Escalation & Child Routing**: Provider-locked branch
+      protection with isolated child session routing and telemetry rollup
       (`docs/requirements/model-gateway-and-routing.md`).
 
 ## 4. Context & Customization
@@ -99,12 +111,14 @@ during the conversational design process.
 ## 5. Extensibility & Compositions
 
 - [x] **Plugin-Composed Services**: Cordis lifecycle and service injection over
-      shared core infrastructure (`docs/requirements/extensibility-and-plugins.md`).
+      shared core infrastructure
+      (`docs/requirements/extensibility-and-plugins.md`).
 - [x] **SDK & Bundled Defaults**: Published SDK contracts for plugin authors;
       default plugins ship with the host without first-launch JSR downloads
       (`docs/requirements/extensibility-and-plugins.md`).
 - [ ] **SDK Release & Compatibility Rules**: Define public exports, host/API
-      version compatibility, and published experience loading before SDK release.
+      version compatibility, and published experience loading before SDK
+      release.
 - [x] **Run Lifecycle Hooks & Interceptors**: Interceptor pipeline with bail
       semantics for guardrails
       (`docs/requirements/extensibility-and-plugins.md`).
@@ -159,6 +173,9 @@ during the conversational design process.
       switcher, `/commit` slash command, and interactive visual studio to
       reorder, adjust, and approve AI semantic commit clusters
       (`docs/requirements/frontend-and-ux.md`).
+- [x] **CLI Terminal Client**: First-class terminal UI (`fathom`), streaming
+      markdown, collapsible thinking, inline diffs, TUI commit studio, and
+      seamless reconnect (`docs/requirements/frontend-and-ux.md`).
 
 ## 7. Runtime Concepts to Lift (from pi)
 

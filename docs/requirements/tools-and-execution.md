@@ -114,7 +114,10 @@ or fragile string matching.
    space (`~/.fathom/scratch/<session-id>/<script-name>.<ext>`) and associated
    with the active session branch.
 2. **Execution**: The tool executes the script using the chosen runtime
-   interpreter with standard timeouts and signal handling.
+   interpreter in a separate process with standard timeouts and signal handling.
+   After passing the approval pipeline, ordinary scripts run with the operating
+   system access of the user running the server. Fathom adds no file or network
+   sandbox. Process separation and approval are not security sandboxes.
 3. **Structured Output**: Returns exit code, execution duration, formatted
    stdout, and stderr.
 4. **Iterative Patching**: If the script errors or outputs incorrect data, the
@@ -147,7 +150,43 @@ or fragile string matching.
 
 ---
 
-## 6. Command & Script Approval Pipeline
+## 6. Expert Model Consultation (`consult_expert`)
+
+- **Purpose**: Enables the active model to autonomously escalate complex,
+  high-uncertainty questions—such as critical system design trade-offs, database
+  schema dilemmas, security audits, or performance bottlenecks—to a more
+  intelligent reasoning model without requiring the developer to manually switch
+  models or fork the main conversation.
+- **Child-Session Architecture**:
+  - Rather than an ephemeral one-off prompt, `consult_expert` is backed by a
+    persistent **Child Session** (`parent_session_id` in SQLite) configured with
+    the project's or user's designated expert reasoning model (e.g. `o3-mini`,
+    `claude-3-7-sonnet` with thinking).
+  - On the first invocation, the runtime forks or seeds a child session with the
+    relevant conversation context up to that turn.
+  - The tool completes and returns
+    `{ answer: string, consultation_id: string }`.
+- **Multi-Turn Expert Follow-Ups**:
+  - If the primary agent has follow-up questions, edge-case clarifications, or
+    iterative verification steps, it passes `consultation_id` in subsequent
+    calls.
+  - The follow-up appends directly to the existing child session, preserving the
+    expert's full conversational train of thought and previous reasoning.
+- **Provider & Context Isolation**:
+  - The primary conversation branch remains strictly locked to its own model
+    provider family. Foreign thinking signatures, cache prefixes, and prompt
+    tokens never enter the parent session's transcript.
+  - The parent transcript records only the concise tool call and the expert's
+    distilled Markdown answer.
+- **Full Observability & Cost Rollup**:
+  - Developers can inspect the expert's complete multi-turn reasoning thread via
+    a linked action in the tool component (`[Inspect Expert Thread]`).
+  - Child session token usage and dollar spend roll up directly into the parent
+    session's cumulative telemetry meter.
+
+---
+
+## 7. Command & Script Approval Pipeline
 
 To eliminate approval fatigue while maintaining rigorous safety, command and
 script execution requests pass through a structured 3-stage pipeline:
@@ -200,9 +239,9 @@ executions, are routed to the LLM Verification Gate:
 
 ---
 
-## 7. Deferred Tool Loading, Tool Search & Scripted MCP
+## 8. Deferred Tool Loading, Tool Search & Scripted MCP
 
-### 7.1 Baseline vs. Deferred Tool Taxonomy
+### 8.1 Baseline vs. Deferred Tool Taxonomy
 
 To eliminate prompt context bloat and preserve model tool-selection accuracy
 across growing tool catalogs:
@@ -217,7 +256,7 @@ across growing tool catalogs:
     support).
   - **Skills Workflows**: Custom workflows and task-specific skills.
 
-### 7.2 100% Harness-Level Tool Catalog & Search (`search_tools`)
+### 8.2 100% Harness-Level Tool Catalog & Search (`search_tools`)
 
 - **Universal Provider Independence**:
   - Rather than transmitting hundreds of serialized tool definitions over the
@@ -237,7 +276,7 @@ across growing tool catalogs:
     Fathom retrieves the matching tool definitions and dynamically injects their
     full schemas into the active run's toolset for subsequent steps.
 
-### 7.3 Dual-Paradigm MCP Support (Direct Tools & Scripted "Code Mode")
+### 8.3 Dual-Paradigm MCP Support (Direct Tools & Scripted "Code Mode")
 
 Fathom supports two complementary paradigms for interacting with Model Context
 Protocol (MCP) servers:
@@ -259,12 +298,12 @@ Protocol (MCP) servers:
 
 ---
 
-## 8. Tool Checkpoints & Concurrency Pipeline
+## 9. Tool Checkpoints & Concurrency Pipeline
 
 When a model response emits multiple tool calls in a single step (e.g. parallel
 reads, edits, and terminal executions):
 
-### 8.1 Tool Checkpoints (Atomic Settlement)
+### 9.1 Tool Checkpoints (Atomic Settlement)
 
 - **Per-Tool Atomic Commits**: Each individual `ToolRun` writes its completed
   `ToolResult` directly to SQLite the exact millisecond it finishes.
@@ -278,7 +317,7 @@ reads, edits, and terminal executions):
   - The transcript remains 100% structurally intact, allowing the user to
     seamlessly hit `[Continue]`.
 
-### 8.2 Adaptive Execution Concurrency
+### 9.2 Adaptive Execution Concurrency
 
 - **Execution Setting**: Configurable via session/app settings
   (`toolExecution`): `"sequential" | "parallel" | "adaptive"`.
@@ -293,12 +332,12 @@ reads, edits, and terminal executions):
 
 ---
 
-## 9. Tool Output Bounds & Disk Spooling
+## 10. Tool Output Bounds & Disk Spooling
 
 To prevent process out-of-memory (OOM) crashes, client UI frame drops, and
 prompt context flooding when commands emit massive outputs:
 
-### 9.1 In-Memory Threshold & Scratch Spooling
+### 10.1 In-Memory Threshold & Scratch Spooling
 
 - **Threshold Limit**: Process stdout/stderr output streams into a rolling
   memory buffer up to a strict cap of **100 KB** (~2,000 lines).
@@ -309,7 +348,7 @@ prompt context flooding when commands emit massive outputs:
 - **Flat Memory Footprint**: Ensures server RAM usage remains flat and
   predictable regardless of command output volume.
 
-### 9.2 Head + Tail Slicing for Model Context
+### 10.2 Head + Tail Slicing for Model Context
 
 The model and transcript receive a bounded, actionable representation:
 
@@ -319,7 +358,7 @@ The model and transcript receive a bounded, actionable representation:
 - **Tail**: The last 50 lines of output (preserving terminal exit statuses,
   compiler error summaries, and test failure digests).
 
-### 9.3 Full Log Inspection in UI
+### 10.3 Full Log Inspection in UI
 
 - The tool card in the transcript feed renders the head/tail preview along with
   an explicit **`[Open Full Log]`** action button.
@@ -328,12 +367,12 @@ The model and transcript receive a bounded, actionable representation:
 
 ---
 
-## 10. Active Tools (Per-Session Allowlist & Mode Scoping)
+## 11. Active Tools (Per-Session Allowlist & Mode Scoping)
 
 Rather than relying on model prompt compliance to prevent tool invocation,
 Fathom provides deterministic, session-scoped tool filtering.
 
-### 10.1 Session-Level Allowlist & Constraints
+### 11.1 Session-Level Allowlist & Constraints
 
 - **Dynamic Per-Session Configuration**: Users can constrain available tools at
   runtime:
@@ -344,7 +383,7 @@ Fathom provides deterministic, session-scoped tool filtering.
 - **Hard Schema Omission**: Disallowed tools are physically stripped from the
   model request payload, guaranteeing the LLM cannot invoke them.
 
-### 10.2 Integration with Modes & Personas (`plugin-modes`)
+### 11.2 Integration with Modes & Personas (`plugin-modes`)
 
 - Session modes apply predefined tool profiles:
   - **Planning Mode**: Disables mutating tools (`write`, `edit`, `bash`,
@@ -354,7 +393,7 @@ Fathom provides deterministic, session-scoped tool filtering.
   - **Architect Mode**: Restricts file modifications to markdown/plans while
     disallowing source code edits.
 
-### 10.3 Catalog Filtering in `search_tools`
+### 11.3 Catalog Filtering in `search_tools`
 
 - When the agent invokes `search_tools(query)` to discover deferred tools, the
   local BM25/FTS5 search engine filters candidate tools against the active

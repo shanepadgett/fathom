@@ -108,14 +108,23 @@ Language Server Protocol (LSP) intelligence is managed by a backend Cordis
 
 ### Pluggable Transcript Entry Renderers (`registerEntryRenderer`)
 
-- **Scoped Entry Presentation**: Plugins contribute specialized card renderers
-  matching specific transcript entries: message types, tool calls, thinking
-  blocks, or custom session entries (e.g. interactive diff inspectors, rich
-  image previews, test runners).
-- **Strict DOM Safety**: All renderers use typed DOM structures with textContent
-  or sanitized canvas/SVG elements, forbidding unescaped HTML interpolation.
+- **Scoped Entry Presentation**: Plugins contribute presentation components
+  matching specific transcript entries: message types, unified tool executions,
+  thinking blocks, or custom session entries (e.g. interactive diff inspectors,
+  rich image previews, test runners).
+- **Unified Tool Execution Component**: Rather than splitting tool handling into
+  disconnected renderers for calls versus results (as in append-only loggers),
+  tool presentation is handled by a single unified component:
+  - Receives the tool execution lifecycle state: `call` parameters, current
+    execution `status` (`pending` | `running` | `completed` | `error` |
+    `aborted`), settled `result` payload, and `durationMs`.
+  - Manages the presentation seamlessly across in-flight execution and settled
+    output without external state coordination.
+- **Strict DOM Safety**: All web/desktop renderers use typed DOM structures with
+  textContent or sanitized canvas/SVG elements, forbidding unescaped HTML
+  interpolation.
 - **Fallback Resolution**: The first matching renderer handles the presentation;
-  unhandled blocks fall back to standard text/JSON cards.
+  unhandled blocks fall back to standard text/JSON presentation.
 
 ### Dockable Views & Surface Slots (`registerView`)
 
@@ -424,3 +433,43 @@ To eliminate monolithic commits and tedious manual staging:
     generates each atomic commit cleanly into Git history.
   - Optional **`[Commit & Push]`** trigger to push to remote tracking branch
     upon completion.
+
+---
+
+## 10. CLI Terminal Client (Terminal UI)
+
+For developers who prefer a keyboard-driven, terminal-first workflow (akin to
+Pi, Claude Code, or Aider), Fathom provides a first-class CLI client (`fathom`)
+backed by the identical headless server over WebSocket.
+
+### 10.1 Presentation & Terminal Adaptation
+
+- **Streaming Transcript**: Incremental markdown rendering with ANSI syntax
+  highlighting and clean terminal reflow.
+- **Collapsible Thinking**: Streamed reasoning tokens render as a compact, muted
+  status indicator with duration (`Thinking... (2.4s)`). Toggled expanded or
+  collapsed via keyboard shortcut (`Ctrl+O`).
+- **Terminal Unified Diffs**: File mutations (`write`, `edit`) render as colored
+  inline terminal diffs with addition (green) and deletion (red) lines.
+- **Compact Tool Statuses**: Clean, single-line status summaries (e.g.
+  `⚡ read src/server.ts (124 lines)` or `⚡ bash cargo test (exited 0)`).
+- **Interactive Commit Studio (TUI)**: Terminal-based interactive selector
+  enabling developers to review, reorder, adjust, and approve AI-generated
+  atomic commit clusters using keyboard navigation before Git execution.
+
+### 10.2 Disconnect & Resumption Superpower
+
+- **Session Survivability**: Because the agent loop runs server-side (Accept
+  Then Drive), closing a terminal window, exiting SSH, or losing terminal focus
+  does not terminate running operations.
+- **Instant Re-Attach**: Re-running `fathom` reconnects to the active server
+  socket and seamlessly resumes the streaming transcript.
+
+### 10.3 Web & Artifact Degradation
+
+- **Markdown Artifacts**: Render directly in the terminal with
+  syntax-highlighted code blocks and headers.
+- **Interactive HTML & Generative UI**: Standalone interactive widgets and
+  canvases display an inline action to launch in the system browser
+  (`[o] Open in browser`), ensuring rich visual experiences remain accessible
+  from terminal workflows.

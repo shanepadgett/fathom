@@ -144,7 +144,7 @@ routing, credential injection, and telemetry attribution:
 - **Combined Invocations**: A schema can be bound to a forced tool call,
   ensuring the generated tool payload strictly adheres to typed constraints.
 
-### 5.3 Schema Engine: Standardized on TypeBox (`@sinclair/typebox`)
+### 5.3 Schema Engine: Standardized on TypeBox (`typebox`)
 
 To eliminate fragile schema conversion layers and maximize performance across
 providers:
@@ -160,3 +160,28 @@ providers:
   TypeScript community `@standard-schema` specification, allowing third-party
   plugin authors to supply Zod, Valibot, or ArkType schemas if preferred, while
   TypeBox remains the native core standard.
+
+---
+
+## 6. Expert Model Escalation & Child Session Routing
+
+To allow fast or economical models to leverage top-tier reasoning intelligence
+without violating provider branch locking or requiring manual model switching:
+
+### Invariants
+
+- **Dedicated Expert Configuration**: Developers configure their preferred
+  expert model in settings (e.g. `expertModel: "openai/o3-mini"` or
+  `"anthropic/claude-3-7-sonnet"`).
+- **Subagent / Child Session Routing**: When `consult_expert` is invoked, the
+  model service routes the request to an isolated child session
+  (`parent_session_id`).
+- **Multi-Turn Continuity (`consultation_id`)**: Child sessions retain their
+  conversational state across follow-up queries, allowing iterative
+  back-and-forth dialogue between the primary agent and the expert model.
+- **Provider Lock Compatibility**: The parent session's provider-locked branch
+  is never polluted by the expert's provider tokens, prompt cache prefixes, or
+  thinking formats. Only standard text tool results enter the primary
+  transcript.
+- **Unified Telemetry**: Inference expenditure from the expert child session
+  rolls up automatically into the parent session's telemetry and spend tracking.

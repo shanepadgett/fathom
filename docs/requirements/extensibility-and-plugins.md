@@ -2,17 +2,17 @@
 
 ## 1. Kernel Architecture (Cordis IoC)
 
-Fathom composes its services and behavior through plugins powered by Cordis.
-The host supplies shared infrastructure, including Cordis and `pi-ai`. There
-is no hardcoded agent loop baked into the core host.
+Fathom composes its services and behavior through plugins powered by Cordis. The
+host supplies shared infrastructure, including Cordis and `pi-ai`. There is no
+hardcoded agent loop baked into the core host.
 
 ### Core Invariants
 
 - **Inversion of Control**: Every major subsystem is exposed as a typed service
   key in Cordis (`context`, `model`, `sessions`, `runtime`, `tools`,
   `workspace`).
-- **Service Replaceability**: Service implementations—including the entire
-  agent loop (`RuntimeService`)—can be swapped through configuration compositions
+- **Service Replaceability**: Service implementations—including the entire agent
+  loop (`RuntimeService`)—can be swapped through configuration compositions
   without modifying or rebuilding the host executable. Replacements follow the
   shared SDK contracts; this does not require replacing foundational libraries
   such as `pi-ai`.
@@ -226,10 +226,10 @@ The agent is equipped to understand, build, and repair its own plugin ecosystem:
 ## 8. Experience Packages & Native `deno.json` Manifests
 
 The Fathom download includes the host, default composition, and all default
-plugin code and assets. First launch does not download default plugins from
-JSR. Bundled plugins remain disableable and replaceable through compositions;
-being a plugin does not require a separate published package. JSR provides the
-SDK and optional plugins or experiences that users choose to install.
+plugin code and assets. First launch does not download default plugins from JSR.
+Bundled plugins remain disableable and replaceable through compositions; being a
+plugin does not require a separate published package. JSR provides the SDK and
+optional plugins or experiences that users choose to install.
 
 To distribute complete, cohesive experiences (e.g. data science workflows,
 spatial canvas shells, or domain-specific coding harnesses), repositories define
