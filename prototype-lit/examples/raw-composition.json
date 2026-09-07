@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    "desktop-window",
+    "session-memory",
+    "workspace-local",
+    "tool-registry",
+    "runtime-echo"
+  ],
+  "uiPlugins": [
+    "./ui/raw-shell.js"
+  ]
+}
