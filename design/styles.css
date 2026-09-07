@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@import "./tokens.css";
+@import "./components/button.css";
+@import "./components/motion.css";
+
+@layer base {
+  body {
+    @apply m-0 bg-canvas font-sans text-base leading-normal text-ink
+      antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-focus;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  button,
+  summary {
+    @apply cursor-pointer;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
+
+  code {
+    @apply font-mono text-base;
+  }
+
+  summary {
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}

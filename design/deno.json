@@ -1,0 +1,19 @@
+{
+  "nodeModulesDir": "auto",
+  "imports": {
+    "vite": "npm:vite@8.2.2",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@4.3.3",
+    "tailwindcss": "npm:tailwindcss@4.3.3"
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"]
+  },
+  "tasks": {
+    "dev": "deno run -A npm:vite@8.2.2",
+    "build": "deno run -A npm:vite@8.2.2 build",
+    "check": "deno check main.ts && deno lint && deno fmt --check",
+    "fmt": "deno fmt"
+  },
+  "fmt": { "exclude": ["dist", "node_modules"] },
+  "lint": { "exclude": ["dist", "node_modules"] }
+}

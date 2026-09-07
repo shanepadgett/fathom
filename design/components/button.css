@@ -1,0 +1,19 @@
+@layer components {
+  ds-button {
+    @apply inline-block;
+  }
+
+  .ds-button {
+    @apply inline-flex min-h-10 items-center justify-center gap-2
+      rounded-control border border-transparent bg-action px-4 py-2 font-medium
+      text-on-action hover:enabled:opacity-80 disabled:opacity-40;
+  }
+
+  ds-button[variant="secondary"] > .ds-button {
+    @apply border-line bg-transparent text-ink;
+  }
+
+  ds-button[variant="quiet"] > .ds-button {
+    @apply bg-transparent px-2 text-ink;
+  }
+}

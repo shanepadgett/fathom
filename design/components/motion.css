@@ -1,0 +1,140 @@
+@layer components {
+  ds-modal,
+  ds-drawer,
+  ds-accordion {
+    display: block;
+  }
+
+  :is(ds-modal, ds-drawer) > dialog {
+    @apply fixed m-auto border border-line rounded-lg bg-canvas p-6 text-ink
+      shadow-md;
+    width: min(32rem, calc(100% - 2 * var(--spacing-4)));
+    max-height: calc(100dvh - 2 * var(--spacing-4));
+    overflow: auto;
+    opacity: 0;
+    transform: translateY(var(--motion-distance-small))
+      scale(var(--motion-scale-enter));
+    transition-property: opacity, transform, display, overlay;
+    transition-duration: var(--motion-duration-fast);
+    transition-timing-function: var(--ease-exit);
+    transition-behavior: allow-discrete;
+  }
+
+  ds-drawer > dialog {
+    @apply inset-y-0 right-0 left-auto m-0 rounded-none border-y-0 border-r-0;
+    width: min(26rem, 100%);
+    height: 100dvh;
+    max-height: 100dvh;
+    transform: translateX(100%);
+    transition-duration: var(--motion-duration-normal);
+  }
+
+  :is(ds-modal, ds-drawer) > dialog[open] {
+    opacity: 1;
+    transform: none;
+    transition-duration: var(--motion-duration-normal);
+    transition-timing-function: var(--ease-enter);
+  }
+
+  ds-drawer > dialog[open] {
+    transition-duration: var(--motion-duration-slow);
+  }
+
+  :is(ds-modal, ds-drawer) > dialog::backdrop {
+    background: rgb(0 0 0 / var(--overlay-opacity));
+    opacity: 0;
+    transition-property: opacity, display, overlay;
+    transition-duration: var(--motion-duration-normal);
+    transition-timing-function: var(--ease-standard);
+    transition-behavior: allow-discrete;
+  }
+
+  :is(ds-modal, ds-drawer) > dialog[open]::backdrop {
+    opacity: 1;
+  }
+
+  ds-drawer[backdrop="none"] > dialog::backdrop {
+    background: transparent;
+  }
+
+  ds-drawer[mode="push"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0fr);
+    overflow: hidden;
+    transition: grid-template-columns var(--motion-duration-normal)
+      var(--ease-standard);
+  }
+
+  ds-drawer[mode="push"][open] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  ds-drawer[mode="push"] > [data-content] {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  ds-drawer[mode="push"] > [data-panel] {
+    /* The workspace sets the height, even while this column collapses. */
+    contain: size;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    visibility: hidden;
+    transition: visibility var(--motion-duration-normal) allow-discrete;
+  }
+
+  ds-drawer[mode="push"][open] > [data-panel] {
+    visibility: visible;
+  }
+
+  @starting-style {
+    ds-modal > dialog[open] {
+      opacity: 0;
+      transform: translateY(var(--motion-distance-small))
+        scale(var(--motion-scale-enter));
+    }
+    ds-drawer > dialog[open] {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    :is(ds-modal, ds-drawer) > dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  ds-accordion > details {
+    @apply border-b border-line;
+  }
+
+  ds-accordion > details > summary {
+    @apply flex items-center justify-between gap-4 py-4 font-medium;
+  }
+
+  ds-accordion > details > summary::after {
+    content: "+";
+    @apply text-muted;
+  }
+
+  ds-accordion > details[open] > summary::after {
+    content: "−";
+  }
+
+  ds-accordion > details > div {
+    @apply pb-4 text-muted;
+  }
+
+  /* Unsupported browsers retain the native instant open/close behavior. */
+  @supports (interpolate-size: allow-keywords) {
+    ds-accordion > details::details-content {
+      interpolate-size: allow-keywords;
+      height: 0;
+      overflow: clip;
+      transition: height var(--motion-duration-normal) var(--ease-standard),
+        content-visibility var(--motion-duration-normal) allow-discrete;
+    }
+    ds-accordion > details[open]::details-content {
+      height: auto;
+    }
+  }
+}

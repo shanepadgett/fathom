@@ -6,6 +6,11 @@ markdownlint-cli2 = "0.23.2"
 description = "Lint markdown and apply fixes"
 run = "markdownlint-cli2 --fix"
 
+[tasks.design]
+description = "Open the local design system"
+dir = "{{config_root}}/design"
+run = "deno task dev --open"
+
 [tasks."integration:desktop"]
 description = "Launch the built integration desktop app in its own workspace"
 dir = "{{config_root}}/prototype-integration"

@@ -9,6 +9,11 @@ Work through the three areas below in order, one decision at a time. Record
 agreed decisions in `docs/technical/` and keep this tracker current. Existing
 requirements in `docs/requirements/` remain the baseline.
 
+The user authorized a separate [local design system scaffold](design-system.md)
+in `design/`. Deep teal and the Tech sparse font stack are selected; token
+defaults are ready for component review. This does not complete the
+planning phase or change the production frontend decision.
+
 ## 1. Technologies and Versions
 
 Current decisions are recorded in [technologies.md](technologies.md). Deno
