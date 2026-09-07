@@ -5,3 +5,8 @@ markdownlint-cli2 = "0.23.2"
 [tasks."lint:markdown"]
 description = "Lint markdown and apply fixes"
 run = "markdownlint-cli2 --fix"
+
+[tasks."integration:desktop"]
+description = "Launch the built integration desktop app in its own workspace"
+dir = "{{config_root}}/prototype-integration"
+run = 'FATHOM_WORKSPACE="$PWD" ./dist/Fathom.app/Contents/MacOS/laufey'

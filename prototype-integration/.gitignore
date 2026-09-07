@@ -1,0 +1,8 @@
+dist/
+native/
+.fathom/
+node_modules/
+*.local.json
+
+/ui/
+/node_modules/
