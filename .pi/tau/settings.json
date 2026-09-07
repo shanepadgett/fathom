@@ -1,0 +1,28 @@
+{
+	"$schema": "https://raw.githubusercontent.com/shanepadgett/tau-agent/refs/heads/main/packages/agent/schemas/tau.schema.json",
+	"extensions": {
+		"context": {
+			"sync": {
+				"enabled": false
+			}
+		},
+		"subagent": {
+			"disabled": ["scout"]
+		},
+		"toolApproval": {
+			"enabled": false
+		},
+		"silentCommandRunner": {
+			"commands": [
+				{
+					"name": "Lint Markdown",
+					"details": "Lint markdown with fixes. Reports only remaining errors.",
+					"command": "mise run lint:markdown",
+					"includeGlobs": [
+						"**/*.md"
+					]
+				}
+			]
+		}
+	}
+}
