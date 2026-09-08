@@ -48,8 +48,8 @@ drawerExamples.push({
       <ds-button><button type="button" data-open aria-expanded="false" aria-controls="push-panel">Toggle drawer</button></ds-button>
       <label class="mt-6 block">Session name<input class="mt-2 block w-full rounded-control border border-line bg-canvas p-2" value="Review changes"></label>
     </div>
-    <aside id="push-panel" data-panel inert aria-labelledby="push-title">
-      <div class="h-full border-l border-line bg-surface p-4 wrap-anywhere">
+    <aside id="push-panel" class="border-l border-line" data-panel inert aria-labelledby="push-title">
+      <div class="h-full bg-surface p-4 wrap-anywhere">
         <header class="flex flex-wrap items-center justify-between gap-3">
           <h2 id="push-title" class="text-xl font-semibold">Session details</h2>
           <ds-button variant="quiet"><button type="button" data-close aria-label="Close drawer">✕</button></ds-button>

@@ -1,6 +1,7 @@
 {
   "nodeModulesDir": "auto",
   "imports": {
+    "@phosphor-icons/web": "npm:@phosphor-icons/web@2.1.2",
     "vite": "npm:vite@8.2.2",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@4.3.3",
     "tailwindcss": "npm:tailwindcss@4.3.3"
@@ -11,7 +12,7 @@
   "tasks": {
     "dev": "deno run -A npm:vite@8.2.2",
     "build": "deno run -A npm:vite@8.2.2 build",
-    "check": "deno check main.ts && deno lint && deno fmt --check",
+    "check": "deno check main.ts && deno lint && deno fmt --check && deno test --allow-read verification",
     "fmt": "deno fmt"
   },
   "fmt": { "exclude": ["dist", "node_modules"] },

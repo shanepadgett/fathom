@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "npm:@phosphor-icons/web@2.1.2": "2.1.2",
     "npm:@tailwindcss/vite@4.3.3": "4.3.3_vite@8.2.2",
     "npm:tailwindcss@4.3.3": "4.3.3",
     "npm:vite@8.2.2": "8.2.2"
@@ -35,6 +36,9 @@
     },
     "@oxc-project/types@0.148.0": {
       "integrity": "sha512-Nm4s/jB+4FpFsPhWGEC4h7rzksesmtnMXomo6rCMcg/b8zLQuOziRgkCS1fxDCXOlJB/6Q8oABOZ/OP6RIPj9A=="
+    },
+    "@phosphor-icons/web@2.1.2": {
+      "integrity": "sha512-rPAR9o/bEcp4Cw4DEeZHXf+nlGCMNGkNDRizYHM47NLxz9vvEHp/Tt6FMK1NcWadzw/pFDPnRBGi/ofRya958A=="
     },
     "@rolldown/binding-android-arm-eabi@1.2.7": {
       "integrity": "sha512-EypzgnYCwyVY4NDHKzGmNJT5b+XaQEBniHxsMdeIQLB/tcCzZnhqrzHpZFbX9iaxx+5RiB8caATBtfvZP7zVxQ==",
@@ -472,6 +476,7 @@
   },
   "workspace": {
     "dependencies": [
+      "npm:@phosphor-icons/web@2.1.2",
       "npm:@tailwindcss/vite@4.3.3",
       "npm:tailwindcss@4.3.3",
       "npm:vite@8.2.2"

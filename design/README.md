@@ -1,47 +1,54 @@
 # Design
 
 Run `mise run design` from the repository root. The site opens at
-`http://127.0.0.1:5175`. Stop it with Ctrl+C.
+`http://127.0.0.1:5175`. Stop it with Ctrl+C. Deno runs Vite and Tailwind v4.
+This reference is independent of the application prototypes and does not select
+its production frontend framework.
 
-This is a standalone design reference, not part of the existing prototypes. Deno
-runs Vite, which builds TypeScript and Tailwind v4 and updates the browser.
+## Composition
 
-Styling is Tailwind-first. Theme tokens live in `tokens.css` via `@theme`.
-Markup uses utilities from those tokens. Custom CSS is only for base resets and
-web component hooks that utilities cannot express. Dark mode uses
-`data-theme="dark"` with `@custom-variant dark` and role token overrides.
+- `tokens.css`: theme values, semantic roles, and app-specific utility
+  categories.
+- `primitives/`: typed icon, control, status, tab, meter, and keyboard
+  renderers.
+- `components/`: existing light-DOM Web Components; the button renderer uses the
+  same `ds-button` styles as existing examples. Overlay and accordion behavior
+  demos stay isolated from static workspaces.
+- `composites/`: reusable conversation, files, sessions, search, inspector,
+  editor, review, and workspace chrome. Related small components share a module.
+- `layouts/`: the slot-based workspace shell and agent/editor assembly recipes.
+- `models.ts`: presentation data contracts without application services.
+- `fixtures/`: one shared scenario plus trusted code/diff samples.
+- `screens/`: fixture and explicit state selection, with no bespoke markup.
+- `site/`: functional reference viewer, navigation, themes, and token
+  inspection.
+- `verification/`: checks and the repository's local verification hook.
 
-- `tokens.css`: theme values (`@theme static`) and light/dark role aliases.
-- `components/`: shared light-DOM Web Components and their preview cases.
-- `screens/`: design-specific compositions of those components.
-- `navigation.ts`: names, descriptions, and preview entries for the drawer.
-- `site/`: the viewer, not a second component library.
+A screen selects `base`, `no-session`, `diff`, `projects`, or `chat-search` for
+the agent layout, or `files`, `changes`, or `agent` for the editor layout.
+Application actions are simulated. Sidebar visibility and pane resizing work in
+the previews. Folder expansion and selected tabs are rendered state, not
+interactive controls. Switch screens through the viewer navigation. Workspace
+overlays and drawers cover the complete workspace frame. Each screen detail page
+has a **Screen only** link beside its title that opens the screen without viewer
+navigation, headings, padding, or the preview frame. The workspace fills the
+viewport height; use the floating, bottom-center **Back to details** button to
+return to the screen detail page. Drawer open controls live in the app title
+bar; reverse-direction close controls live in each drawer header.
 
-Add a component module to `main.ts`, its CSS import to `styles.css` only if the
-component needs a small hook stylesheet, and its examples to `navigation.ts`.
-Screens use the same elements and register in the `screens` array. Markup in
-this registry is trusted, locally authored HTML. Token previews read the
-compiled CSS rather than copying values into TypeScript.
+## Maintaining the Reference
 
-`ds-button` wraps a native `<button>`; put labels, disabled state, accessibility
-attributes, and event handlers on that native button. `variant` belongs on the
-wrapper. The viewer uses the same component as the previews.
+Before changing the design system, read the
+[design system maintenance standard](../docs/standards/design-system.md). It
+owns component boundaries, token policy, preview behavior, and verification. You
+do not need that standard when using this reference to implement application
+code elsewhere.
 
-Keep screens to composition. Shared appearance belongs in tokens or utilities.
-Prefer type, spacing, and simple rows to cards. No filler copy.
+The [component architecture record](../docs/technical/component-architecture.md)
+provides background and component inventories.
 
-Motion values live in `tokens.css`. Use `duration-(--motion-duration-normal)`
-and `ease-standard` in Tailwind, or reference the same variables in component
-CSS. Shared components own animation behavior; screens do not invent motion.
-Reduced motion sets all motion durations to zero.
+## Archived Experiment
 
-`ds-modal` and `ds-drawer` wrap a native `dialog`. Supply a `data-open` button,
-an accessible dialog label, content, and a `data-close` button. Native dialogs
-handle focus and Escape. `closedby="any"` enables backdrop dismissal in browsers
-that support it. `ds-accordion` wraps direct `details` children with `summary`
-labels and content inside a `div`. Add `multiple` to allow several sections
-open. Accordion height animation uses modern CSS; older browsers toggle
-instantly.
-
-From `design/`, run `deno task check` or `deno task build` to check the
-scaffold.
+`vibe-lab.html` is a standalone historical visual exploration, excluded from the
+maintained component catalog and design-system styling checks. Its bespoke CSS
+is not a source for new components or screens.

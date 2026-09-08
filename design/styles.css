@@ -1,8 +1,18 @@
 @import "tailwindcss";
+@import "@phosphor-icons/web/regular";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @import "./tokens.css";
 @import "./components/button.css";
 @import "./components/motion.css";
+
+[data-screen-only] [data-workspace-frame] {
+  border: 0;
+  border-radius: 0;
+}
+
+[data-screen-only] [data-workspace] {
+  height: 100dvh;
+}
 
 @layer base {
   body {
@@ -38,4 +48,84 @@
   summary::-webkit-details-marker {
     display: none;
   }
+}
+
+@utility conversation-rows {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+@utility composer-fade {
+  mask-image: linear-gradient(to bottom, transparent, black 30%);
+}
+
+@utility composer-bottom-glass {
+  backdrop-filter: blur(var(--blur-composer));
+  mask-image: linear-gradient(to bottom, transparent 20%, black 75%);
+}
+
+@layer components {
+  .viewer-edge-tab {
+    @apply block -translate-x-full -translate-y-1/2 opacity-0
+      pointer-events-none;
+    transition: transform var(--motion-duration-fast), opacity
+      var(--motion-duration-fast), top var(--motion-duration-normal) ease-out;
+  }
+  .viewer-edge-tab[data-positioning] {
+    transition: transform var(--motion-duration-fast), opacity
+      var(--motion-duration-fast);
+  }
+  .viewer-edge-tab[data-revealed],
+  .viewer-edge-tab:focus-within {
+    @apply translate-x-0 opacity-100 pointer-events-auto;
+  }
+  .viewer-edge-tab[variant] > .ds-button {
+    @apply h-16 w-10 rounded-l-none rounded-r-lg border-l-0 bg-surface p-0
+      text-action;
+  }
+  @media (hover: none) {
+    .viewer-edge-tab {
+      @apply translate-x-0 opacity-100 pointer-events-auto;
+    }
+  }
+  .viewer-nav-group[open] > summary > .ph-caret-right {
+    @apply rotate-90;
+  }
+  .viewer-nav-row:focus-visible {
+    @apply outline-offset-0;
+  }
+  edge-resizer {
+    @apply absolute inset-y-0 z-40 block w-2 translate-x-1/2 cursor-col-resize
+      touch-none select-none;
+    right: calc(var(--spacing-resize-line) / -2);
+  }
+  edge-resizer[edge="left"] {
+    @apply -translate-x-1/2;
+    right: auto;
+    left: calc(var(--spacing-resize-line) / -2);
+  }
+  edge-resizer::after {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-1/2 w-resize-line
+      -translate-x-1/2 bg-focus opacity-0 shadow-resize-glow;
+    transition: opacity var(--motion-duration-fast);
+  }
+  edge-resizer:hover::after,
+  edge-resizer[dragging]::after,
+  edge-resizer:focus-visible::after {
+    @apply opacity-100;
+  }
+  edge-resizer:focus-visible {
+    @apply outline-none;
+  }
+  ds-drawer > [data-panel] {
+    position: relative;
+  }
+  ds-drawer[mode="push"][open] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--resized-panel-width,
+      1fr));
+  }
+}
+
+[data-workspace-body] > aside[hidden] {
+  display: none;
 }

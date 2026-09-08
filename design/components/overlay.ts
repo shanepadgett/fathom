@@ -2,6 +2,21 @@
 class DesignOverlay extends HTMLElement {
   connectedCallback() {
     this.addEventListener("click", this.onClick);
+    if (this.localName === "ds-drawer") {
+      const panel = this.querySelector(
+        ":scope > dialog, :scope > [data-panel]",
+      );
+      if (panel && !panel.querySelector("edge-resizer")) {
+        // Scroll content independently so the centered handle can cross the border.
+        const scroll = document.createElement("div");
+        scroll.setAttribute("data-drawer-scroll", "");
+        scroll.append(...panel.childNodes);
+        panel.append(scroll);
+        const handle = document.createElement("edge-resizer");
+        handle.setAttribute("edge", "left");
+        panel.append(handle);
+      }
+    }
   }
 
   disconnectedCallback() {

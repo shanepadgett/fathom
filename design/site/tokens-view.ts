@@ -77,7 +77,7 @@ class TokensView extends HTMLElement {
       button.textContent = category;
       button.dataset.category = category;
       button.className =
-        "shrink-0 border-0 border-b-[3px] border-transparent bg-transparent px-0 py-3 whitespace-nowrap text-muted aria-[pressed=true]:border-current aria-[pressed=true]:font-semibold aria-[pressed=true]:text-action focus-visible:outline-offset-[-4px]";
+        "shrink-0 border-0 border-b-3 border-transparent bg-transparent px-0 py-3 whitespace-nowrap text-muted aria-[pressed=true]:border-current aria-[pressed=true]:font-semibold aria-[pressed=true]:text-action focus-visible:-outline-offset-4";
       button.setAttribute("aria-controls", panel.id);
       button.setAttribute("aria-pressed", String(category === this.category));
       button.addEventListener("click", () => {
@@ -94,6 +94,17 @@ class TokensView extends HTMLElement {
     }
 
     const sections = [
+      {
+        title: "Semantic geometry",
+        category: "Layout & effects",
+        kind: "geometry",
+        tokens: [...names].filter((name) =>
+          /^--spacing-[a-z]/.test(name) || name.startsWith("--container-") ||
+          name.startsWith("--grid-") || name.startsWith("--blur-")
+        ),
+        description:
+          "Named app and preview dimensions, grids, and effects. Components consume these through Tailwind utilities.",
+      },
       {
         title: "Durations",
         category: "Animation",
@@ -177,7 +188,7 @@ class TokensView extends HTMLElement {
         title: "Spacing",
         category: "Layout & effects",
         kind: "spacing",
-        prefix: "--spacing",
+        tokens: [...names].filter((name) => /^--spacing(?:-\d+)?$/.test(name)),
         description: "A 4px base unit. Bars show the actual distance.",
       },
       {
@@ -221,7 +232,7 @@ class TokensView extends HTMLElement {
 
       const list = document.createElement("dl");
       list.className = definition.kind === "roles"
-        ? "m-0 grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] gap-2"
+        ? "m-0 grid grid-cols-token-roles gap-2"
         : "m-0";
       section.append(list);
       panels.get(definition.category)!.append(section);
@@ -231,20 +242,20 @@ class TokensView extends HTMLElement {
         const value = styles.getPropertyValue(name).trim();
         const row = document.createElement("div");
         row.className = definition.kind === "family"
-          ? "grid grid-cols-1 items-center gap-2 border-t border-line py-4 md:grid-cols-[minmax(15rem,1fr)_minmax(0,2fr)] md:gap-4"
-          : "grid min-h-12 grid-cols-1 items-center gap-2 border-t border-line py-2 md:grid-cols-[minmax(15rem,1fr)_minmax(0,2fr)] md:gap-4";
+          ? "grid grid-cols-1 items-center gap-2 border-t border-line py-4 md:grid-cols-token-row md:gap-4"
+          : "grid min-h-12 grid-cols-1 items-center gap-2 border-t border-line py-2 md:grid-cols-token-row md:gap-4";
         const term = document.createElement("dt");
         term.className = "m-0 wrap-anywhere text-base";
         term.textContent = name;
         const detail = document.createElement("dd");
         detail.className =
-          "m-0 grid min-w-0 grid-cols-1 items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto]";
+          "m-0 grid min-w-0 grid-cols-1 items-center gap-4 md:grid-cols-token-detail";
         const sample = document.createElement("span");
         sample.className = "wrap-anywhere whitespace-pre-line text-base";
         sample.setAttribute("aria-hidden", "true");
         const code = document.createElement("code");
         code.className =
-          "max-w-[22ch] wrap-anywhere text-right text-base text-muted";
+          "max-w-token-value wrap-anywhere text-right text-base text-muted";
         code.textContent = value;
         row.append(term, detail);
 
@@ -329,10 +340,10 @@ class TokensView extends HTMLElement {
               ? "const session = await agent.run();\n0O 1lI · {} [] => !=="
               : "A clear view of the work.\nPlan, build, and review with Fathom.";
             code.className =
-              "max-w-[22ch] wrap-anywhere text-right font-sans text-base text-muted md:text-right max-md:text-left";
+              "max-w-token-value wrap-anywhere text-right font-sans text-base text-muted md:text-right max-md:text-left";
             code.textContent = value.split(",")[0].replaceAll('"', "");
             detail.className =
-              "m-0 grid min-w-0 grid-cols-1 items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto]";
+              "m-0 grid min-w-0 grid-cols-1 items-center gap-4 md:grid-cols-token-detail";
             break;
           case "size":
             sample.textContent = "A clear view of the work";
@@ -372,7 +383,7 @@ class TokensView extends HTMLElement {
         list.remove();
         const strip = document.createElement("div");
         strip.className =
-          "grid grid-cols-[repeat(5,minmax(13rem,1fr))] gap-2 overflow-x-auto pb-2";
+          "grid grid-cols-token-palette gap-2 overflow-x-auto pb-2";
         strip.tabIndex = 0;
         strip.setAttribute("role", "region");
         strip.setAttribute(

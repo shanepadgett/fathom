@@ -17,3 +17,36 @@
     @apply bg-transparent px-2 text-ink;
   }
 }
+
+@layer components {
+  ds-button[size="compact"] > .ds-button {
+    @apply min-h-0 gap-2 px-3 py-1 text-sm font-normal
+      hover:enabled:opacity-100;
+  }
+  ds-button[size="small"] > .ds-button {
+    @apply h-7 min-h-0 gap-2 px-0 py-0 text-sm font-normal
+      hover:enabled:opacity-100;
+  }
+  ds-button[icon-only] > .ds-button {
+    @apply w-7 text-muted hover:enabled:bg-canvas hover:enabled:text-ink;
+  }
+  ds-button[size="compact"][variant="secondary"] > .ds-button {
+    @apply hover:enabled:bg-canvas;
+  }
+  ds-button[size="compact"][variant="quiet"] > .ds-button {
+    @apply px-0 text-muted hover:enabled:text-ink;
+  }
+  ds-button[size="small"][variant="quiet"] > .ds-button {
+    @apply text-muted hover:enabled:text-ink;
+  }
+}
+
+@layer components {
+  ds-button[size="project"] {
+    @apply block w-full;
+  }
+  ds-button[size="project"] > .ds-button {
+    @apply h-8 min-h-0 w-full justify-start rounded-control border-0 bg-canvas
+      px-2 py-0 text-sm font-normal hover:enabled:opacity-100;
+  }
+}
