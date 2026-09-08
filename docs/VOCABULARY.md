@@ -316,6 +316,22 @@ execution without modifying active editor files.
 Interactive visual interface for inspecting, reordering, and adjusting
 AI-generated semantic commit clusters prior to Git execution.
 
+### AuthorizedWorkingDirectories
+
+Additional local repositories or directories explicitly authorized by the
+developer for a project, enabling cross-repository reasoning and tool execution.
+
+### ReferenceRepository
+
+External Git repository cloned to Fathom-managed storage
+(`~/.fathom/references/`) for read-only pattern inspection and context
+referencing.
+
+### AudioCues
+
+Configurable sound design alerts signaling run completion, required approvals,
+or execution failures, with background-only firing support.
+
 ## Avoid
 
 ### Timeline

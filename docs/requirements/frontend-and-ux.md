@@ -473,3 +473,44 @@ backed by the identical headless server over WebSocket.
   canvases display an inline action to launch in the system browser
   (`[o] Open in browser`), ensuring rich visual experiences remain accessible
   from terminal workflows.
+
+---
+
+## 11. Audio Feedback & System Notifications
+
+To keep developers informed during long agent runs without demanding constant
+visual focus, Fathom includes sound design and OS notifications.
+
+### 11.1 Audio Cues
+
+- **Event Sounds**: Distinct audio cues for key operational transitions:
+  - **Run Succeeded**: Gentle chime when an agent run finishes and transitions
+    to idle.
+  - **Input / Approval Required**: Audible prompt when execution halts waiting
+    for manual user confirmation (Tier 3 command escalation, plan review).
+  - **Run Failed / Interrupted**: Alert tone when a run is aborted or encounters
+    an unrecoverable error.
+- **Mute & Customization**: Audio volume can be adjusted or specific cue types
+  toggled in app settings.
+
+### 11.2 System Notifications
+
+- **Native OS Alerts**: Dispatches desktop notifications on macOS, Windows, and
+  Linux.
+- **Rich Context**: Displays run outcome, count of modified files, or the
+  plain-English explanation of an action requiring approval.
+- **One-Click Navigation**: Clicking a notification brings the Fathom window to
+  the foreground and focuses the relevant session thread.
+- **Terminal Notifications (CLI)**: In the CLI client, emits terminal bell
+  (`\a`) or OSC 9 / OSC 777 notifications supported by modern terminal
+  emulators.
+
+### 11.3 Background-Only Policy
+
+- **Configurable Firing Policy**:
+  - **`background_only` (Default)**: Audio cues and system notifications only
+    fire when the Fathom application window is blurred, minimized, or in the
+    background, preventing redundant sounds while actively watching the stream.
+  - **`always`**: Sounds and notifications fire regardless of window focus
+    state.
+  - **`muted`**: Completely disables all audio playback.

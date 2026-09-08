@@ -33,8 +33,11 @@ during the conversational design process.
 - [x] **Session Tree & Branching**: Strict tree history with parent pointers,
       permanent retention, active head pointer
       (`docs/requirements/architecture-and-persistence.md`).
-- [x] **Workspace Scoping**: Per-project session management and repository
-      isolation (`docs/requirements/architecture-and-persistence.md`).
+- [x] **Workspace Scoping & Authorized Working Directories**: Per-project
+      session management, authorized multi-working directories for cross-repo
+      reasoning/tools, and Fathom-managed reference repositories
+      (`~/.fathom/references/`)
+      (`docs/requirements/architecture-and-persistence.md`).
 - [x] **Git Worktree Isolation**: Provisioning child sessions/runs in isolated
       worktrees (`.fathom/worktrees/<task-id>`) for non-destructive parallel
       execution (`docs/requirements/architecture-and-persistence.md`).
@@ -176,6 +179,9 @@ during the conversational design process.
 - [x] **CLI Terminal Client**: First-class terminal UI (`fathom`), streaming
       markdown, collapsible thinking, inline diffs, TUI commit studio, and
       seamless reconnect (`docs/requirements/frontend-and-ux.md`).
+- [x] **Audio Feedback & System Notifications**: Event sound design (success,
+      action required, error), desktop and CLI notifications, and
+      background-only firing policy (`docs/requirements/frontend-and-ux.md`).
 
 ## 7. Runtime Concepts to Lift (from pi)
 

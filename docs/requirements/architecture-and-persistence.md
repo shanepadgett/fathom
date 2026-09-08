@@ -62,6 +62,8 @@ than placed inside user git repositories.
 ```text
 ~/.fathom/
 ├── global.db                   # Global registry, auth references, app settings
+├── references/                 # Fathom-managed read-only reference repositories
+│   └── <reference-slug>/       # Git clones isolated from user working directories
 ├── projects/
 │   └── <project-hash>/         # SHA-256 hash or deterministic slug of absolute project path
 │       ├── sessions.db         # Isolated SQLite database for this project's sessions & branches
@@ -81,6 +83,30 @@ than placed inside user git repositories.
   - Isolated WAL and checkpointing per project so heavy agent runs never degrade
     other projects.
   - Zero disk pollution inside the user's workspace (no git ignores required).
+
+### Multi-Workspace Scoping & Authorized Working Directories
+
+In modern software development, projects frequently span multiple repositories
+or sibling directories (e.g. frontend app, backend API, shared libraries):
+
+- **Primary Working Directory**: The root workspace directory actively opened in
+  the editor/session.
+- **Authorized Working Directories**: Additional local repositories or
+  directories explicitly authorized by the developer for the project.
+  - The agent is instructed on the layout of all authorized working directories.
+  - Core tools (`read`, `write`, `edit`, `bash`, `lsp`) treat all authorized
+    working directories as valid local workspace targets, allowing
+    cross-repository reasoning, modifications, and build verification without
+    triggering security denials.
+- **Reference Repositories (`~/.fathom/references/`)**:
+  - Developers can attach external Git repositories as references (e.g. via
+    slash command or UI).
+  - Fathom clones and manages these repositories centrally under
+    `~/.fathom/references/<reference-slug>`, completely isolated from the
+    developer's manual project checkouts.
+  - Reference repositories are strictly read-only for the agent, used for
+    discovering architectural patterns, library conventions, type definitions,
+    and implementation examples.
 
 ---
 

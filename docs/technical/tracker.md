@@ -11,8 +11,15 @@ requirements in `docs/requirements/` remain the baseline.
 
 The user authorized a separate [local design system scaffold](design-system.md)
 in `design/`. Deep teal and the Tech sparse font stack are selected; token
-defaults are ready for component review. This does not complete the
-planning phase or change the production frontend decision.
+defaults are ready for component review. This does not complete the planning
+phase or change the production frontend decision.
+
+The workspace screen baseline has been reviewed through iterative design edits.
+The approved [component architecture](component-architecture.md) is implemented
+in the local design reference: shared primitives, composites, layouts, tokenized
+geometry, fixtures, and seven static screen states. Local verification includes
+component contracts and browser checks. Production architecture planning remains
+separate.
 
 ## 1. Technologies and Versions
 
