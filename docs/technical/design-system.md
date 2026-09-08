@@ -12,7 +12,7 @@ This does not complete technical planning or choose the production UI framework.
 ## Agreed Structure
 
 - Deno runs the site through `mise run design` and opens a browser.
-- TypeScript and light-DOM Web Components provide reusable design pieces.
+- TypeScript and Lit-based light-DOM Web Components provide reusable design pieces.
 - Tailwind v4 theme values live in one `tokens.css` file.
 - The left drawer can close and reopen. Tokens is a direct page link.
 - Components and Screens are expandable lists with individual preview links.
@@ -26,7 +26,8 @@ This does not complete technical planning or choose the production UI framework.
 
 Deno 2.9.6 runs Vite 8.2.2 with Tailwind CSS and its Vite plugin at 4.3.3. Vite
 handles browser TypeScript, CSS compilation, and live updates; no custom server
-is needed. These tools are local to `design/`.
+is needed. Lit 3.3.1 supplies declarative templates and component properties.
+These tools are local to `design/`.
 
 ## Tokens
 
@@ -50,10 +51,10 @@ is needed. These tools are local to `design/`.
 ## Component Architecture
 
 The [component architecture](component-architecture.md) is implemented in the
-local reference. Screens select fixtures and explicit static states. Shared
-primitives and composites own appearance; layout components consume named tokens
-and compose content slots. The catalog includes isolated component examples and
-seven workspace states, including Editor Changes.
+local reference. Registered screens visibly compose custom elements and select
+fixtures and explicit static states. Shared primitives and composites own
+appearance; layout elements own geometry, not screen content. The catalog
+includes isolated component examples and eight workspace states.
 
 The native button wrapper is shared by the compact controls. Existing
 interactive modal, drawer, and accordion demos are grouped as Behavior demos;

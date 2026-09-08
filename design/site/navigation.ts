@@ -1,15 +1,19 @@
-import { components, type DesignEntry, screens } from "../navigation.ts";
-import { icon, type IconName, text } from "../primitives/content.ts";
+import type { DesignEntry } from "./design-entry.ts";
+
+import { html, type TemplateResult } from "lit";
+
+import { icon, type IconName } from "../primitives/icon.ts";
+import { components } from "./component-catalog.ts";
+import { screens } from "./screen-catalog.ts";
 
 const row =
   "viewer-nav-row flex min-h-8 min-w-0 items-center gap-2 rounded-control px-2 py-1.5 text-dense text-muted hover:bg-canvas hover:text-ink aria-[current=page]:bg-action/10 aria-[current=page]:font-medium aria-[current=page]:text-action";
 
-const link = (href: string, label: string, symbol?: IconName, fullLabel = label) =>
-  `<a class="${row}" href="${text(href)}" title="${text(
-    fullLabel,
-  )}" aria-label="${text(fullLabel)}">${
-    symbol ? icon(symbol) : ""
-  }<span class="min-w-0 break-words">${text(label)}</span></a>`;
+const link = (href: string, label: string, symbol?: IconName, fullLabel = label) => html`
+  <a class="${row}" href="${href}" title="${fullLabel}" aria-label="${fullLabel}"
+    >${symbol ? icon(symbol) : ""}<span class="min-w-0 break-words">${label}</span></a
+  >
+`;
 
 const group = (
   label: string,
@@ -17,57 +21,58 @@ const group = (
   entries: DesignEntry[],
   path: string,
   open = false,
-) =>
-  `<details class="viewer-nav-group" ${open ? "open" : ""}>
-    <summary class="${row}">${icon(symbol)}<span class="flex-1">${text(
-      label,
-    )}</span><span class="font-mono text-micro text-muted">${entries.length}</span>${icon(
-      "caret-right",
-      "small",
-    )}</summary>
-    <div class="ml-4 grid gap-0.5 border-l border-line py-1 pl-2">${entries
-      .map((entry) =>
+) => html`
+  <details class="viewer-nav-group" ?open=${open}>
+    <summary class="${row}">
+      ${icon(symbol)}<span class="flex-1">${label}</span
+      ><span class="font-mono text-micro text-muted">${entries.length}</span
+      >${icon("caret-right", "small")}
+    </summary>
+    <div class="ml-4 grid gap-0.5 border-l border-line py-1 pl-2">
+      ${entries.map((entry) =>
         link(
           `#/${path}/${entry.id}`,
           path === "screens" ? (entry.name.split(" · ")[1] ?? "Overview") : entry.name,
           undefined,
           entry.name,
         ),
-      )
-      .join("")}</div>
-  </details>`;
+      )}
+    </div>
+  </details>
+`;
 
-const section = (label: string, href: string, body: string) =>
-  `<section class="mt-6"><h2 class="mb-2 px-2 text-micro font-medium uppercase tracking-widest text-muted"><a class="hover:text-ink" href="${href}">${label}</a></h2><div class="grid gap-1">${body}</div></section>`;
+const section = (label: string, href: string, body: TemplateResult | TemplateResult[]) => html`
+  <section class="mt-6">
+    <h2 class="mb-2 px-2 text-micro font-medium uppercase tracking-widest text-muted">
+      <a class="hover:text-ink" href="${href}">${label}</a>
+    </h2>
+    <div class="grid gap-1">${body}</div>
+  </section>
+`;
 
 export const viewerNavigation = () =>
-  `<div class="grid gap-1">${link("#/", "Overview", "folder-open")}${link(
-    "#/tokens",
-    "Tokens",
-    "brackets-curly",
-  )}</div>${section(
-    "Components",
-    "#/components",
-    (["Primitives", "Composites", "Behavior demos"] as const)
-      .map((category, index) =>
+  html`<div class="grid gap-1">
+      ${link("#/", "Overview", "folder-open")}${link("#/tokens", "Tokens", "brackets-curly")}
+    </div>
+    ${section(
+      "Components",
+      "#/components",
+      (["Primitives", "Composites", "Behavior demos"] as const).map((category, index) =>
         group(
           category,
           (["brackets-curly", "folder", "note-pencil"] as const)[index],
           components.filter((entry) => entry.category === category),
           "components",
         ),
-      )
-      .join(""),
-  )}${section(
-    "Screens",
-    "#/screens",
-    group(
-      "Agent focus",
-      "chat-circle-text",
-      screens.filter((entry) => entry.id.startsWith("agent-")),
-      "screens",
-      true,
-    ) +
+      ),
+    )}${section("Screens", "#/screens", [
+      group(
+        "Agent focus",
+        "chat-circle-text",
+        screens.filter((entry) => entry.id.startsWith("agent-")),
+        "screens",
+        true,
+      ),
       group(
         "Editor focus",
         "code",
@@ -75,4 +80,17 @@ export const viewerNavigation = () =>
         "screens",
         true,
       ),
-  )}`;
+    ])}`;
+
+export function selectNavigation(host: HTMLElement, path: string) {
+  for (const link of host.querySelectorAll<HTMLAnchorElement>("[data-nav] a")) {
+    if (link.hash === `#${path}`) {
+      link.setAttribute("aria-current", "page");
+      let group = link.closest("details");
+      while (group) {
+        group.open = true;
+        group = group.parentElement?.closest("details") ?? null;
+      }
+    } else link.removeAttribute("aria-current");
+  }
+}

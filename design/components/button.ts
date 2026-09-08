@@ -1,7 +1,11 @@
-/** Light-DOM wrapper. The native button owns labels, events, and form behavior. */
-export class DesignButton extends HTMLElement {
-  connectedCallback() {
-    this.querySelector(":scope > button")?.classList.add("ds-button");
+import { nothing } from "lit";
+
+import { DesignElement } from "./design-element.ts";
+
+/** Authored native buttons own labels, events, disabled state, and form behavior. */
+export class DesignButton extends DesignElement {
+  override render() {
+    return nothing;
   }
 }
 

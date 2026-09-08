@@ -23,6 +23,9 @@ build/
 coverage/
 *.tsbuildinfo
 
+# Design browser verification
+design/verification/**/__pycache__/
+
 # Env and local secrets
 .env
 .env.*

@@ -1,43 +1,90 @@
-// Trusted, locally authored syntax markup. Never interpolate external text here.
-const codeMarkup = `<span class="text-action">import</span> { createStore } <span class="text-action">from</span> <span class="text-success">"../state/store.ts"</span>;
-<span class="text-action">import</span> { api } <span class="text-action">from</span> <span class="text-success">"../api.ts"</span>;
-<span class="text-action">import type</span> { Session } <span class="text-action">from</span> <span class="text-success">"./session.ts"</span>;
+import type { CodeLine } from "../models/code.ts";
 
-<span class="text-action">export const</span> sessions = createStore&lt;Session&gt;();
-
-<span class="text-action">export async function</span> loadSessions() {
-  <span class="text-action">const</span> result = <span class="text-action">await</span> api.listSessions();
-  sessions.replace(result);
-}
-
-<span class="text-muted">// Keep every view of this session in sync.</span>
-<span class="text-action">export async function</span> renameSession(
-  id: <span class="text-warning">string</span>,
-  title: <span class="text-warning">string</span>,
-) {
-  <span class="text-action">const</span> session = <span class="text-action">await</span> api.renameSession(id, title);
-<span class="text-success">  sessions.update(id, session);</span>
-  <span class="text-action">return</span> session;
-}
-`;
-
-export const diffLines: import("../models.ts").DiffLine[] = [
+// Plain syntax tokens keep significant code whitespace out of HTML formatting.
+export const codeLines: CodeLine[] = [
   {
-    kind: "context",
-    text: "  18  export async function renameSession(\n  19    id: string,\n  20    title: string,\n  21  ) {",
+    tokens: [
+      { text: "import", tone: "action" },
+      " { createStore } ",
+      { text: "from", tone: "action" },
+      " ",
+      { text: '"../state/store.ts"', tone: "success" },
+      ";",
+    ],
   },
-  { kind: "removed", text: "− 22    await api.renameSession(id, title);" },
   {
-    kind: "added",
-    text: "+ 22    const session = await api.renameSession(id, title);\n+ 23    sessions.update(id, session);\n+ 24    return session;",
+    tokens: [
+      { text: "import", tone: "action" },
+      " { api } ",
+      { text: "from", tone: "action" },
+      " ",
+      { text: '"../api.ts"', tone: "success" },
+      ";",
+    ],
   },
-  { kind: "context", text: "  25  }" },
+  {
+    tokens: [
+      { text: "import type", tone: "action" },
+      " { Session } ",
+      { text: "from", tone: "action" },
+      " ",
+      { text: '"./session.ts"', tone: "success" },
+      ";",
+    ],
+  },
+  { tokens: [" "] },
+  {
+    tokens: [{ text: "export const", tone: "action" }, " sessions = createStore<Session>();"],
+  },
+  { tokens: [" "] },
+  {
+    tokens: [{ text: "export async function", tone: "action" }, " loadSessions() {"],
+  },
+  {
+    tokens: [
+      "  ",
+      { text: "const", tone: "action" },
+      " result = ",
+      {
+        text: "await",
+        tone: "action",
+      },
+      " api.listSessions();",
+    ],
+  },
+  { tokens: ["  sessions.replace(result);"] },
+  { tokens: ["}"] },
+  { tokens: [" "] },
+  {
+    tokens: [
+      {
+        text: "// Keep every view of this session in sync.",
+        tone: "neutral",
+      },
+    ],
+  },
+  {
+    tokens: [{ text: "export async function", tone: "action" }, " renameSession("],
+  },
+  { tokens: ["  id: ", { text: "string", tone: "warning" }, ","] },
+  { tokens: ["  title: ", { text: "string", tone: "warning" }, ","] },
+  { tokens: [") {"] },
+  {
+    tokens: [
+      "  ",
+      { text: "const", tone: "action" },
+      " session = ",
+      {
+        text: "await",
+        tone: "action",
+      },
+      " api.renameSession(id, title);",
+    ],
+  },
+  {
+    tokens: [{ text: "  sessions.update(id, session);", tone: "success" }],
+    added: true,
+  },
+  { tokens: ["  ", { text: "return", tone: "action" }, " session;"] },
+  { tokens: ["}"] },
 ];
-
-export const codeLines: import("../models.ts").CodeLine[] = codeMarkup
-  .trimEnd()
-  .split("\n")
-  .map((markup) => ({
-    markup,
-    added: markup.includes("sessions.update"),
-  }));

@@ -1,0 +1,12 @@
+@utility conversation-rows {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+@utility composer-fade {
+  mask-image: linear-gradient(to bottom, transparent, black 30%);
+}
+
+@utility composer-bottom-glass {
+  backdrop-filter: blur(var(--blur-composer));
+  mask-image: linear-gradient(to bottom, transparent 20%, black 75%);
+}

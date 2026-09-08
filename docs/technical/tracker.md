@@ -16,10 +16,18 @@ phase or change the production frontend decision.
 
 The workspace screen baseline has been reviewed through iterative design edits.
 The approved [component architecture](component-architecture.md) is implemented
-in the local design reference: shared primitives, composites, layouts, tokenized
-geometry, fixtures, and seven static screen states. Local verification includes
-component contracts and browser checks. Production architecture planning remains
-separate.
+in the local design reference. The user then authorized its full conversion to
+Lit-based light-DOM Web Components, with visible screen composition and unchanged
+visuals. Two registered screen families cover eight static states. Local
+verification includes component contracts and browser checks. Production
+architecture planning remains separate.
+
+The user requested an audit and plan for files with multiple concerns in the
+design reference. [Design file boundaries](design-file-boundaries.md) records
+the findings and completed migration. Each registered component has its own
+file; viewer behavior, data, examples, styles, and checks have separate owners.
+Source checks, build, and browser verification pass. All 60 before/after
+screenshots match exactly. Production architecture planning remains separate.
 
 ## 1. Technologies and Versions
 

@@ -13,7 +13,9 @@ export function setupScreenReturn() {
   const timer = setTimeout(() => {
     introductory = false;
     update();
-  }, 2500);
+  }, 3000);
+
+  update();
 
   globalThis.addEventListener(
     "pointermove",

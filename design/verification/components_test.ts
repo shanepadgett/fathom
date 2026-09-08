@@ -1,53 +1,11 @@
-import { changedFilesList, fileTree } from "../composites/files.ts";
-import { chatListItem } from "../composites/sessions.ts";
-import { scenario } from "../fixtures/workspace-scenario.ts";
-import { screens } from "../navigation.ts";
 /// <reference lib="deno.ns" />
-import { meter, text } from "../primitives/content.ts";
+
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
-Deno.test("text is escaped in text and attribute positions", () => {
-  const hostile = '<script title="x">&\'</script>';
-  assert(
-    text(hostile) === "&lt;script title=&quot;x&quot;&gt;&amp;&#39;&lt;/script&gt;",
-    "escaping boundary failed",
-  );
-  const row = chatListItem({ ...scenario.chats[0], title: hostile }, scenario.projects[0]);
-  assert(!row.includes("<script"), "chat title became markup");
-  assert(row.includes(`title="${text(hostile)}"`), "attribute not escaped");
-});
-Deno.test("meter bounds and fill derive from the same data", () => {
-  assert(meter(48, 200, "Context").includes("width:24%"), "fill must match value");
-  assert(meter(250, 200, "Context").includes('aria-valuenow="200"'), "maximum clamp");
-  assert(!meter(NaN, 0, "Context").includes("NaN"), "invalid data escaped normalization");
-});
-Deno.test("static tree expansion and Changes share file row rendering", () => {
-  const closed = fileTree(scenario.files, scenario.selectedFile, []);
-  const open = fileTree(scenario.files, scenario.selectedFile, scenario.expandedFolders);
-  assert(!closed.includes("session-store.ts"), "collapsed children visible");
-  assert(open.includes("session-store.ts"), "expanded children missing");
-  assert(!open.includes("<details"), "tree remains interactive");
-  const changes = changedFilesList(scenario.changedFiles, scenario.selectedFile, scenario.changes);
-  assert((changes.match(/data-file-row/g) ?? []).length === 3, "changes must reuse file rows");
-});
-Deno.test("all workspace states compose shared chrome and static controls", () => {
-  assert(screens.length === 8, "missing workspace state");
-  for (const entry of screens) {
-    const html = entry.examples[0].markup;
-    assert(html.includes("data-workspace "), `${entry.id}: missing shell`);
-    assert(html.includes('data-component="workspace-status"'), `${entry.id}: missing footer`);
-    assert(
-      !/<(?:dialog|details|input)\b|href=|\son\w+=/.test(html),
-      `${entry.id}: interactive application behavior`,
-    );
-    assert(!/\sid=/.test(html), `${entry.id}: globally scoped IDs`);
-    if (entry.id.startsWith("agent") || entry.id === "editor-focus-drawer") {
-      assert(html.includes('data-component="composer"'), `${entry.id}: missing shared composer`);
-      assert(html.includes("Medium"), `${entry.id}: stale model label`);
-    }
-  }
-});
+
+// Rendered contracts (escaping, meters, trees, and state updates) run in browser.py.
+// Source checks here enforce the boundaries that a visual snapshot cannot show.
 Deno.test("design markup has no arbitrary numeric utility values", async () => {
   const roots = ["primitives", "composites", "layouts", "screens", "site"];
   for (const root of roots) {
@@ -63,16 +21,55 @@ Deno.test("design markup has no arbitrary numeric utility values", async () => {
 });
 
 Deno.test("authored CSS references defined tokens or documented runtime properties", async () => {
-  const paths = ["tokens.css", "styles.css", "components/button.css", "components/motion.css"];
+  const paths = ["tokens.css", "styles.css"];
+  for (const root of ["components", "composites", "layouts", "site"]) {
+    for await (const entry of Deno.readDir(root)) {
+      if (entry.name.endsWith(".css")) paths.push(`${root}/${entry.name}`);
+    }
+  }
   const sources = await Promise.all(paths.map((path) => Deno.readTextFile(path)));
   const defined = new Set(
     sources.flatMap((source) => [...source.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1])),
   );
-  // Set by the shared drag controller, with a CSS fallback before interaction.
+  // Set by the push drawer owner, with a CSS fallback before interaction.
   defined.add("--resized-panel-width");
   for (let index = 0; index < sources.length; index++) {
     for (const match of sources[index].matchAll(/var\((--[\w-]+)/g)) {
       assert(defined.has(match[1]), `${paths[index]}: undefined token ${match[1]}`);
+    }
+  }
+});
+
+Deno.test("registered component files have one owner and direct child imports", async () => {
+  const registrations = new Map<string, string>();
+  const sources = new Map<string, string>();
+  for (const root of ["components", "composites", "layouts", "screens", "site"]) {
+    for await (const entry of Deno.readDir(root)) {
+      if (!entry.name.endsWith(".ts")) continue;
+      const path = `${root}/${entry.name}`;
+      const source = await Deno.readTextFile(path);
+      sources.set(path, source);
+      const tags = [...source.matchAll(/customElements\.define\("([\w-]+)"/g)];
+      assert(tags.length <= 1, `${path}: multiple registered components`);
+      for (const [, tag] of tags) {
+        assert(!registrations.has(tag), `${tag}: duplicate registration`);
+        registrations.set(tag, path);
+        const filename = tag.startsWith("ds-") ? tag.slice(3) : tag;
+        assert(entry.name === `${filename}.ts`, `${path}: filename does not match ${tag}`);
+      }
+    }
+  }
+  for (const [path, source] of sources) {
+    const imports = [...source.matchAll(/import\s+(?:[^;]*?from\s+)?["']([^"']+)["']/g)].map(
+      (match) => new URL(match[1], `file:///${path}`).pathname.slice(1),
+    );
+    for (const [, tag] of source.matchAll(/<([a-z]+-[a-z-]+)\b/g)) {
+      const owner = registrations.get(tag);
+      assert(!!owner, `${path}: unknown child ${tag}`);
+      assert(
+        owner === path || imports.includes(owner!),
+        `${path}: missing direct import for ${tag}`,
+      );
     }
   }
 });
@@ -98,10 +95,35 @@ Deno.test("renderers preserve dependency boundaries and avoid inline visual dime
       );
       if (root === "screens") {
         assert(
-          !/<[a-z][^>]*>/.test(source),
-          `${path}: screen owns markup instead of selecting compositions`,
+          !/<(?:div|section|aside|header|footer|button|span)\b/.test(source),
+          `${path}: screen owns appearance instead of composing named elements`,
         );
       }
+      assert(
+        !/innerHTML\s*=|unsafeHTML\(|\.join\(["']{2}\)/.test(source),
+        `${path}: HTML string rendering bypasses Lit composition`,
+      );
     }
+  }
+});
+
+Deno.test("screen families are registered components with visible composition", async () => {
+  for (const name of ["agent", "editor"]) {
+    const source = await Deno.readTextFile(`screens/${name}-screen.ts`);
+    assert(source.includes(`customElements.define("${name}-screen"`), "screen is not registered");
+    for (const tag of [
+      "workspace-shell",
+      "workspace-header",
+      "workspace-body",
+      "workspace-sidebar",
+      "workspace-status-bar",
+    ]) {
+      assert(source.includes(`<${tag}`), `${name}: ${tag} is hidden outside the screen`);
+    }
+  }
+  for await (const entry of Deno.readDir("layouts")) {
+    if (!entry.name.endsWith(".ts")) continue;
+    const source = await Deno.readTextFile(`layouts/${entry.name}`);
+    assert(!/composites\//.test(source), `${entry.name}: layout selects screen content`);
   }
 });

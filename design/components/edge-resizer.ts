@@ -1,6 +1,11 @@
-export const sidebarResizeBounds = { min: 180, max: 560 };
+export interface ResizeBounds {
+  min: number;
+  max: number;
+}
+
 /** Shared edge handle for sidebar and drawer preview sizing. */
-class EdgeResizer extends HTMLElement {
+export class EdgeResizer extends HTMLElement {
+  bounds: () => ResizeBounds = () => ({ min: 0, max: innerWidth });
   private events?: AbortController;
   private observer?: ResizeObserver;
   private finish?: () => void;
@@ -11,43 +16,19 @@ class EdgeResizer extends HTMLElement {
     const { signal } = this.events;
     const panel = this.parentElement!;
     const left = this.getAttribute("edge") === "left";
-    const drawer = panel.matches("section, dialog, [data-panel]");
     let defaultWidth = 0;
-    const bounds = () => {
-      const workspace = panel.closest<HTMLElement>("[data-workspace]");
-      let available =
-        workspace?.clientWidth ??
-        (panel.matches("[data-panel]") ? panel.parentElement!.clientWidth : innerWidth);
-      if (workspace && panel.matches("aside:not([data-panel])")) {
-        const siblings = panel.parentElement!.querySelectorAll<HTMLElement>(":scope > aside");
-        for (const sibling of siblings) {
-          if (sibling !== panel) {
-            available -= sibling.getBoundingClientRect().width;
-          }
-        }
-        available -= 320;
-      } else available -= 80;
-      const max = Math.max(1, Math.min(drawer ? 1200 : sidebarResizeBounds.max, available));
-      return {
-        min: Math.min(drawer ? 280 : sidebarResizeBounds.min, max),
-        max,
-      };
-    };
     const sync = () => {
       const width = panel.getBoundingClientRect().width;
       if (!defaultWidth && width > 0) defaultWidth = width;
-      const { min, max } = bounds();
+      const { min, max } = this.bounds();
       this.setAttribute("aria-valuemin", String(Math.round(min)));
       this.setAttribute("aria-valuemax", String(Math.round(max)));
       this.setAttribute("aria-valuenow", String(Math.round(width)));
     };
     const setWidth = (width: number) => {
-      const { min, max } = bounds();
+      const { min, max } = this.bounds();
       const value = Math.round(Math.max(min, Math.min(max, width)));
       panel.style.width = `${value}px`;
-      if (panel.matches("[data-panel]")) {
-        panel.parentElement!.style.setProperty("--resized-panel-width", `${value}px`);
-      }
       sync();
       this.dispatchEvent(new CustomEvent("edge-resize", { detail: value, bubbles: true }));
     };
@@ -79,7 +60,9 @@ class EdgeResizer extends HTMLElement {
         this.finish = () => {
           drag.abort();
           this.removeAttribute("dragging");
-          for (const [frame, value] of frames) frame.style.pointerEvents = value;
+          for (const [frame, value] of frames) {
+            frame.style.pointerEvents = value;
+          }
           document.body.style.cursor = cursor;
           document.body.style.userSelect = selection;
           if (this.hasPointerCapture(event.pointerId)) {
@@ -109,7 +92,7 @@ class EdgeResizer extends HTMLElement {
     this.addEventListener(
       "keydown",
       (event) => {
-        const { min, max } = bounds();
+        const { min, max } = this.bounds();
         const width = panel.getBoundingClientRect().width;
         if (!panel.style.width) defaultWidth = width;
         const step = event.shiftKey ? 48 : 16;
@@ -147,4 +130,5 @@ class EdgeResizer extends HTMLElement {
     this.observer?.disconnect();
   }
 }
+
 customElements.define("edge-resizer", EdgeResizer);

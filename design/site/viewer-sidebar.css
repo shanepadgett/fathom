@@ -1,0 +1,32 @@
+@layer components {
+  .viewer-edge-tab {
+    @apply block -translate-x-full -translate-y-1/2 opacity-0
+      pointer-events-none;
+    transition:
+      transform var(--motion-duration-fast),
+      opacity var(--motion-duration-fast),
+      top var(--motion-duration-normal) ease-out;
+  }
+
+  .viewer-edge-tab[data-positioning] {
+    transition:
+      transform var(--motion-duration-fast),
+      opacity var(--motion-duration-fast);
+  }
+
+  .viewer-edge-tab[data-revealed],
+  .viewer-edge-tab:focus-within {
+    @apply translate-x-0 opacity-100 pointer-events-auto;
+  }
+
+  .viewer-edge-tab[variant] > button {
+    @apply h-16 w-10 rounded-l-none rounded-r-lg border-l-0 bg-surface p-0
+      text-action;
+  }
+
+  @media (hover: none) {
+    .viewer-edge-tab {
+      @apply translate-x-0 opacity-100 pointer-events-auto;
+    }
+  }
+}

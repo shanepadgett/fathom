@@ -108,6 +108,7 @@
   --text-2xl: 1.5rem;
   --text-3xl: 1.875rem;
   --text-title: 2.25rem;
+  --text-wordmark: 4rem;
 
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -211,6 +212,17 @@
 }
 @utility grid-cols-component-example {
   grid-template-columns: var(--grid-component-example);
+}
+
+/* Motion utilities keep the reduced-motion token overrides in effect. */
+@utility duration-motion-fast {
+  transition-duration: var(--motion-duration-fast);
+}
+@utility duration-motion-normal {
+  transition-duration: var(--motion-duration-normal);
+}
+@utility duration-motion-slow {
+  transition-duration: var(--motion-duration-slow);
 }
 
 /* Shared glass treatment for workspace overlays and native overlay demos. */

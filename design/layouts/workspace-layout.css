@@ -1,0 +1,10 @@
+[data-screen-only] workspace-layout {
+  @apply h-dvh;
+}
+
+@layer components {
+  workspace-layout {
+    @apply relative flex h-workspace-preview min-w-workspace-minimum flex-col
+      bg-canvas;
+  }
+}
