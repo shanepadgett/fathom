@@ -1,8 +1,10 @@
-import { relative, resolve } from "node:path";
 import type { HarnessEvent } from "../contracts/session.ts";
+import type { AppConfig } from "./config.ts";
+
+import { relative, resolve } from "node:path";
+
 import { PluginHost } from "../kernel/host.ts";
 import { compose } from "./composition.ts";
-import type { AppConfig } from "./config.ts";
 export class BusyError extends Error {}
 export class Controller {
   private host = new PluginHost();
@@ -31,16 +33,21 @@ export class Controller {
     let model = { provider: "none", id: "none" };
     try {
       model = this.host.get("model").info;
-    } catch { /* A runtime may not use an LLM. */ }
+    } catch {
+      /* A runtime may not use an LLM. */
+    }
     return {
       workspace: this.host.get("workspace").root,
       model,
       runtime: this.host.get("runtime").id,
       plugins: this.host.describe(),
-      tools: this.host.get("tools").list().map(({ name, description }) => ({
-        name,
-        description,
-      })),
+      tools: this.host
+        .get("tools")
+        .list()
+        .map(({ name, description }) => ({
+          name,
+          description,
+        })),
       uiPlugins: this.uiPlugins,
       session: this.host.get("sessions").snapshot(),
       profiles: [],
@@ -69,9 +76,7 @@ export class Controller {
   }
   private assertIdle() {
     if (this.work || this.switching) {
-      throw new BusyError(
-        "Wait for the current run or composition change to finish.",
-      );
+      throw new BusyError("Wait for the current run or composition change to finish.");
     }
   }
   send(text: string) {
@@ -82,21 +87,23 @@ export class Controller {
     this.abort = new AbortController();
     const signal = this.abort.signal;
     sessions.status("running");
-    this.work = Promise.resolve().then(() => runtime.run(text, signal)).then(
-      () => {
+    this.work = Promise.resolve()
+      .then(() => runtime.run(text, signal))
+      .then(() => {
         sessions.status(signal.aborted ? "cancelled" : "idle");
-      },
-    ).catch((error) => {
-      const message = error instanceof Error ? error.message : String(error);
-      if (!signal.aborted) {
-        sessions.append({ role: "system", text: message, isError: true });
-        sessions.publish({ type: "error", message });
-      }
-      sessions.status(signal.aborted ? "cancelled" : "error");
-    }).finally(() => {
-      this.work = undefined;
-      this.abort = undefined;
-    });
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : String(error);
+        if (!signal.aborted) {
+          sessions.append({ role: "system", text: message, isError: true });
+          sessions.publish({ type: "error", message });
+        }
+        sessions.status(signal.aborted ? "cancelled" : "error");
+      })
+      .finally(() => {
+        this.work = undefined;
+        this.abort = undefined;
+      });
   }
   cancel() {
     this.abort?.abort(new Error("Cancelled by user"));

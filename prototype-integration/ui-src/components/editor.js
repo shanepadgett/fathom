@@ -12,7 +12,8 @@ export function mountEditor(container, changed) {
     fontSize: 13,
     scrollBeyondLastLine: false,
   });
-  let model, updating = false;
+  let model,
+    updating = false;
   const subscription = editor.onDidChangeModelContent(() => {
     if (!updating) changed(model.getValue());
   });
@@ -22,11 +23,7 @@ export function mountEditor(container, changed) {
       try {
         if (!model || model.uri.toString() !== doc.uri) {
           model?.dispose();
-          model = monaco.editor.createModel(
-            doc.text,
-            "typescript",
-            monaco.Uri.parse(doc.uri),
-          );
+          model = monaco.editor.createModel(doc.text, "typescript", monaco.Uri.parse(doc.uri));
           editor.setModel(model);
         } else if (syncText && model.getValue() !== doc.text) {
           model.setValue(doc.text);
@@ -38,7 +35,7 @@ export function mountEditor(container, changed) {
             message: d.message,
             source: d.source,
             code: d.code === undefined ? undefined : String(d.code),
-            severity: ({ 1: 8, 2: 4, 3: 2, 4: 1 })[d.severity] ?? 8,
+            severity: { 1: 8, 2: 4, 3: 2, 4: 1 }[d.severity] ?? 8,
             startLineNumber: d.range.start.line + 1,
             startColumn: d.range.start.character + 1,
             endLineNumber: d.range.end.line + 1,

@@ -1,8 +1,6 @@
-import {
-  compositeEntries,
-  primitiveEntries,
-} from "./composites/catalog.examples.ts";
 import { buttonExamples } from "./components/button.examples.ts";
+import { accordionExamples, drawerExamples, modalExamples } from "./components/motion.examples.ts";
+import { compositeEntries, primitiveEntries } from "./composites/catalog.examples.ts";
 import {
   agentChatSearchExamples,
   agentDrawerExamples,
@@ -13,11 +11,6 @@ import {
   editorDrawerExamples,
   editorFocusExamples,
 } from "./screens/workspace.ts";
-import {
-  accordionExamples,
-  drawerExamples,
-  modalExamples,
-} from "./components/motion.examples.ts";
 
 // Local, authored markup only. Never put external data into these templates.
 export interface DesignEntry {
@@ -55,8 +48,7 @@ export const components: DesignEntry[] = [
     id: "accordion",
     category: "Behavior demos",
     name: "Accordion",
-    description:
-      "Expandable sections. Allow one or multiple sections to stay open.",
+    description: "Expandable sections. Allow one or multiple sections to stay open.",
     examples: accordionExamples,
   },
   {

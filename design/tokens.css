@@ -141,7 +141,8 @@
   --radius-full: 9999px;
 
   --spacing-resize-line: 0.0625rem;
-  --shadow-resize-glow: 0 0 0.375rem 0.125rem color-mix(in srgb, var(--color-focus) 45%, transparent);
+  --shadow-resize-glow: 0 0 0.375rem 0.125rem
+    color-mix(in srgb, var(--color-focus) 45%, transparent);
 
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.12);
@@ -214,7 +215,10 @@
 
 /* Shared glass treatment for workspace overlays and native overlay demos. */
 @utility overlay-glass {
-  background-color: color-mix(in srgb, var(--color-canvas)
-    calc(var(--overlay-opacity) * 100%), transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--color-canvas) calc(var(--overlay-opacity) * 100%),
+    transparent
+  );
   backdrop-filter: blur(var(--blur-workspace));
 }

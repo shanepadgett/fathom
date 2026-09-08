@@ -1,11 +1,12 @@
-import { definePlugin } from "../kernel/plugin.ts";
+import type { ModelMessage } from "../contracts/model.ts";
 import type {
   DisplayMessage,
   HarnessEvent,
   RunStatus,
   SessionService,
 } from "../contracts/session.ts";
-import type { ModelMessage } from "../contracts/model.ts";
+
+import { definePlugin } from "../kernel/plugin.ts";
 export class MemorySession implements SessionService {
   private id = crypto.randomUUID();
   private state: RunStatus = "idle";

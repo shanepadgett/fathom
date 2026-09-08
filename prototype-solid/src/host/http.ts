@@ -1,4 +1,5 @@
 import { extname } from "node:path";
+
 import { BusyError, type Controller } from "./controller.ts";
 const types: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -18,9 +19,7 @@ export function createHandler(controller: Controller, shutdown?: AbortSignal) {
         const stream = new ReadableStream<Uint8Array>({
           start(output) {
             const send = (data: unknown) =>
-              output.enqueue(
-                new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`),
-              );
+              output.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`));
             const unsubscribe = controller.subscribe(send);
             const heartbeat = setInterval(
               () => output.enqueue(new TextEncoder().encode(": heartbeat\n\n")),
@@ -30,7 +29,9 @@ export function createHandler(controller: Controller, shutdown?: AbortSignal) {
               dispose();
               try {
                 output.close();
-              } catch { /* Already closed. */ }
+              } catch {
+                /* Already closed. */
+              }
             };
             dispose = () => {
               unsubscribe();
@@ -50,19 +51,16 @@ export function createHandler(controller: Controller, shutdown?: AbortSignal) {
           headers: {
             "content-type": "text/event-stream",
             "cache-control": "no-cache",
-            "connection": "keep-alive",
+            connection: "keep-alive",
           },
         });
       }
       if (request.method === "POST" && url.pathname.startsWith("/api/")) {
         // The browser transport accepts same-origin JSON requests only.
-        if (
-          request.headers.get("origin") &&
-          request.headers.get("origin") !== url.origin
-        ) return new Response("Origin mismatch", { status: 403 });
-        if (
-          !request.headers.get("content-type")?.includes("application/json")
-        ) return new Response("Expected JSON", { status: 415 });
+        if (request.headers.get("origin") && request.headers.get("origin") !== url.origin)
+          return new Response("Origin mismatch", { status: 403 });
+        if (!request.headers.get("content-type")?.includes("application/json"))
+          return new Response("Expected JSON", { status: 415 });
         const body = await request.json();
         switch (url.pathname) {
           case "/api/message":
@@ -88,9 +86,7 @@ export function createHandler(controller: Controller, shutdown?: AbortSignal) {
       if (request.method !== "GET") {
         return new Response("Method not allowed", { status: 405 });
       }
-      const path = url.pathname === "/"
-        ? "/ui/index.html"
-        : decodeURIComponent(url.pathname);
+      const path = url.pathname === "/" ? "/ui/index.html" : decodeURIComponent(url.pathname);
       const external = controller.asset(path);
       if (external) {
         return new Response(await Deno.readFile(external), {
@@ -114,9 +110,12 @@ export function createHandler(controller: Controller, shutdown?: AbortSignal) {
       if (error instanceof Deno.errors.NotFound) {
         return new Response("Not found", { status: 404 });
       }
-      return Response.json({
-        error: error instanceof Error ? error.message : String(error),
-      }, { status: error instanceof BusyError ? 409 : 400 });
+      return Response.json(
+        {
+          error: error instanceof Error ? error.message : String(error),
+        },
+        { status: error instanceof BusyError ? 409 : 400 },
+      );
     }
   };
 }

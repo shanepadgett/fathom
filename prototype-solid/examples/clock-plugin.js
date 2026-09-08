@@ -14,7 +14,7 @@ export default {
           additionalProperties: false,
         },
         execute: () => Promise.resolve(new Date().toISOString()),
-      })
+      }),
     );
   },
 };

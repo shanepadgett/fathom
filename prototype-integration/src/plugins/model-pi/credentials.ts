@@ -1,8 +1,5 @@
-import type {
-  AuthOperationOptions,
-  Credential,
-  CredentialStore,
-} from "@earendil-works/pi-ai";
+import type { AuthOperationOptions, Credential, CredentialStore } from "@earendil-works/pi-ai";
+
 // @deno-types="@types/proper-lockfile"
 import lockfile from "proper-lockfile";
 
@@ -22,9 +19,10 @@ export class PiCredentialStore implements CredentialStore {
   }
   async list(options?: AuthOperationOptions) {
     options?.signal?.throwIfAborted();
-    return Object.entries(await this.load()).map((
-      [providerId, credential],
-    ) => ({ providerId, type: credential.type }));
+    return Object.entries(await this.load()).map(([providerId, credential]) => ({
+      providerId,
+      type: credential.type,
+    }));
   }
   private async locked<T>(
     operation: (data: Record<string, Credential>) => Promise<T>,
@@ -48,11 +46,7 @@ export class PiCredentialStore implements CredentialStore {
       if (compromised) throw compromised;
       options?.signal?.throwIfAborted();
       if (before !== JSON.stringify(data)) {
-        await Deno.writeTextFile(
-          this.path,
-          JSON.stringify(data, null, 2) + "\n",
-          { mode: 0o600 },
-        );
+        await Deno.writeTextFile(this.path, JSON.stringify(data, null, 2) + "\n", { mode: 0o600 });
       }
       return result;
     } finally {

@@ -1,5 +1,5 @@
-import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 
 export function mountTerminal(container, command, report) {
@@ -11,16 +11,13 @@ export function mountTerminal(container, command, report) {
   const fit = new FitAddon();
   term.loadAddon(fit);
   term.open(container);
-  let previous = "", running = false;
-  const data = term.onData((data) =>
-    command("terminal-write", { data }).catch(report)
-  );
+  let previous = "",
+    running = false;
+  const data = term.onData((data) => command("terminal-write", { data }).catch(report));
   const resize = () => {
     fit.fit();
     if (running) {
-      command("terminal-resize", { cols: term.cols, rows: term.rows }).catch(
-        report,
-      );
+      command("terminal-resize", { cols: term.cols, rows: term.rows }).catch(report);
     }
   };
   const observer = new ResizeObserver(resize);

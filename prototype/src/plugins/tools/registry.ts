@@ -1,5 +1,6 @@
-import { definePlugin } from "../../kernel/plugin.ts";
 import type { ToolDefinition, ToolRegistry } from "../../contracts/tools.ts";
+
+import { definePlugin } from "../../kernel/plugin.ts";
 export class Registry implements ToolRegistry {
   private tools = new Map<string, ToolDefinition>();
   register(tool: ToolDefinition) {

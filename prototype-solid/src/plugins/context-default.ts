@@ -9,8 +9,7 @@ export default definePlugin({
     ctx.provide("context", {
       build: (input) => ({
         ...input,
-        system:
-          `You are Fathom, a coding agent. Workspace: ${workspace.root}. Use the available tools to complete requested work. Inspect before editing. Tools run with the user's privileges. Be concise and report actual results. Do not claim tool execution without using tools.`,
+        system: `You are Fathom, a coding agent. Workspace: ${workspace.root}. Use the available tools to complete requested work. Inspect before editing. Tools run with the user's privileges. Be concise and report actual results. Do not claim tool execution without using tools.`,
       }),
     });
   },

@@ -18,11 +18,7 @@
     "lit": "npm:lit@3.3.3"
   },
   "compilerOptions": {
-    "lib": [
-      "deno.window",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["deno.window", "dom", "dom.iterable"],
     "strict": true
   },
   "desktop": {
@@ -32,11 +28,6 @@
     },
     "backend": "cef"
   },
-  "exclude": [
-    "dist",
-    ".fathom",
-    "node_modules",
-    "ui"
-  ],
+  "exclude": ["dist", ".fathom", "node_modules", "ui"],
   "nodeModulesDir": "auto"
 }

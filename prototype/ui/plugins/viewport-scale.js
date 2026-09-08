@@ -27,10 +27,7 @@ export default {
 
     function apply(next) {
       scale = next;
-      document.documentElement.style.setProperty(
-        "--interface-scale",
-        String(scale),
-      );
+      document.documentElement.style.setProperty("--interface-scale", String(scale));
       saveScale(scale);
       globalThis.dispatchEvent(
         new CustomEvent("fathom:viewport-scale-changed", {
@@ -41,10 +38,7 @@ export default {
 
     function change(direction) {
       const current = ZOOM_LEVELS.indexOf(scale);
-      const next = Math.min(
-        ZOOM_LEVELS.length - 1,
-        Math.max(0, current + direction),
-      );
+      const next = Math.min(ZOOM_LEVELS.length - 1, Math.max(0, current + direction));
       apply(ZOOM_LEVELS[next]);
     }
 
@@ -60,13 +54,10 @@ export default {
     function onKeyDown(event) {
       if (!(event.metaKey || event.ctrlKey) || event.altKey) return;
       let command;
-      if (
-        event.key === "+" || event.key === "=" || event.code === "NumpadAdd"
-      ) command = "view.zoomIn";
-      else if (
-        event.key === "-" || event.key === "_" ||
-        event.code === "NumpadSubtract"
-      ) command = "view.zoomOut";
+      if (event.key === "+" || event.key === "=" || event.code === "NumpadAdd")
+        command = "view.zoomIn";
+      else if (event.key === "-" || event.key === "_" || event.code === "NumpadSubtract")
+        command = "view.zoomOut";
       else if (event.key === "0" || event.code === "Numpad0") {
         command = "view.resetZoom";
       } else return;

@@ -7,9 +7,7 @@ export function schema(fields: Record<string, string>) {
   return {
     type: "object",
     properties: Object.fromEntries(
-      Object.entries(fields).map((
-        [key, description],
-      ) => [key, { type: "string", description }]),
+      Object.entries(fields).map(([key, description]) => [key, { type: "string", description }]),
     ),
     required: Object.keys(fields),
     additionalProperties: false,

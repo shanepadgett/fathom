@@ -1,5 +1,6 @@
 .workbench {
-  grid-template-columns: minmax(300px, var(--conversation-width, 40%)) 6px
+  grid-template-columns:
+    minmax(300px, var(--conversation-width, 40%)) 6px
     minmax(400px, 1fr);
 }
 .workbench > .side-rail {

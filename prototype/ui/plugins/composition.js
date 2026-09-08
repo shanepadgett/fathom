@@ -48,7 +48,7 @@ function mount(container, host) {
               el("dt", {}, "REQUIRES"),
               el("dd", {}, plugin.requires.join(", ") || "None"),
             ),
-          )
+          ),
         ),
         el("h3", { class: "tool-heading eyebrow" }, "Available tools"),
         ...bootstrap.tools.map((tool) =>
@@ -57,7 +57,7 @@ function mount(container, host) {
             { class: "tool-entry" },
             el("summary", {}, tool.name),
             el("p", {}, tool.description),
-          )
+          ),
         ),
         el(
           "div",

@@ -23,7 +23,7 @@ export default {
           additionalProperties: false,
         },
         execute: () => Promise.resolve("Hello from an external plugin"),
-      })
+      }),
     );
   },
 };

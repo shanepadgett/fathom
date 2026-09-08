@@ -30,22 +30,19 @@ export default definePlugin({
           }
           const content = await Deno.readTextFile(path, { signal });
           const first = content.indexOf(oldText);
-          if (
-            first < 0 || content.indexOf(oldText, first + 1) >= 0
-          ) {
+          if (first < 0 || content.indexOf(oldText, first + 1) >= 0) {
             throw new Error(
               "oldText must match exactly once; read the file and provide more context",
             );
           }
           await Deno.writeTextFile(
             path,
-            content.slice(0, first) + newText +
-              content.slice(first + oldText.length),
+            content.slice(0, first) + newText + content.slice(first + oldText.length),
             { signal },
           );
           return `Edited ${path}`;
         },
-      })
+      }),
     );
   },
 });

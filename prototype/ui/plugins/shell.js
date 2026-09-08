@@ -1,31 +1,19 @@
-import { el } from "../core/dom.js";
-
 import { createContextMeter } from "../components/context-meter.js";
+import { el } from "../core/dom.js";
 
 export default {
   id: "ui.shell",
   activate(host) {
     const root = document.querySelector("#app");
     const model = el("span", {}, "Connecting…");
-    const workspace = el(
-      "span",
-      { class: "workspace-path" },
-      "Loading workspace",
-    );
-    const status = el(
-      "span",
-      { class: "footer-status status", role: "status" },
-      "Connecting",
-    );
+    const workspace = el("span", { class: "workspace-path" }, "Loading workspace");
+    const status = el("span", { class: "footer-status status", role: "status" }, "Connecting");
     const context = createContextMeter();
-    const profile = el(
-      "select",
-      {
-        id: "runtime",
-        "aria-label": "Runtime composition",
-        "aria-describedby": "runtime-note",
-      },
-    );
+    const profile = el("select", {
+      id: "runtime",
+      "aria-label": "Runtime composition",
+      "aria-describedby": "runtime-note",
+    });
     const runtimeNote = el("small", {
       id: "runtime-note",
       class: "runtime-note",
@@ -46,11 +34,7 @@ export default {
       el(
         "div",
         { class: "context-bar" },
-        el(
-          "div",
-          { class: "context-brand" },
-          el("h1", {}, "FATHOM", el("span", {}, ".")),
-        ),
+        el("div", { class: "context-brand" }, el("h1", {}, "FATHOM", el("span", {}, "."))),
         el("div", {}, el("span", { class: "eyebrow" }, "Workspace"), workspace),
         el("div", {}, el("span", { class: "eyebrow" }, "Model"), model),
         el(
@@ -63,12 +47,7 @@ export default {
       ),
       error,
       el("div", { class: "workbench" }, main, rail),
-      el(
-        "footer",
-        {},
-        status,
-        context.node,
-      ),
+      el("footer", {}, status, context.node),
     );
     profile.addEventListener("change", async () => {
       const selected = profile.value;
@@ -100,22 +79,21 @@ export default {
         profile.replaceChildren(
           ...(profiles.length
             ? profiles.map((name) =>
-              el(
-                "option",
-                { value: name },
-                name === "default"
-                  ? "Default / pi-ai"
-                  : name === "echo"
-                  ? "Echo / alternate runtime"
-                  : name,
+                el(
+                  "option",
+                  { value: name },
+                  name === "default"
+                    ? "Default / pi-ai"
+                    : name === "echo"
+                      ? "Echo / alternate runtime"
+                      : name,
+                ),
               )
-            )
             : [el("option", { value: "custom" }, data.runtime)]),
         );
       }
       profile.value = profiles.length ? data.profile : "custom";
-      profile.disabled = switching || !profiles.length ||
-        data.session.status === "running";
+      profile.disabled = switching || !profiles.length || data.session.status === "running";
       runtimeNote.textContent = profiles.length
         ? "Switching starts a fresh session"
         : "Custom composition";
@@ -123,8 +101,8 @@ export default {
         ? data.session.status === "running"
           ? "Working"
           : data.session.status === "idle"
-          ? "Idle"
-          : data.session.status
+            ? "Idle"
+            : data.session.status
         : "Reconnecting";
       status.dataset.state = state.connected ? data.session.status : "offline";
       context.update(data.session, state.liveText);

@@ -1,6 +1,7 @@
-import { Controller } from "../src/host/controller.ts";
-import { readConfig } from "../src/host/config.ts";
 import { assertEquals } from "@std/assert";
+
+import { readConfig } from "../src/host/config.ts";
+import { Controller } from "../src/host/controller.ts";
 const workspace = await Deno.makeTempDir({ prefix: "fathom-smoke-" });
 const controller = new Controller({
   ...readConfig(),
@@ -25,17 +26,13 @@ try {
   assertEquals(controller.bootstrap().session.status, "idle");
   assertEquals(await Deno.readTextFile(`${workspace}/proof.txt`), "beta\n");
   assertEquals([...used].sort(), ["bash", "edit", "read", "write"]);
-  console.log(
-    "PASS: pi OAuth + streamed model + read/write/edit/bash; file verified on disk.",
-  );
+  console.log("PASS: pi OAuth + streamed model + read/write/edit/bash; file verified on disk.");
   await controller.switchProfile("echo");
   controller.send("replacement proof");
   await controller.wait();
   assertEquals(controller.bootstrap().runtime, "echo");
   assertEquals(controller.bootstrap().session.messages.length, 2);
-  console.log(
-    "PASS: runtime replacement through the same controller contract.",
-  );
+  console.log("PASS: runtime replacement through the same controller contract.");
 } finally {
   await controller.dispose();
   await Deno.remove(workspace, { recursive: true });

@@ -17,9 +17,7 @@ export function createTransport(state) {
     });
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      throw new Error(
-        body.error || body.message || `Request failed (${response.status})`,
-      );
+      throw new Error(body.error || body.message || `Request failed (${response.status})`);
     }
     return response.json();
   }

@@ -13,9 +13,8 @@ export default definePlugin({
         description:
           "Run bash in the workspace. Each call starts a fresh shell. 60 second timeout; output capped. Nonzero exits are reported.",
         parameters: schema({ command: "Bash command" }),
-        execute: (args, signal) =>
-          runBash(stringArg(args, "command"), workspace.root, signal),
-      })
+        execute: (args, signal) => runBash(stringArg(args, "command"), workspace.root, signal),
+      }),
     );
   },
 });

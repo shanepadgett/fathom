@@ -2,10 +2,7 @@ import { spawn } from "node:child_process";
 import { resolve } from "node:path";
 
 const root = await Deno.makeTempDir({ prefix: "fathom-native-" });
-await Deno.writeTextFile(
-  `${root}/issues.ts`,
-  'export const answer: number = "wrong";\n',
-);
+await Deno.writeTextFile(`${root}/issues.ts`, 'export const answer: number = "wrong";\n');
 await Deno.writeTextFile(`${root}/deno.json`, "{}");
 const child = spawn(resolve("dist/Fathom.app/Contents/MacOS/laufey"), [], {
   env: {
@@ -17,15 +14,13 @@ const child = spawn(resolve("dist/Fathom.app/Contents/MacOS/laufey"), [], {
   stdio: ["ignore", "pipe", "pipe"],
 });
 let logs = "";
-child.stdout.on("data", (data) => logs += data);
-child.stderr.on("data", (data) => logs += data);
+child.stdout.on("data", (data) => (logs += data));
+child.stderr.on("data", (data) => (logs += data));
 const closed = new Promise((done) => child.once("close", done));
 try {
   const deadline = Date.now() + 30000;
-  while (
-    !logs.includes("Listening on") && Date.now() < deadline &&
-    child.exitCode === null
-  ) await new Promise((r) => setTimeout(r, 100));
+  while (!logs.includes("Listening on") && Date.now() < deadline && child.exitCode === null)
+    await new Promise((r) => setTimeout(r, 100));
   const base = logs.match(/Listening on (http:\/\/127\.0\.0\.1:\d+)/)?.[1];
   if (!base) throw new Error(logs);
   async function command(action: string, args: Record<string, unknown> = {}) {

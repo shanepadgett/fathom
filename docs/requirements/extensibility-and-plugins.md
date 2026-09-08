@@ -242,19 +242,14 @@ their Fathom configuration directly within `deno.json`.
   "name": "@org/fathom-experience",
   "version": "1.0.0",
   "imports": {
-    "@std/fs": "jsr:@std/fs@^1.0.0"
+    "@std/fs": "jsr:@std/fs@^1.0.0",
   },
   "fathom": {
     // Dynamic glob discovery: automatically mounts any file exporting a valid plugin
-    "plugins": [
-      "./plugins/**/*.ts"
-    ],
+    "plugins": ["./plugins/**/*.ts"],
     // Built-in plugins or services to disable
-    "disables": [
-      "fathom:builtin:default-shell",
-      "fathom:builtin:runtime-agent"
-    ]
-  }
+    "disables": ["fathom:builtin:default-shell", "fathom:builtin:runtime-agent"],
+  },
 }
 ```
 

@@ -10,8 +10,7 @@ const categories = [
   ["results", "Tool results", "#478773"],
 ];
 const tokens = (text = "") => Math.ceil(text.length / 4);
-const format = (value) =>
-  value < 1000 ? String(value) : `${+(value / 1000).toFixed(1)}K`;
+const format = (value) => (value < 1000 ? String(value) : `${+(value / 1000).toFixed(1)}K`);
 
 // The transcript is a display projection, not the exact provider request.
 // Keep the existing fixed allowance explicit until runtime accounting is exposed.
@@ -27,9 +26,7 @@ function estimate(session, liveText) {
   for (const message of session.messages) {
     if (message.role === "tool") {
       counts.results += tokens(message.text);
-      counts.calls += tokens(
-        (message.toolName || "") + JSON.stringify(message.args || {}),
-      );
+      counts.calls += tokens((message.toolName || "") + JSON.stringify(message.args || {}));
     } else if (message.role === "user" || message.role === "assistant") {
       counts[message.role] += tokens(message.text);
     }
@@ -48,11 +45,15 @@ export function createContextMeter() {
   const value = el("span", { class: "context-value" });
   const rows = new Map();
   const segments = new Map();
-  const popover = el("div", {
-    class: "context-popover",
-    id: "context-breakdown",
-    role: "tooltip",
-  }, el("strong", {}, "Context breakdown"));
+  const popover = el(
+    "div",
+    {
+      class: "context-popover",
+      id: "context-breakdown",
+      role: "tooltip",
+    },
+    el("strong", {}, "Context breakdown"),
+  );
   for (const [key, label, color] of categories) {
     const segment = el("span", {
       class: "context-segment",
@@ -97,31 +98,20 @@ export function createContextMeter() {
     if (event.key === "Escape") node.classList.add("popover-dismissed");
   });
   for (const event of ["mouseenter", "focusin"]) {
-    node.addEventListener(
-      event,
-      () => node.classList.remove("popover-dismissed"),
-    );
+    node.addEventListener(event, () => node.classList.remove("popover-dismissed"));
   }
   return {
     node,
     update(session, liveText = "") {
       const counts = estimate(session, liveText);
-      const total = Object.values(counts).reduce(
-        (sum, count) => sum + count,
-        0,
-      );
+      const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
       for (const [key] of categories) {
-        segments.get(key).style.width = `${
-          counts[key] / Math.max(LIMIT, total) * 100
-        }%`;
+        segments.get(key).style.width = `${(counts[key] / Math.max(LIMIT, total)) * 100}%`;
         rows.get(key).textContent = `~${format(counts[key])}`;
       }
       value.textContent = `~${format(total)} / 256K`;
       track.setAttribute("aria-valuenow", String(Math.min(LIMIT, total)));
-      track.setAttribute(
-        "aria-valuetext",
-        `Approximately ${total} of ${LIMIT} tokens`,
-      );
+      track.setAttribute("aria-valuetext", `Approximately ${total} of ${LIMIT} tokens`);
     },
   };
 }

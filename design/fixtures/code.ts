@@ -1,6 +1,5 @@
 // Trusted, locally authored syntax markup. Never interpolate external text here.
-const codeMarkup =
-  `<span class="text-action">import</span> { createStore } <span class="text-action">from</span> <span class="text-success">"../state/store.ts"</span>;
+const codeMarkup = `<span class="text-action">import</span> { createStore } <span class="text-action">from</span> <span class="text-success">"../state/store.ts"</span>;
 <span class="text-action">import</span> { api } <span class="text-action">from</span> <span class="text-success">"../api.ts"</span>;
 <span class="text-action">import type</span> { Session } <span class="text-action">from</span> <span class="text-success">"./session.ts"</span>;
 
@@ -25,20 +24,20 @@ const codeMarkup =
 export const diffLines: import("../models.ts").DiffLine[] = [
   {
     kind: "context",
-    text:
-      "  18  export async function renameSession(\n  19    id: string,\n  20    title: string,\n  21  ) {",
+    text: "  18  export async function renameSession(\n  19    id: string,\n  20    title: string,\n  21  ) {",
   },
   { kind: "removed", text: "− 22    await api.renameSession(id, title);" },
   {
     kind: "added",
-    text:
-      "+ 22    const session = await api.renameSession(id, title);\n+ 23    sessions.update(id, session);\n+ 24    return session;",
+    text: "+ 22    const session = await api.renameSession(id, title);\n+ 23    sessions.update(id, session);\n+ 24    return session;",
   },
   { kind: "context", text: "  25  }" },
 ];
 
-export const codeLines: import("../models.ts").CodeLine[] = codeMarkup.trimEnd()
-  .split("\n").map((markup) => ({
+export const codeLines: import("../models.ts").CodeLine[] = codeMarkup
+  .trimEnd()
+  .split("\n")
+  .map((markup) => ({
     markup,
     added: markup.includes("sessions.update"),
   }));

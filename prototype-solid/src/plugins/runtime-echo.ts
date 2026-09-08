@@ -13,8 +13,7 @@ export default definePlugin({
         sessions.append({ role: "user", text });
         sessions.append({
           role: "assistant",
-          text:
-            `Echo runtime received: ${text}\n\nThis is a different runtime plugin. No model request or tool execution occurred. The desktop UI and session service are unchanged.`,
+          text: `Echo runtime received: ${text}\n\nThis is a different runtime plugin. No model request or tool execution occurred. The desktop UI and session service are unchanged.`,
         });
         return Promise.resolve();
       },

@@ -15,14 +15,11 @@ class EdgeResizer extends HTMLElement {
     let defaultWidth = 0;
     const bounds = () => {
       const workspace = panel.closest<HTMLElement>("[data-workspace]");
-      let available = workspace?.clientWidth ??
-        (panel.matches("[data-panel]")
-          ? panel.parentElement!.clientWidth
-          : innerWidth);
+      let available =
+        workspace?.clientWidth ??
+        (panel.matches("[data-panel]") ? panel.parentElement!.clientWidth : innerWidth);
       if (workspace && panel.matches("aside:not([data-panel])")) {
-        const siblings = panel.parentElement!.querySelectorAll<HTMLElement>(
-          ":scope > aside",
-        );
+        const siblings = panel.parentElement!.querySelectorAll<HTMLElement>(":scope > aside");
         for (const sibling of siblings) {
           if (sibling !== panel) {
             available -= sibling.getBoundingClientRect().width;
@@ -30,10 +27,7 @@ class EdgeResizer extends HTMLElement {
         }
         available -= 320;
       } else available -= 80;
-      const max = Math.max(
-        1,
-        Math.min(drawer ? 1200 : sidebarResizeBounds.max, available),
-      );
+      const max = Math.max(1, Math.min(drawer ? 1200 : sidebarResizeBounds.max, available));
       return {
         min: Math.min(drawer ? 280 : sidebarResizeBounds.min, max),
         max,
@@ -52,90 +46,98 @@ class EdgeResizer extends HTMLElement {
       const value = Math.round(Math.max(min, Math.min(max, width)));
       panel.style.width = `${value}px`;
       if (panel.matches("[data-panel]")) {
-        panel.parentElement!.style.setProperty(
-          "--resized-panel-width",
-          `${value}px`,
-        );
+        panel.parentElement!.style.setProperty("--resized-panel-width", `${value}px`);
       }
       sync();
-      this.dispatchEvent(
-        new CustomEvent("edge-resize", { detail: value, bubbles: true }),
-      );
+      this.dispatchEvent(new CustomEvent("edge-resize", { detail: value, bubbles: true }));
     };
     this.tabIndex = 0;
     this.setAttribute("role", "separator");
     this.setAttribute("aria-orientation", "vertical");
-    this.setAttribute(
-      "aria-label",
-      `Resize ${panel.getAttribute("aria-label") ?? "drawer"}`,
-    );
+    this.setAttribute("aria-label", `Resize ${panel.getAttribute("aria-label") ?? "drawer"}`);
     this.title = "Drag to resize; use arrow keys; double-click to reset";
-    this.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0 || !event.isPrimary) return;
-      event.preventDefault();
-      this.finish?.();
-      const start = event.clientX;
-      const width = panel.getBoundingClientRect().width;
-      if (!panel.style.width) defaultWidth = width;
-      const cursor = document.body.style.cursor;
-      const selection = document.body.style.userSelect;
-      const drag = new AbortController();
-      const frames = [...document.querySelectorAll("iframe")].map((frame) =>
-        [frame, frame.style.pointerEvents] as const
-      );
-      for (const [frame] of frames) frame.style.pointerEvents = "none";
-      document.body.style.cursor = "col-resize";
-      document.body.style.userSelect = "none";
-      this.setAttribute("dragging", "");
-      this.setPointerCapture(event.pointerId);
-      this.finish = () => {
-        drag.abort();
-        this.removeAttribute("dragging");
-        for (const [frame, value] of frames) frame.style.pointerEvents = value;
-        document.body.style.cursor = cursor;
-        document.body.style.userSelect = selection;
-        if (this.hasPointerCapture(event.pointerId)) {
-          this.releasePointerCapture(event.pointerId);
+    this.addEventListener(
+      "pointerdown",
+      (event) => {
+        if (event.button !== 0 || !event.isPrimary) return;
+        event.preventDefault();
+        this.finish?.();
+        const start = event.clientX;
+        const width = panel.getBoundingClientRect().width;
+        if (!panel.style.width) defaultWidth = width;
+        const cursor = document.body.style.cursor;
+        const selection = document.body.style.userSelect;
+        const drag = new AbortController();
+        const frames = [...document.querySelectorAll("iframe")].map(
+          (frame) => [frame, frame.style.pointerEvents] as const,
+        );
+        for (const [frame] of frames) frame.style.pointerEvents = "none";
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+        this.setAttribute("dragging", "");
+        this.setPointerCapture(event.pointerId);
+        this.finish = () => {
+          drag.abort();
+          this.removeAttribute("dragging");
+          for (const [frame, value] of frames) frame.style.pointerEvents = value;
+          document.body.style.cursor = cursor;
+          document.body.style.userSelect = selection;
+          if (this.hasPointerCapture(event.pointerId)) {
+            this.releasePointerCapture(event.pointerId);
+          }
+          this.finish = undefined;
+        };
+        this.addEventListener(
+          "pointermove",
+          (move) => {
+            setWidth(width + (move.clientX - start) * (left ? -1 : 1));
+          },
+          { signal: drag.signal },
+        );
+        for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) {
+          this.addEventListener(type, () => this.finish?.(), {
+            signal: drag.signal,
+          });
         }
-        this.finish = undefined;
-      };
-      this.addEventListener("pointermove", (move) => {
-        setWidth(width + (move.clientX - start) * (left ? -1 : 1));
-      }, { signal: drag.signal });
-      for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) {
-        this.addEventListener(type, () => this.finish?.(), {
+        globalThis.addEventListener("blur", () => this.finish?.(), {
           signal: drag.signal,
         });
-      }
-      globalThis.addEventListener("blur", () => this.finish?.(), {
-        signal: drag.signal,
-      });
-    }, { signal });
+      },
+      { signal },
+    );
     this.addEventListener("dblclick", () => setWidth(defaultWidth), { signal });
-    this.addEventListener("keydown", (event) => {
-      const { min, max } = bounds();
-      const width = panel.getBoundingClientRect().width;
-      if (!panel.style.width) defaultWidth = width;
-      const step = event.shiftKey ? 48 : 16;
-      const values: Record<string, number> = {
-        ArrowLeft: width + (left ? step : -step),
-        ArrowRight: width + (left ? -step : step),
-        Home: min,
-        End: max,
-        Enter: defaultWidth,
-        " ": defaultWidth,
-      };
-      if (event.key in values) {
-        event.preventDefault();
-        setWidth(values[event.key]);
-      }
-    }, { signal });
+    this.addEventListener(
+      "keydown",
+      (event) => {
+        const { min, max } = bounds();
+        const width = panel.getBoundingClientRect().width;
+        if (!panel.style.width) defaultWidth = width;
+        const step = event.shiftKey ? 48 : 16;
+        const values: Record<string, number> = {
+          ArrowLeft: width + (left ? step : -step),
+          ArrowRight: width + (left ? -step : step),
+          Home: min,
+          End: max,
+          Enter: defaultWidth,
+          " ": defaultWidth,
+        };
+        if (event.key in values) {
+          event.preventDefault();
+          setWidth(values[event.key]);
+        }
+      },
+      { signal },
+    );
     this.observer = new ResizeObserver(sync);
     this.observer.observe(panel);
-    globalThis.addEventListener("resize", () => {
-      if (panel.style.width) setWidth(panel.getBoundingClientRect().width);
-      else sync();
-    }, { signal });
+    globalThis.addEventListener(
+      "resize",
+      () => {
+        if (panel.style.width) setWidth(panel.getBoundingClientRect().width);
+        else sync();
+      },
+      { signal },
+    );
     sync();
   }
 

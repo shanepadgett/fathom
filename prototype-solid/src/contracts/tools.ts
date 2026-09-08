@@ -5,11 +5,7 @@ export interface ToolDefinition extends ToolSchema {
 export interface ToolRegistry {
   register(tool: ToolDefinition): () => void;
   list(): ToolDefinition[];
-  execute(
-    name: string,
-    args: Record<string, unknown>,
-    signal: AbortSignal,
-  ): Promise<string>;
+  execute(name: string, args: Record<string, unknown>, signal: AbortSignal): Promise<string>;
 }
 export interface WorkspaceService {
   root: string;

@@ -1,6 +1,7 @@
 import { html } from "lit";
-import { HostElement, mountElement } from "../core/component.js";
+
 import { createContextMeter } from "../components/context-meter.js";
+import { HostElement, mountElement } from "../core/component.js";
 
 class Shell extends HostElement {
   constructor() {
@@ -38,9 +39,7 @@ class Shell extends HostElement {
     const data = this.state.bootstrap;
     if (data) {
       this.context.update(data.session, this.state.liveText);
-      this.querySelector("select").value = data.profiles?.length
-        ? data.profile
-        : "custom";
+      this.querySelector("select").value = data.profiles?.length ? data.profile : "custom";
     }
     for (const [id, entry] of this.mounted) {
       if (!this.host.views.has(id)) {
@@ -64,44 +63,56 @@ class Shell extends HostElement {
     const status = !data
       ? "Connecting"
       : !connected
-      ? "Reconnecting"
-      : data.session.status === "running"
-      ? "Working"
-      : data.session.status === "idle"
-      ? "Idle"
-      : data.session.status;
+        ? "Reconnecting"
+        : data.session.status === "running"
+          ? "Working"
+          : data.session.status === "idle"
+            ? "Idle"
+            : data.session.status;
     return html`
       <div class="context-bar">
         <div class="context-brand">
           <h1>FATHOM<span>.</span></h1>
         </div>
-        <div><span class="eyebrow">Workspace</span><span class="workspace-path" title=${data
-          ?.workspace || ""}>${data?.workspace ||
-          "Loading workspace"}</span></div>
-        <div><span class="eyebrow">Model</span><span>${data
-          ? `${data.model.provider} / ${data.model.id}`
-          : "Connecting…"}</span></div>
-        <div><label for="runtime" class="eyebrow">Runtime</label>
-          <select id="runtime" aria-label="Runtime composition" aria-describedby="runtime-note"
-            ?disabled=${this.switching || !profiles.length ||
-              data?.session.status === "running"} @change=${this.switchProfile}>
-            ${profiles.length
-              ? profiles.map((name) =>
-                html`<option value=${name}>${
-                  name === "default"
-                    ? "Default / pi-ai"
-                    : name === "echo"
-                    ? "Echo / alternate runtime"
-                    : name
-                }</option>`
-              )
-              : html`<option value="custom">${
-                data?.runtime || "Connecting…"
-              }</option>`}
+        <div>
+          <span class="eyebrow">Workspace</span
+          ><span class="workspace-path" title=${data?.workspace || ""}
+            >${data?.workspace || "Loading workspace"}</span
+          >
+        </div>
+        <div>
+          <span class="eyebrow">Model</span
+          ><span>${data ? `${data.model.provider} / ${data.model.id}` : "Connecting…"}</span>
+        </div>
+        <div>
+          <label for="runtime" class="eyebrow">Runtime</label>
+          <select
+            id="runtime"
+            aria-label="Runtime composition"
+            aria-describedby="runtime-note"
+            ?disabled=${this.switching || !profiles.length || data?.session.status === "running"}
+            @change=${this.switchProfile}
+          >
+            ${
+              profiles.length
+                ? profiles.map(
+                    (name) =>
+                      html`<option value=${name}>
+                        ${
+                          name === "default"
+                            ? "Default / pi-ai"
+                            : name === "echo"
+                              ? "Echo / alternate runtime"
+                              : name
+                        }
+                      </option>`,
+                  )
+                : html`<option value="custom">${data?.runtime || "Connecting…"}</option>`
+            }
           </select>
-          <small id="runtime-note" class="runtime-note">${profiles.length
-            ? "Switching starts a fresh session"
-            : "Custom composition"}</small>
+          <small id="runtime-note" class="runtime-note"
+            >${profiles.length ? "Switching starts a fresh session" : "Custom composition"}</small
+          >
         </div>
       </div>
       <div class="error-banner" role="alert" ?hidden=${!error}>${error}</div>
@@ -109,15 +120,19 @@ class Shell extends HostElement {
         <main class="main-view"></main>
         <aside class="side-rail" aria-label="Plugin composition"></aside>
       </div>
-      <footer><span class="footer-status status" role="status" data-state=${connected
-        ? data?.session.status
-        : "offline"}>${status}</span>${this.context.node}</footer>
+      <footer>
+        <span
+          class="footer-status status"
+          role="status"
+          data-state=${connected ? data?.session.status : "offline"}
+          >${status}</span
+        >${this.context.node}
+      </footer>
     `;
   }
 }
 customElements.define("fathom-lit-shell", Shell);
 export default {
   id: "ui.shell",
-  activate: (host) =>
-    mountElement("fathom-lit-shell", document.querySelector("#app"), host),
+  activate: (host) => mountElement("fathom-lit-shell", document.querySelector("#app"), host),
 };

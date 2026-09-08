@@ -1,7 +1,8 @@
 import { assertEquals } from "@std/assert";
+
+import { appRoot, readConfig } from "../src/host/config.ts";
 import { Controller } from "../src/host/controller.ts";
 import { createHandler } from "../src/host/http.ts";
-import { appRoot, readConfig } from "../src/host/config.ts";
 Deno.test("external composition registers backend and frontend modules", async () => {
   const app = new Controller({
     ...readConfig(),
@@ -11,7 +12,10 @@ Deno.test("external composition registers backend and frontend modules", async (
   try {
     await app.init();
     const bootstrap = app.bootstrap();
-    assertEquals(bootstrap.tools.some((t) => t.name === "clock"), true);
+    assertEquals(
+      bootstrap.tools.some((t) => t.name === "clock"),
+      true,
+    );
     const handle = createHandler(app);
     const html = await handle(new Request("http://localhost/"));
     assertEquals(html.status, 200);

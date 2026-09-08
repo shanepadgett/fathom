@@ -10,8 +10,7 @@ export default {
       return element;
     }
     const view = node("main");
-    view.style.cssText =
-      "max-width:900px;margin:32px auto;padding:24px;font-family:monospace";
+    view.style.cssText = "max-width:900px;margin:32px auto;padding:24px;font-family:monospace";
     const title = node("h1", "RAW / FATHOM");
     title.style.cssText = "font:700 32px monospace;letter-spacing:0";
     const context = node("p");
@@ -31,8 +30,7 @@ export default {
     input.id = "raw-prompt";
     input.rows = 3;
     input.required = true;
-    input.style.cssText =
-      "display:block;width:100%;margin:12px 0;padding:12px;border:2px solid";
+    input.style.cssText = "display:block;width:100%;margin:12px 0;padding:12px;border:2px solid";
     const send = node("button", "Run");
     send.type = "submit";
     const stop = node("button", "Stop");
@@ -55,8 +53,7 @@ export default {
       const data = state.bootstrap;
       error.textContent = state.error;
       if (!data) return;
-      context.textContent =
-        `${data.workspace} · ${data.runtime} · ${data.model.provider}/${data.model.id}`;
+      context.textContent = `${data.workspace} · ${data.runtime} · ${data.model.provider}/${data.model.id}`;
       status.textContent = `${
         state.connected ? "Connected" : "Reconnecting"
       } / ${data.session.status}`;
@@ -65,25 +62,27 @@ export default {
       const serialized = JSON.stringify(data.session.messages);
       if (serialized !== rendered) {
         rendered = serialized;
-        transcript.replaceChildren(...data.session.messages.map((message) => {
-          const entry = node("article");
-          entry.style.cssText = "border-top:1px solid;padding:16px 0";
-          const text = node("pre", message.text || "");
-          text.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere";
-          entry.append(
-            node(
-              "strong",
-              `${message.role}${
-                message.toolName ? ` / ${message.toolName}` : ""
-              }${message.isError ? " / failed" : ""}`,
-            ),
-            text,
-          );
-          return entry;
-        }));
+        transcript.replaceChildren(
+          ...data.session.messages.map((message) => {
+            const entry = node("article");
+            entry.style.cssText = "border-top:1px solid;padding:16px 0";
+            const text = node("pre", message.text || "");
+            text.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere";
+            entry.append(
+              node(
+                "strong",
+                `${message.role}${
+                  message.toolName ? ` / ${message.toolName}` : ""
+                }${message.isError ? " / failed" : ""}`,
+              ),
+              text,
+            );
+            return entry;
+          }),
+        );
       }
-      live.textContent = state.liveText ||
-        (state.activeTool ? `Tool: ${state.activeTool.name}` : "");
+      live.textContent =
+        state.liveText || (state.activeTool ? `Tool: ${state.activeTool.name}` : "");
     });
     form.addEventListener("submit", async (event) => {
       event.preventDefault();

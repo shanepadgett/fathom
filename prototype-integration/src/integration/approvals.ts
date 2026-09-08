@@ -11,7 +11,8 @@ export class Approvals {
       const settle = (allow: boolean) => {
         this.pending.delete(id);
         signal.removeEventListener("abort", abort);
-        allow ? resolve() : reject(new Error("Execution denied or cancelled"));
+        if (allow) resolve();
+        else reject(new Error("Execution denied or cancelled"));
       };
       this.pending.set(id, { id, description, settle });
       signal.addEventListener("abort", abort, { once: true });

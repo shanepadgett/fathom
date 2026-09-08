@@ -1,4 +1,5 @@
 import type { Context } from "cordis";
+
 import type { Services } from "../contracts/services.ts";
 export interface PluginContext {
   /** Native Cordis context for more advanced extension needs. */

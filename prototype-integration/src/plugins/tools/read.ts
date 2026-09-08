@@ -14,13 +14,11 @@ export default definePlugin({
         parameters: schema({ path: "File path" }),
         async execute(args, signal) {
           signal.throwIfAborted();
-          const open = ctx.get("workbench").lsp.documents.get(
-            workspace.resolve(stringArg(args, "path")),
-          );
+          const open = ctx
+            .get("workbench")
+            .lsp.documents.get(workspace.resolve(stringArg(args, "path")));
           if (open) return bounded(open.text);
-          const file = await Deno.open(
-            workspace.resolve(stringArg(args, "path")),
-          );
+          const file = await Deno.open(workspace.resolve(stringArg(args, "path")));
           try {
             const buffer = new Uint8Array(128_000);
             let n = 0;
@@ -30,14 +28,15 @@ export default definePlugin({
               if (count === null) break;
               n += count;
             }
-            return bounded(
-              new TextDecoder().decode(buffer.subarray(0, n ?? 0)),
-            ) + (n === buffer.length ? "\n[file read capped at 128KB]" : "");
+            return (
+              bounded(new TextDecoder().decode(buffer.subarray(0, n ?? 0))) +
+              (n === buffer.length ? "\n[file read capped at 128KB]" : "")
+            );
           } finally {
             file.close();
           }
         },
-      })
+      }),
     );
   },
 });

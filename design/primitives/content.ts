@@ -1,8 +1,11 @@
 /** Plain text and attribute values must cross this boundary; slots are authored HTML. */
 export const text = (value: string | number) =>
   String(value)
-    .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 
 export type IconName =
   | "sidebar-simple"
@@ -32,9 +35,7 @@ const iconSizes = {
   toolbar: "text-xl",
 };
 export const icon = (name: IconName, size: keyof typeof iconSizes = "normal") =>
-  `<i class="ph ph-${name} shrink-0 ${
-    iconSizes[size]
-  }" aria-hidden="true"></i>`;
+  `<i class="ph ph-${name} shrink-0 ${iconSizes[size]}" aria-hidden="true"></i>`;
 
 export type Tone = "neutral" | "action" | "success" | "warning" | "danger";
 export const tones: Record<Tone, string> = {
@@ -52,9 +53,7 @@ const dots: Record<Tone, string> = {
   danger: "bg-danger",
 };
 export const statusDot = (tone: Tone, label = "", small = false) =>
-  `<span class="shrink-0 rounded-full ${small ? "h-1.5 w-1.5" : "h-2 w-2"} ${
-    dots[tone]
-  }" ${
+  `<span class="shrink-0 rounded-full ${small ? "h-1.5 w-1.5" : "h-2 w-2"} ${dots[tone]}" ${
     label ? `role="img" aria-label="${text(label)}"` : 'aria-hidden="true"'
   }></span>`;
 export type GitStatus = "A" | "M" | "D" | "R" | "?";
@@ -68,30 +67,25 @@ const gitStatuses: Record<GitStatus, [string, Tone]> = {
 export const changeStatus = (status?: GitStatus) =>
   status
     ? `<span class="shrink-0 text-micro ${
-      tones[gitStatuses[status][1]]
-    }" aria-label="${gitStatuses[status][0]}">${status}</span>`
+        tones[gitStatuses[status][1]]
+      }" aria-label="${gitStatuses[status][0]}">${status}</span>`
     : "";
 export const diffStat = (added: number, removed: number) =>
-  `<span class="inline-flex gap-1 font-mono text-sm"><span class="text-success">+${
-    text(added)
-  }</span><span class="text-danger">−${text(removed)}</span></span>`;
+  `<span class="inline-flex gap-1 font-mono text-sm"><span class="text-success">+${text(
+    added,
+  )}</span><span class="text-danger">−${text(removed)}</span></span>`;
 export const meter = (value: number, max: number, label: string) => {
   const maximum = Number.isFinite(max) && max > 0 ? max : 1;
-  const current = Number.isFinite(value)
-    ? Math.max(0, Math.min(maximum, value))
-    : 0;
+  const current = Number.isFinite(value) ? Math.max(0, Math.min(maximum, value)) : 0;
   // Percentage is derived data, not a design dimension.
-  return `<span class="flex h-3 w-24 overflow-hidden rounded-sm bg-line" role="meter" aria-label="${
-    text(label)
-  }" aria-valuemin="0" aria-valuemax="${maximum}" aria-valuenow="${current}"><span class="bg-action" style="width:${
-    current / maximum * 100
+  return `<span class="flex h-3 w-24 overflow-hidden rounded-sm bg-line" role="meter" aria-label="${text(
+    label,
+  )}" aria-valuemin="0" aria-valuemax="${maximum}" aria-valuenow="${current}"><span class="bg-action" style="width:${
+    (current / maximum) * 100
   }%"></span></span>`;
 };
-export const keycap = (key: string) =>
-  `<kbd class="rounded-sm bg-line px-1">${text(key)}</kbd>`;
+export const keycap = (key: string) => `<kbd class="rounded-sm bg-line px-1">${text(key)}</kbd>`;
 export const shortcutHint = (keys: string[], action: string) =>
-  `<span class="flex items-center gap-1">${keys.map(keycap).join("")} ${
-    text(action)
-  }</span>`;
+  `<span class="flex items-center gap-1">${keys.map(keycap).join("")} ${text(action)}</span>`;
 export const emptyState = (message: string) =>
   `<p class="px-3 py-6 text-sm text-muted">${text(message)}</p>`;

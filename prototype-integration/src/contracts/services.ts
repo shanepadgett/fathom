@@ -1,8 +1,8 @@
+import type { Workbench } from "../integration/workbench.ts";
+import type { ContextService } from "./context.ts";
 import type { ModelService } from "./model.ts";
 import type { RuntimeService, SessionService } from "./session.ts";
 import type { ToolRegistry, WorkspaceService } from "./tools.ts";
-import type { ContextService } from "./context.ts";
-import type { Workbench } from "../integration/workbench.ts";
 export interface Services {
   workbench: Workbench;
   context: ContextService;

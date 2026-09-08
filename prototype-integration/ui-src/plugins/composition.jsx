@@ -1,5 +1,6 @@
 import { For, onCleanup } from "solid-js";
 import { render } from "solid-js/web";
+
 import { useHostState } from "../core/component.js";
 
 function Composition(props) {
@@ -10,7 +11,9 @@ function Composition(props) {
   const data = () => state.bootstrap;
   return (
     <details
-      ref={panel}
+      ref={(el) => {
+        panel = el;
+      }}
       class="composition-panel"
       open
       onToggle={() => {
@@ -22,9 +25,7 @@ function Composition(props) {
         <h2>Composition ({data()?.plugins.length || 0})</h2>
       </summary>
       <div class="composition-body">
-        <p class="rail-intro">
-          The harness is the sum of its parts. Every service has an owner.
-        </p>
+        <p class="rail-intro">The harness is the sum of its parts. Every service has an owner.</p>
         <For each={data()?.plugins}>
           {(plugin) => (
             <details class="plugin-entry">
@@ -51,7 +52,8 @@ function Composition(props) {
           )}
         </For>
         <div class="composition-note">
-          BUILT TO BE REPLACED.<p>
+          BUILT TO BE REPLACED.
+          <p>
             {data()?.profiles?.includes("echo")
               ? "Switch to Echo to try an alternate runtime. Switching starts a fresh session."
               : "This workbench runs your custom composition. Its plugins are selected by configuration."}
@@ -67,7 +69,6 @@ export default {
     host.registerView("composition", {
       title: "Composition",
       slot: "rail",
-      mount: (container, host) =>
-        render(() => <Composition host={host} />, container),
+      mount: (container, host) => render(() => <Composition host={host} />, container),
     }),
 };

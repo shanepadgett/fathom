@@ -67,12 +67,15 @@
   .viewer-edge-tab {
     @apply block -translate-x-full -translate-y-1/2 opacity-0
       pointer-events-none;
-    transition: transform var(--motion-duration-fast), opacity
-      var(--motion-duration-fast), top var(--motion-duration-normal) ease-out;
+    transition:
+      transform var(--motion-duration-fast),
+      opacity var(--motion-duration-fast),
+      top var(--motion-duration-normal) ease-out;
   }
   .viewer-edge-tab[data-positioning] {
-    transition: transform var(--motion-duration-fast), opacity
-      var(--motion-duration-fast);
+    transition:
+      transform var(--motion-duration-fast),
+      opacity var(--motion-duration-fast);
   }
   .viewer-edge-tab[data-revealed],
   .viewer-edge-tab:focus-within {
@@ -121,8 +124,7 @@
     position: relative;
   }
   ds-drawer[mode="push"][open] {
-    grid-template-columns: minmax(0, 1fr) minmax(0, var(--resized-panel-width,
-      1fr));
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--resized-panel-width, 1fr));
   }
 }
 

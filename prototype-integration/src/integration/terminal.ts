@@ -1,5 +1,6 @@
-import { instantiate, libName, Pty } from "@sigma/pty-ffi/noinit";
 import { fileURLToPath } from "node:url";
+
+import { instantiate, libName, Pty } from "@sigma/pty-ffi/noinit";
 
 export class TerminalService {
   private pty?: Pty;
@@ -26,10 +27,9 @@ export class TerminalService {
     this.timer = setInterval(() => {
       try {
         const result = this.pty!.readBytes();
-        this.output = (this.output +
-          this.decoder.decode(result.data, { stream: !result.done })).slice(
-            -128_000,
-          );
+        this.output = (
+          this.output + this.decoder.decode(result.data, { stream: !result.done })
+        ).slice(-128_000);
         if (result.done) {
           this.exitCode = this.pty!.exitCode;
           this.stop();

@@ -3,9 +3,7 @@ class DesignOverlay extends HTMLElement {
   connectedCallback() {
     this.addEventListener("click", this.onClick);
     if (this.localName === "ds-drawer") {
-      const panel = this.querySelector(
-        ":scope > dialog, :scope > [data-panel]",
-      );
+      const panel = this.querySelector(":scope > dialog, :scope > [data-panel]");
       if (panel && !panel.querySelector("edge-resizer")) {
         // Scroll content independently so the centered handle can cross the border.
         const scroll = document.createElement("div");
@@ -26,17 +24,13 @@ class DesignOverlay extends HTMLElement {
 
   private onClick = (event: MouseEvent) => {
     const target = event.target;
-    if (
-      !(target instanceof Element) ||
-      target.closest("ds-modal, ds-drawer") !== this
-    ) return;
+    if (!(target instanceof Element) || target.closest("ds-modal, ds-drawer") !== this) return;
     if (this.matches('ds-drawer[mode="push"]')) {
       const panel = this.querySelector<HTMLElement>(":scope > [data-panel]");
       const trigger = this.querySelector<HTMLButtonElement>("[data-open]");
       if (!panel || !trigger) return;
       if (!target.closest("[data-open], [data-close]")) return;
-      const open = !target.closest("[data-close]") &&
-        !this.hasAttribute("open");
+      const open = !target.closest("[data-close]") && !this.hasAttribute("open");
       if (!open && panel.contains(document.activeElement)) trigger.focus();
       this.toggleAttribute("open", open);
       panel.inert = !open;

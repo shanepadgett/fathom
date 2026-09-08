@@ -1,6 +1,7 @@
-import { Context, type Fiber } from "cordis";
 import type { Services } from "../contracts/services.ts";
 import type { HarnessPlugin } from "./plugin.ts";
+
+import { Context, type Fiber } from "cordis";
 
 /** Validates composition upfront; Cordis owns activation effects and teardown. */
 export class PluginHost {
@@ -19,9 +20,7 @@ export class PluginHost {
       ids.add(p.id);
       for (const key of p.provides ?? []) {
         if (providers.has(key)) {
-          throw new Error(
-            `Duplicate service ${key}: ${providers.get(key)}, ${p.id}`,
-          );
+          throw new Error(`Duplicate service ${key}: ${providers.get(key)}, ${p.id}`);
         }
         providers.set(key, p.id);
       }
@@ -30,18 +29,14 @@ export class PluginHost {
     const ready = new Set<string>();
     const ordered: HarnessPlugin[] = [];
     while (pending.length) {
-      const index = pending.findIndex((p) =>
-        (p.requires ?? []).every((k) => ready.has(k))
-      );
+      const index = pending.findIndex((p) => (p.requires ?? []).every((k) => ready.has(k)));
       if (index < 0) {
         throw new Error(
-          `Missing or cyclic dependencies: ${
-            pending.map((p) =>
-              `${p.id} needs ${
-                (p.requires ?? []).filter((k) => !ready.has(k)).join(",")
-              }`
-            ).join("; ")
-          }`,
+          `Missing or cyclic dependencies: ${pending
+            .map(
+              (p) => `${p.id} needs ${(p.requires ?? []).filter((k) => !ready.has(k)).join(",")}`,
+            )
+            .join("; ")}`,
         );
       }
       const [p] = pending.splice(index, 1);
@@ -58,17 +53,13 @@ export class PluginHost {
               cordis: ctx,
               get: (key) => {
                 if (!(plugin.requires ?? []).includes(key)) {
-                  throw new Error(
-                    `${plugin.id} did not declare dependency ${key}`,
-                  );
+                  throw new Error(`${plugin.id} did not declare dependency ${key}`);
                 }
                 return ctx.get(`fathom:${key}`, true);
               },
               provide: (key, value) => {
                 if (!(plugin.provides ?? []).includes(key)) {
-                  throw new Error(
-                    `${plugin.id} did not declare service ${key}`,
-                  );
+                  throw new Error(`${plugin.id} did not declare service ${key}`);
                 }
                 ctx.provide(`fathom:${key}`, value);
               },

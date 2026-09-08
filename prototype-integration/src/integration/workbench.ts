@@ -1,12 +1,15 @@
-import { resolve } from "node:path";
-import { Type } from "typebox";
-import { definePlugin } from "../kernel/plugin.ts";
 import type { ToolRegistry } from "../contracts/tools.ts";
+
+import { resolve } from "node:path";
+
+import { Type } from "typebox";
+
+import { definePlugin } from "../kernel/plugin.ts";
+import { Approvals } from "./approvals.ts";
 import { LanguageService } from "./lsp.ts";
 import { McpService } from "./mcp.ts";
-import { TerminalService } from "./terminal.ts";
-import { Approvals } from "./approvals.ts";
 import { Scripts } from "./scripts.ts";
+import { TerminalService } from "./terminal.ts";
 
 export class Workbench {
   readonly lsp: LanguageService;
@@ -28,14 +31,14 @@ export class Workbench {
   >();
   private unregister: (() => void)[] = [];
   private mcpUnregister: (() => void)[] = [];
-  constructor(readonly root: string, readonly tools: ToolRegistry) {
+  constructor(
+    readonly root: string,
+    readonly tools: ToolRegistry,
+  ) {
     this.lsp = new LanguageService(root);
     this.scripts = new Scripts(
       root,
-      resolve(
-        Deno.env.get("HOME") ?? root,
-        ".fathom/prototype-integration/scratch",
-      ),
+      resolve(Deno.env.get("HOME") ?? root, ".fathom/prototype-integration/scratch"),
       this.mcp,
       this.approvals,
     );
@@ -46,10 +49,7 @@ export class Workbench {
       name: string,
       description: string,
       parameters: object,
-      execute: (
-        args: Record<string, unknown>,
-        signal: AbortSignal,
-      ) => Promise<string>,
+      execute: (args: Record<string, unknown>, signal: AbortSignal) => Promise<string>,
     ) => {
       this.unregister.push(
         this.tools.register({
@@ -88,9 +88,7 @@ export class Workbench {
         const doc = await this.lsp.open(String(args.path));
         const old = String(args.oldText);
         if (!old || doc.text.split(old).length !== 2) {
-          throw new Error(
-            "oldText must match exactly once",
-          );
+          throw new Error("oldText must match exactly once");
         }
         await this.lsp.change(
           doc.path,
@@ -118,13 +116,13 @@ export class Workbench {
       "Search tools connected through MCP. All matching tools are callable by their mcp_ prefixed names in this prototype.",
       Type.Object({ query: Type.String() }),
       (args) =>
-        Promise.resolve(JSON.stringify(
-          this.mcp.tools.filter((t) =>
-            `${t.name} ${t.description}`.toLowerCase().includes(
-              String(args.query).toLowerCase(),
-            )
+        Promise.resolve(
+          JSON.stringify(
+            this.mcp.tools.filter((t) =>
+              `${t.name} ${t.description}`.toLowerCase().includes(String(args.query).toLowerCase()),
+            ),
           ),
-        )),
+        ),
     );
   }
   async connect(args: { command?: string; args?: string[]; url?: string }) {
@@ -134,18 +132,20 @@ export class Workbench {
     for (const remove of this.mcpUnregister.splice(0)) remove();
     const tools = await this.mcp.connect(args);
     for (const tool of tools) {
-      this.mcpUnregister.push(this.tools.register({
-        name: `mcp_${tool.name}`,
-        description: tool.description ?? tool.name,
-        parameters: tool.inputSchema,
-        execute: async (args, signal) => {
-          await this.approvals.request(
-            `MCP tool ${tool.name}\n${JSON.stringify(args, null, 2)}`,
-            signal,
-          );
-          return JSON.stringify(await this.mcp.call(tool.name, args, signal));
-        },
-      }));
+      this.mcpUnregister.push(
+        this.tools.register({
+          name: `mcp_${tool.name}`,
+          description: tool.description ?? tool.name,
+          parameters: tool.inputSchema,
+          execute: async (args, signal) => {
+            await this.approvals.request(
+              `MCP tool ${tool.name}\n${JSON.stringify(args, null, 2)}`,
+              signal,
+            );
+            return JSON.stringify(await this.mcp.call(tool.name, args, signal));
+          },
+        }),
+      );
     }
     return tools;
   }
@@ -169,20 +169,14 @@ export class Workbench {
       case "open":
         return await this.lsp.open(String(args.path));
       case "change":
-        return await this.lsp.change(
-          String(args.path),
-          String(args.text),
-          Number(args.version),
-        );
+        return await this.lsp.change(String(args.path), String(args.text), Number(args.version));
       case "save":
         return await this.lsp.save(String(args.path), Number(args.version));
       case "approve":
         this.approvals.decide(String(args.id), args.allow === true);
         break;
       case "connect":
-        return await this.connect(
-          args as { command?: string; args?: string[]; url?: string },
-        );
+        return await this.connect(args as { command?: string; args?: string[]; url?: string });
       case "connect-fixture": {
         const source = new URL("../../examples/mcp-server.ts", import.meta.url);
         const dir = await Deno.makeTempDir({ prefix: "fathom-mcp-" });
@@ -224,11 +218,12 @@ export class Workbench {
           work: Promise.resolve(),
         };
         this.jobs.set(id, job);
-        job.work = this.tools.execute(
-          job.tool,
-          args.args as Record<string, unknown> ?? {},
-          AbortSignal.any([abort.signal, this.abort.signal]),
-        )
+        job.work = this.tools
+          .execute(
+            job.tool,
+            (args.args as Record<string, unknown>) ?? {},
+            AbortSignal.any([abort.signal, this.abort.signal]),
+          )
           .then((result) => {
             job.status = "done";
             job.result = result;
@@ -261,10 +256,7 @@ export default definePlugin({
   provides: ["workbench"],
   requires: ["workspace", "tools"],
   async activate(ctx) {
-    const workbench = new Workbench(
-      ctx.get("workspace").root,
-      ctx.get("tools"),
-    );
+    const workbench = new Workbench(ctx.get("workspace").root, ctx.get("tools"));
     ctx.effect(() => () => workbench.dispose());
     await workbench.init();
     ctx.provide("workbench", workbench);

@@ -44,14 +44,16 @@ button {
   border: var(--rule);
   padding: 9px 14px;
   background: transparent;
-  font: 500 11px "IBM Plex Mono", monospace;
+  font:
+    500 11px "IBM Plex Mono",
+    monospace;
 }
 button:hover {
   background: var(--ink);
   color: var(--paper);
 }
 button:disabled {
-  opacity: .4;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 button:focus-visible,
@@ -65,7 +67,7 @@ h1 {
   font-family: "Barlow Condensed", Impact, sans-serif;
   font-size: 48px;
   font-weight: 800;
-  line-height: .85;
+  line-height: 0.85;
   letter-spacing: -2px;
   margin: 0;
 }
@@ -100,7 +102,7 @@ footer,
   display: block;
   font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: .09em;
+  letter-spacing: 0.09em;
   font-weight: 500;
 }
 .context-bar .eyebrow {
@@ -208,7 +210,9 @@ h2 {
 .composition-panel > .section-heading::after {
   content: "+";
   margin-left: auto;
-  font: 600 16px "IBM Plex Mono", monospace;
+  font:
+    600 16px "IBM Plex Mono",
+    monospace;
 }
 .composition-panel[open] > .section-heading::after {
   content: "−";
@@ -280,7 +284,7 @@ h2 {
 .role {
   font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   margin-bottom: 12px;
   font-weight: 600;
 }
@@ -291,7 +295,9 @@ h2 {
   color: #a5320b;
 }
 .message-text {
-  font: 13px/1.7 "IBM Plex Mono", monospace;
+  font:
+    13px/1.7 "IBM Plex Mono",
+    monospace;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   margin: 0;
@@ -304,7 +310,9 @@ summary {
 }
 .evidence summary {
   padding: 9px 12px;
-  font: 11px "IBM Plex Mono", monospace;
+  font:
+    11px "IBM Plex Mono",
+    monospace;
 }
 .evidence pre {
   border-top: 1px solid #9c9588;
@@ -342,7 +350,9 @@ textarea::placeholder {
   justify-content: flex-end;
 }
 .hint {
-  font: 10px "IBM Plex Mono", monospace;
+  font:
+    10px "IBM Plex Mono",
+    monospace;
   color: var(--muted);
 }
 .primary {
@@ -366,7 +376,9 @@ textarea::placeholder {
   border-top: 1px solid #bdb7ab;
 }
 .plugin-entry summary {
-  font: 11px "IBM Plex Mono", monospace;
+  font:
+    11px "IBM Plex Mono",
+    monospace;
   padding: 13px 0;
   overflow-wrap: anywhere;
 }
@@ -378,7 +390,9 @@ textarea::placeholder {
 }
 dl {
   margin: 0 0 14px;
-  font: 10px/1.7 "IBM Plex Mono", monospace;
+  font:
+    10px/1.7 "IBM Plex Mono",
+    monospace;
 }
 dt {
   color: var(--muted);
@@ -395,7 +409,9 @@ dd {
 }
 .tool-entry {
   margin: 0 24px;
-  font: 11px/1.6 "IBM Plex Mono", monospace;
+  font:
+    11px/1.6 "IBM Plex Mono",
+    monospace;
   padding: 6px 0;
 }
 .tool-entry p {
@@ -411,7 +427,9 @@ dd {
 }
 .composition-note p {
   color: var(--muted);
-  font: 12px/1.6 "IBM Plex Sans", sans-serif;
+  font:
+    12px/1.6 "IBM Plex Sans",
+    sans-serif;
 }
 .error-banner {
   grid-row: 2;
@@ -432,7 +450,7 @@ footer {
   justify-content: space-between;
   gap: 24px;
   font-size: 9px;
-  letter-spacing: .04em;
+  letter-spacing: 0.04em;
 }
 .footer-status {
   font-weight: 600;
@@ -508,7 +526,9 @@ footer {
   border-top: 1px solid #bdb7ab;
   padding-top: 12px;
   margin: 16px 0 0;
-  font: 11px/1.5 "IBM Plex Sans", sans-serif;
+  font:
+    11px/1.5 "IBM Plex Sans",
+    sans-serif;
   color: var(--muted);
 }
 .context-threshold {
@@ -526,7 +546,7 @@ footer {
 }
 @keyframes blink {
   50% {
-    opacity: .35;
+    opacity: 0.35;
   }
 }
 @media (min-width: 1400px) {
@@ -598,6 +618,8 @@ footer {
 .runtime-note {
   display: block;
   color: var(--muted);
-  font: 9px/1.4 "IBM Plex Mono", monospace;
+  font:
+    9px/1.4 "IBM Plex Mono",
+    monospace;
   margin-top: 4px;
 }

@@ -21,13 +21,11 @@ export interface ToolSchema {
 }
 export interface ModelService {
   readonly info: { provider: string; id: string };
-  respond(
-    input: {
-      system: string;
-      messages: ModelMessage[];
-      tools: ToolSchema[];
-      signal: AbortSignal;
-      onText(text: string): void;
-    },
-  ): Promise<ModelReply>;
+  respond(input: {
+    system: string;
+    messages: ModelMessage[];
+    tools: ToolSchema[];
+    signal: AbortSignal;
+    onText(text: string): void;
+  }): Promise<ModelReply>;
 }

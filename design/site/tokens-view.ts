@@ -24,9 +24,7 @@ class TokensView extends HTMLElement {
     const names = new Set<string>();
     const collect = (rules: CSSRuleList) => {
       for (const rule of rules) {
-        if (
-          rule instanceof CSSStyleRule && rule.selectorText.includes(":root")
-        ) {
+        if (rule instanceof CSSStyleRule && rule.selectorText.includes(":root")) {
           for (const name of rule.style) {
             if (name.startsWith("--") && !name.startsWith("--tw-")) {
               names.add(name);
@@ -41,9 +39,7 @@ class TokensView extends HTMLElement {
         collect(sheet.cssRules);
       } catch (error) {
         // Google Fonts stylesheets are not readable across origins.
-        if (
-          !(error instanceof DOMException && error.name === "SecurityError")
-        ) throw error;
+        if (!(error instanceof DOMException && error.name === "SecurityError")) throw error;
       }
     }
     const styles = getComputedStyle(document.documentElement);
@@ -59,15 +55,12 @@ class TokensView extends HTMLElement {
     nav.setAttribute("aria-label", "Token categories");
     this.append(nav);
     const panels = new Map<string, HTMLElement>();
-    for (
-      const [index, category] of [
-        "Colors",
-        "Typography",
-        "Layout & effects",
-        "Animation",
-      ]
-        .entries()
-    ) {
+    for (const [index, category] of [
+      "Colors",
+      "Typography",
+      "Layout & effects",
+      "Animation",
+    ].entries()) {
       const panel = document.createElement("div");
       panel.id = `tokens-panel-${index}`;
       panel.hidden = category !== this.category;
@@ -98,9 +91,12 @@ class TokensView extends HTMLElement {
         title: "Semantic geometry",
         category: "Layout & effects",
         kind: "geometry",
-        tokens: [...names].filter((name) =>
-          /^--spacing-[a-z]/.test(name) || name.startsWith("--container-") ||
-          name.startsWith("--grid-") || name.startsWith("--blur-")
+        tokens: [...names].filter(
+          (name) =>
+            /^--spacing-[a-z]/.test(name) ||
+            name.startsWith("--container-") ||
+            name.startsWith("--grid-") ||
+            name.startsWith("--blur-"),
         ),
         description:
           "Named app and preview dimensions, grids, and effects. Components consume these through Tailwind utilities.",
@@ -125,9 +121,8 @@ class TokensView extends HTMLElement {
         title: "Movement and scale",
         category: "Animation",
         kind: "motion",
-        tokens: [...names].filter((name) =>
-          name.startsWith("--motion-distance-") ||
-          name.startsWith("--motion-scale-")
+        tokens: [...names].filter(
+          (name) => name.startsWith("--motion-distance-") || name.startsWith("--motion-scale-"),
         ),
         description:
           "Small movement and subtle scale for modal entrances. Full-width drawer travel belongs to the component, not a distance token.",
@@ -136,19 +131,15 @@ class TokensView extends HTMLElement {
         title: "Color scales",
         category: "Colors",
         kind: "palette",
-        description:
-          "Deep teal with neutral grays. Each column runs from 50 to 950.",
+        description: "Deep teal with neutral grays. Each column runs from 50 to 950.",
         tokens: [...names].filter((name) => /^--color-.+-\d+$/.test(name)),
       },
       {
         title: "Color roles",
         category: "Colors",
         kind: "roles",
-        description:
-          "The values used by components. These follow the light / dark switch.",
-        tokens: [...names].filter((name) =>
-          name.startsWith("--color-") && !/-\d+$/.test(name)
-        ),
+        description: "The values used by components. These follow the light / dark switch.",
+        tokens: [...names].filter((name) => name.startsWith("--color-") && !/-\d+$/.test(name)),
       },
       {
         title: "Font families",
@@ -169,8 +160,7 @@ class TokensView extends HTMLElement {
         category: "Typography",
         kind: "weight",
         prefix: "--font-weight-",
-        description:
-          "UI weights in Space Grotesk. Code uses Fragment Mono at 400.",
+        description: "UI weights in Space Grotesk. Code uses Fragment Mono at 400.",
       },
       {
         title: "Line heights",
@@ -206,10 +196,12 @@ class TokensView extends HTMLElement {
     ];
 
     for (const definition of sections) {
-      const tokens = definition.tokens ??
-        [...names].filter((name) =>
-          name.startsWith(definition.prefix!) &&
-          !(definition.kind === "family" && name.startsWith("--font-weight-"))
+      const tokens =
+        definition.tokens ??
+        [...names].filter(
+          (name) =>
+            name.startsWith(definition.prefix!) &&
+            !(definition.kind === "family" && name.startsWith("--font-weight-")),
         );
       if (!tokens.length) continue;
 
@@ -218,8 +210,7 @@ class TokensView extends HTMLElement {
       const header = document.createElement("header");
       header.className = "mb-4";
       const heading = document.createElement("h2");
-      heading.className =
-        "m-0 text-2xl font-semibold leading-tight tracking-tight";
+      heading.className = "m-0 text-2xl font-semibold leading-tight tracking-tight";
       heading.textContent = definition.title;
       header.append(heading);
       if (definition.description) {
@@ -231,9 +222,7 @@ class TokensView extends HTMLElement {
       section.append(header);
 
       const list = document.createElement("dl");
-      list.className = definition.kind === "roles"
-        ? "m-0 grid grid-cols-token-roles gap-2"
-        : "m-0";
+      list.className = definition.kind === "roles" ? "m-0 grid grid-cols-token-roles gap-2" : "m-0";
       section.append(list);
       panels.get(definition.category)!.append(section);
 
@@ -241,9 +230,10 @@ class TokensView extends HTMLElement {
       for (const name of tokens) {
         const value = styles.getPropertyValue(name).trim();
         const row = document.createElement("div");
-        row.className = definition.kind === "family"
-          ? "grid grid-cols-1 items-center gap-2 border-t border-line py-4 md:grid-cols-token-row md:gap-4"
-          : "grid min-h-12 grid-cols-1 items-center gap-2 border-t border-line py-2 md:grid-cols-token-row md:gap-4";
+        row.className =
+          definition.kind === "family"
+            ? "grid grid-cols-1 items-center gap-2 border-t border-line py-4 md:grid-cols-token-row md:gap-4"
+            : "grid min-h-12 grid-cols-1 items-center gap-2 border-t border-line py-2 md:grid-cols-token-row md:gap-4";
         const term = document.createElement("dt");
         term.className = "m-0 wrap-anywhere text-base";
         term.textContent = name;
@@ -254,29 +244,28 @@ class TokensView extends HTMLElement {
         sample.className = "wrap-anywhere whitespace-pre-line text-base";
         sample.setAttribute("aria-hidden", "true");
         const code = document.createElement("code");
-        code.className =
-          "max-w-token-value wrap-anywhere text-right text-base text-muted";
+        code.className = "max-w-token-value wrap-anywhere text-right text-base text-muted";
         code.textContent = value;
         row.append(term, detail);
 
         if (name.startsWith("--color-")) {
-          row.className =
-            "flex min-h-11 items-center justify-between gap-2 border-0 px-3 py-2";
+          row.className = "flex min-h-11 items-center justify-between gap-2 border-0 px-3 py-2";
           if (definition.kind === "roles") {
             row.classList.add("rounded-sm");
           }
           row.style.background = `var(${name})`;
           colorContext.fillStyle = value;
           const hex = colorContext.fillStyle;
-          const channels = hex.slice(1).match(/../g)!.map((channel) => {
-            const c = parseInt(channel, 16) / 255;
-            return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-          });
-          const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 +
-            channels[2] * 0.0722;
+          const channels = hex
+            .slice(1)
+            .match(/../g)!
+            .map((channel) => {
+              const c = parseInt(channel, 16) / 255;
+              return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+            });
+          const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
           row.style.color = luminance > 0.179 ? "#000000" : "#ffffff";
-          code.className =
-            "whitespace-nowrap text-right text-base text-inherit";
+          code.className = "whitespace-nowrap text-right text-base text-inherit";
           code.textContent = hex;
           detail.className = "m-0";
           detail.append(code);
@@ -309,25 +298,24 @@ class TokensView extends HTMLElement {
             sample.append(dot);
             if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
               const current = getComputedStyle(document.documentElement);
-              const duration = current.getPropertyValue(
-                name.startsWith("--motion-duration-")
-                  ? name
-                  : "--motion-duration-slow",
-              ).trim();
+              const duration = current
+                .getPropertyValue(
+                  name.startsWith("--motion-duration-") ? name : "--motion-duration-slow",
+                )
+                .trim();
               const from = name.startsWith("--motion-scale-")
                 ? `scale(var(${name}))`
                 : "translateX(0)";
               const to = name.startsWith("--motion-scale-")
                 ? "scale(1)"
                 : `translateX(var(${
-                  name.startsWith("--motion-distance-") ? name : "--spacing-16"
-                }))`;
+                    name.startsWith("--motion-distance-") ? name : "--spacing-16"
+                  }))`;
               dot.animate([{ transform: from }, { transform: to }], {
-                duration: parseFloat(duration) *
-                  (duration.endsWith("ms") ? 1 : 1000),
-                easing: current.getPropertyValue(
-                  name.startsWith("--ease-") ? name : "--ease-standard",
-                ).trim(),
+                duration: parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000),
+                easing: current
+                  .getPropertyValue(name.startsWith("--ease-") ? name : "--ease-standard")
+                  .trim(),
                 iterations: Infinity,
                 direction: "alternate",
               });
@@ -336,9 +324,10 @@ class TokensView extends HTMLElement {
           }
           case "family":
             sample.style.fontFamily = `var(${name})`;
-            sample.textContent = name === "--font-mono"
-              ? "const session = await agent.run();\n0O 1lI · {} [] => !=="
-              : "A clear view of the work.\nPlan, build, and review with Fathom.";
+            sample.textContent =
+              name === "--font-mono"
+                ? "const session = await agent.run();\n0O 1lI · {} [] => !=="
+                : "A clear view of the work.\nPlan, build, and review with Fathom.";
             code.className =
               "max-w-token-value wrap-anywhere text-right font-sans text-base text-muted md:text-right max-md:text-left";
             code.textContent = value.split(",")[0].replaceAll('"', "");
@@ -354,8 +343,7 @@ class TokensView extends HTMLElement {
             sample.style.fontWeight = `var(${name})`;
             break;
           case "leading":
-            sample.textContent =
-              "Read the code. Trace the cause.\nKeep the next step clear.";
+            sample.textContent = "Read the code. Trace the cause.\nKeep the next step clear.";
             sample.style.lineHeight = `var(${name})`;
             break;
           case "tracking":
@@ -371,8 +359,7 @@ class TokensView extends HTMLElement {
             sample.style.borderRadius = `var(${name})`;
             break;
           case "shadow":
-            sample.className =
-              "my-2 h-8 w-20 rounded-sm border border-line bg-surface";
+            sample.className = "my-2 h-8 w-20 rounded-sm border border-line bg-surface";
             sample.style.boxShadow = `var(${name})`;
             break;
         }
@@ -382,14 +369,10 @@ class TokensView extends HTMLElement {
       if (definition.kind === "palette") {
         list.remove();
         const strip = document.createElement("div");
-        strip.className =
-          "grid grid-cols-token-palette gap-2 overflow-x-auto pb-2";
+        strip.className = "grid grid-cols-token-palette gap-2 overflow-x-auto pb-2";
         strip.tabIndex = 0;
         strip.setAttribute("role", "region");
-        strip.setAttribute(
-          "aria-label",
-          "Color scales, scroll horizontally to compare",
-        );
+        strip.setAttribute("aria-label", "Color scales, scroll horizontally to compare");
         strip.append(...section.querySelectorAll(":scope > div"));
         section.append(strip);
       }

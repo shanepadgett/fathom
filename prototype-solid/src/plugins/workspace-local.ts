@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+
 import { definePlugin } from "../kernel/plugin.ts";
 export function workspacePlugin(root: string) {
   return definePlugin({

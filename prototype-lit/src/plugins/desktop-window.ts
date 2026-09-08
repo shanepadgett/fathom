@@ -8,9 +8,7 @@ interface NativeWindow {
   setTitle(title: string): void;
 }
 type DesktopDeno = typeof Deno & {
-  BrowserWindow?: new (
-    options: { title: string; width: number; height: number },
-  ) => NativeWindow;
+  BrowserWindow?: new (options: { title: string; width: number; height: number }) => NativeWindow;
 };
 // The startup window belongs to the process and survives composition switches.
 let startupWindow: NativeWindow | undefined;
@@ -26,10 +24,7 @@ export default definePlugin({
       height: 860,
     });
     startupWindow = win;
-    win.addEventListener(
-      "close",
-      () => globalThis.dispatchEvent(new Event("fathom:close")),
-    );
+    win.addEventListener("close", () => globalThis.dispatchEvent(new Event("fathom:close")));
     win.setSize(1280, 860);
     win.setTitle("Fathom Prototype");
     win.setApplicationMenu([
@@ -89,9 +84,9 @@ export default definePlugin({
       const id = (event as CustomEvent<{ id?: string }>).detail?.id;
       if (!id?.startsWith("view.zoom") && id !== "view.resetZoom") return;
       void win.executeJs(
-        `globalThis.dispatchEvent(new CustomEvent("fathom:view-command", { detail: ${
-          JSON.stringify(id)
-        } }))`,
+        `globalThis.dispatchEvent(new CustomEvent("fathom:view-command", { detail: ${JSON.stringify(
+          id,
+        )} }))`,
       );
     });
   },

@@ -191,8 +191,8 @@ and specialized workflows.
 ---
 name: deploy-kubernetes
 description: Production deployment workflow for Kubernetes clusters.
-user_invocable: true          # Can be triggered manually by the user via slash command
-agent_invocable: false         # Hidden from agent auto-discovery (only user can trigger)
+user_invocable: true # Can be triggered manually by the user via slash command
+agent_invocable: false # Hidden from agent auto-discovery (only user can trigger)
 requires_tools:
   - bash
   - script

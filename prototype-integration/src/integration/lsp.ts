@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
-import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+
 import {
   createMessageConnection,
   StreamMessageReader,
@@ -38,9 +39,7 @@ export class LanguageService {
       cwd: root,
       stdio: ["pipe", "pipe", "inherit"],
     });
-    this.ended = new Promise<void>((done) =>
-      this.child.once("close", () => done())
-    );
+    this.ended = new Promise<void>((done) => this.child.once("close", () => done()));
     this.rpc = createMessageConnection(
       new StreamMessageReader(this.child.stdout),
       new StreamMessageWriter(this.child.stdin),
@@ -49,20 +48,15 @@ export class LanguageService {
       console.error("LSP:", error.message);
       this.rpc.dispose();
     });
-    this.rpc.onNotification("textDocument/publishDiagnostics", (params: {
-      uri: string;
-      version?: number;
-      diagnostics: Diagnostic[];
-    }) => {
-      const doc = [...this.documents.values()].find((d) =>
-        d.uri === params.uri
-      );
-      if (
-        !doc || (params.version !== undefined && params.version !== doc.version)
-      ) return;
-      doc.diagnostics = params.diagnostics;
-      doc.diagnosticVersion = doc.version;
-    });
+    this.rpc.onNotification(
+      "textDocument/publishDiagnostics",
+      (params: { uri: string; version?: number; diagnostics: Diagnostic[] }) => {
+        const doc = [...this.documents.values()].find((d) => d.uri === params.uri);
+        if (!doc || (params.version !== undefined && params.version !== doc.version)) return;
+        doc.diagnostics = params.diagnostics;
+        doc.diagnosticVersion = doc.version;
+      },
+    );
     this.rpc.listen();
   }
   async init() {
@@ -73,10 +67,12 @@ export class LanguageService {
         textDocument: { publishDiagnostics: { versionSupport: true } },
       },
       initializationOptions: { enable: true, lint: true },
-      workspaceFolders: [{
-        uri: pathToFileURL(this.root).href,
-        name: "prototype",
-      }],
+      workspaceFolders: [
+        {
+          uri: pathToFileURL(this.root).href,
+          name: "prototype",
+        },
+      ],
     });
     await this.rpc.sendNotification("initialized", {});
   }
@@ -124,10 +120,8 @@ export class LanguageService {
     if (doc.version !== version) {
       throw new Error("Document changed. Reload before saving.");
     }
-    if (await Deno.readTextFile(doc.path) !== doc.saved) {
-      throw new Error(
-        "File changed on disk. Resolve the conflict before saving.",
-      );
+    if ((await Deno.readTextFile(doc.path)) !== doc.saved) {
+      throw new Error("File changed on disk. Resolve the conflict before saving.");
     }
     await Deno.writeTextFile(doc.path, doc.text);
     doc.saved = doc.text;

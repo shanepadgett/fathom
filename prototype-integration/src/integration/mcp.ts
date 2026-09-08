@@ -1,7 +1,4 @@
-import {
-  Client,
-  StreamableHTTPClientTransport,
-} from "@modelcontextprotocol/client";
+import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 
 export class McpService {
@@ -19,9 +16,9 @@ export class McpService {
     const transport = options.url
       ? (this.http = new StreamableHTTPClientTransport(new URL(options.url)))
       : new StdioClientTransport({
-        command: options.command ?? "deno",
-        args: options.args ?? [],
-      });
+          command: options.command ?? "deno",
+          args: options.args ?? [],
+        });
     try {
       await client.connect(transport);
       let cursor: string | undefined;

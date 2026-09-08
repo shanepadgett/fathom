@@ -1,28 +1,53 @@
 {
-	"$schema": "https://raw.githubusercontent.com/shanepadgett/tau-agent/refs/heads/main/packages/agent/schemas/tau.schema.json",
-	"extensions": {
-		"context": {
-			"sync": {
-				"enabled": false
-			}
-		},
-		"subagent": {
-			"disabled": ["scout"]
-		},
-		"toolApproval": {
-			"enabled": false
-		},
-		"silentCommandRunner": {
-			"commands": [
-				{
-					"name": "Lint Markdown",
-					"details": "Lint markdown with fixes. Reports only remaining errors.",
-					"command": "mise run lint:markdown",
-					"includeGlobs": [
-						"**/*.md"
-					]
-				}
-			]
-		}
-	}
+  "$schema": "https://raw.githubusercontent.com/shanepadgett/tau-agent/refs/heads/main/packages/agent/schemas/tau.schema.json",
+  "extensions": {
+    "context": {
+      "sync": {
+        "enabled": false
+      }
+    },
+    "subagent": {
+      "disabled": ["scout"]
+    },
+    "toolApproval": {
+      "enabled": false
+    },
+    "silentCommandRunner": {
+      "commands": [
+        {
+          "name": "Lint Markdown",
+          "details": "Lint markdown with fixes. Reports only remaining errors.",
+          "command": "mise run lint:markdown",
+          "includeGlobs": ["**/*.md"]
+        },
+        {
+          "name": "Lint Oxc",
+          "details": "Apply oxlint safe fixes, then oxfmt. Best-effort auto-fix only.",
+          "command": "mise run lint:oxc",
+          "includeGlobs": [
+            "**/*.ts",
+            "**/*.tsx",
+            "**/*.mts",
+            "**/*.cts",
+            "**/*.js",
+            "**/*.jsx",
+            "**/*.mjs",
+            "**/*.cjs",
+            "**/*.json",
+            "**/*.jsonc",
+            "**/*.json5",
+            "**/*.css",
+            "**/*.scss",
+            "**/*.less",
+            "**/*.html",
+            "**/*.md",
+            "**/*.mdx",
+            "**/*.yml",
+            "**/*.yaml",
+            "**/*.toml"
+          ]
+        }
+      ]
+    }
+  }
 }

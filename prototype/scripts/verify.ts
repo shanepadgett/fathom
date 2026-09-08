@@ -2,13 +2,7 @@
 const commands = [
   ["fmt", "--unstable-css"],
   ["lint"],
-  [
-    "run",
-    "-A",
-    "npm:markdownlint-cli2@0.18.1",
-    "--config",
-    "../.markdownlint-cli2.jsonc",
-  ],
+  ["run", "-A", "npm:markdownlint-cli2@0.18.1", "--config", "../.markdownlint-cli2.jsonc"],
   ["check", "main.ts", "tests/", "scripts/"],
   ["test", "-A", "tests/"],
 ];

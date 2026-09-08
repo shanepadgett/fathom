@@ -2,9 +2,7 @@
   "version": "7",
   "dialect": "sqlite",
   "id": "30864591-9fe0-47c9-8621-dfdcb364b7b6",
-  "prevIds": [
-    "00000000-0000-0000-0000-000000000000"
-  ],
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
   "ddl": [
     {
       "name": "conversations",
@@ -41,9 +39,7 @@
       "table": "conversations"
     },
     {
-      "columns": [
-        "workspace"
-      ],
+      "columns": ["workspace"],
       "nameExplicit": false,
       "name": "conversations_pk",
       "table": "conversations",

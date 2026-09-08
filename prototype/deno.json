@@ -14,11 +14,7 @@
     "@types/proper-lockfile": "npm:@types/proper-lockfile@4.1.4"
   },
   "compilerOptions": {
-    "lib": [
-      "deno.window",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["deno.window", "dom", "dom.iterable"],
     "strict": true
   },
   "desktop": {
@@ -28,9 +24,5 @@
     },
     "backend": "cef"
   },
-  "exclude": [
-    "dist",
-    ".fathom",
-    "node_modules"
-  ]
+  "exclude": ["dist", ".fathom", "node_modules"]
 }

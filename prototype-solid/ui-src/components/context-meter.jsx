@@ -1,13 +1,10 @@
 import { createMemo, createSignal, For } from "solid-js";
+
 import { categories, estimate, format, LIMIT } from "./context-data.js";
 
 export function ContextMeter(props) {
-  const counts = createMemo(() =>
-    estimate(props.session || { messages: [] }, props.liveText)
-  );
-  const total = createMemo(() =>
-    Object.values(counts()).reduce((sum, count) => sum + count, 0)
-  );
+  const counts = createMemo(() => estimate(props.session || { messages: [] }, props.liveText));
+  const total = createMemo(() => Object.values(counts()).reduce((sum, count) => sum + count, 0));
   const [dismissed, setDismissed] = createSignal(false);
   return (
     <div
@@ -38,7 +35,7 @@ export function ContextMeter(props) {
               class="context-segment"
               style={{
                 background: color,
-                width: `${counts()[key] / Math.max(LIMIT, total()) * 100}%`,
+                width: `${(counts()[key] / Math.max(LIMIT, total())) * 100}%`,
               }}
             />
           )}
@@ -58,9 +55,8 @@ export function ContextMeter(props) {
           )}
         </For>
         <p>
-          Estimated tokens. System and tool definitions use fixed allowances;
-          message text uses characters ÷ 4. Reasoning, attachments, and protocol
-          overhead aren’t counted.
+          Estimated tokens. System and tool definitions use fixed allowances; message text uses
+          characters ÷ 4. Reasoning, attachments, and protocol overhead aren’t counted.
         </p>
       </div>
     </div>

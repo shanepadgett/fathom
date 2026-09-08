@@ -1,12 +1,13 @@
-import { definePlugin } from "../kernel/plugin.ts";
+import type { ModelMessage } from "../contracts/model.ts";
 import type {
   DisplayMessage,
   HarnessEvent,
   RunStatus,
   SessionService,
 } from "../contracts/session.ts";
-import type { ModelMessage } from "../contracts/model.ts";
+
 import { Storage } from "../integration/storage.ts";
+import { definePlugin } from "../kernel/plugin.ts";
 export class MemorySession implements SessionService {
   private id: string = crypto.randomUUID();
   private state: RunStatus = "idle";
@@ -19,9 +20,7 @@ export class MemorySession implements SessionService {
       this.id = saved.snapshot.id;
       this.messages = saved.snapshot.messages;
       this.history = saved.history;
-      this.state = saved.snapshot.status === "running"
-        ? "cancelled"
-        : saved.snapshot.status;
+      this.state = saved.snapshot.status === "running" ? "cancelled" : saved.snapshot.status;
       if (saved.snapshot.status === "running") {
         this.messages.push({
           id: crypto.randomUUID(),

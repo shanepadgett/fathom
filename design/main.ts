@@ -13,8 +13,8 @@ if (params.has("screen")) {
   document.body.innerHTML = example
     ? `<main data-screen-only>${example.markup}</main>
       <a class="ds-button fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full shadow-md" href="./index.html#/screens/${
-      entry!.id
-    }">← Back to details</a>`
+        entry!.id
+      }">← Back to details</a>`
     : "<p>Screen not found.</p>";
   document.title = `${entry?.name ?? "Screen"} — Fathom`;
 } else if (params.has("preview")) {
@@ -28,8 +28,7 @@ if (params.has("screen")) {
   // These same-origin frames follow the viewer without reloading open examples.
   if (parent !== window) {
     const syncTheme = () => {
-      document.documentElement.dataset.theme =
-        parent.document.documentElement.dataset.theme;
+      document.documentElement.dataset.theme = parent.document.documentElement.dataset.theme;
     };
     syncTheme();
     const observer = new MutationObserver(syncTheme);

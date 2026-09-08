@@ -8,8 +8,7 @@ export const categories = [
   ["results", "Tool results", "#478773"],
 ];
 const tokens = (text = "") => Math.ceil(text.length / 4);
-export const format = (value) =>
-  value < 1000 ? String(value) : `${+(value / 1000).toFixed(1)}K`;
+export const format = (value) => (value < 1000 ? String(value) : `${+(value / 1000).toFixed(1)}K`);
 
 // The transcript is a display projection, not the exact provider request.
 // Keep the existing fixed allowance explicit until runtime accounting is exposed.
@@ -25,9 +24,7 @@ export function estimate(session, liveText) {
   for (const message of session.messages) {
     if (message.role === "tool") {
       counts.results += tokens(message.text);
-      counts.calls += tokens(
-        (message.toolName || "") + JSON.stringify(message.args || {}),
-      );
+      counts.calls += tokens((message.toolName || "") + JSON.stringify(message.args || {}));
     } else if (message.role === "user" || message.role === "assistant") {
       counts[message.role] += tokens(message.text);
     }

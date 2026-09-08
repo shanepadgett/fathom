@@ -6,20 +6,8 @@ function defaultMessage(message) {
   return el(
     "details",
     { class: `evidence ${message.isError ? "failed" : ""}` },
-    el(
-      "summary",
-      {},
-      `${message.toolName || "Tool"} / ${
-        message.isError ? "failed" : "result"
-      }`,
-    ),
-    message.args
-      ? el(
-        "pre",
-        { class: "message-text" },
-        JSON.stringify(message.args, null, 2),
-      )
-      : "",
+    el("summary", {}, `${message.toolName || "Tool"} / ${message.isError ? "failed" : "result"}`),
+    message.args ? el("pre", { class: "message-text" }, JSON.stringify(message.args, null, 2)) : "",
     content,
   );
 }
@@ -37,7 +25,8 @@ function mount(container, host) {
     textarea.style.height = "auto";
     const styles = getComputedStyle(textarea);
     const lineHeight = Number.parseFloat(styles.lineHeight);
-    const chrome = Number.parseFloat(styles.paddingTop) +
+    const chrome =
+      Number.parseFloat(styles.paddingTop) +
       Number.parseFloat(styles.paddingBottom) +
       Number.parseFloat(styles.borderTopWidth) +
       Number.parseFloat(styles.borderBottomWidth);
@@ -47,11 +36,7 @@ function mount(container, host) {
     textarea.style.height = `${Math.min(desired, maximum)}px`;
     textarea.style.overflowY = desired > maximum ? "auto" : "hidden";
   }
-  const submit = el(
-    "button",
-    { type: "submit", class: "primary" },
-    "Run agent ↗",
-  );
+  const submit = el("button", { type: "submit", class: "primary" }, "Run agent ↗");
   const cancel = button("Stop ■", () => act("cancel"));
   const clear = button("New session", () => act("reset"));
   const form = el(
@@ -67,12 +52,7 @@ function mount(container, host) {
     ),
   );
   container.append(
-    el(
-      "div",
-      { class: "section-heading" },
-      el("h2", {}, "Working transcript"),
-      clear,
-    ),
+    el("div", { class: "section-heading" }, el("h2", {}, "Working transcript"), clear),
     ledger,
     form,
   );
@@ -89,10 +69,7 @@ function mount(container, host) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = textarea.value.trim();
-    if (
-      !text || submitting ||
-      host.state.get().bootstrap?.session.status === "running"
-    ) return;
+    if (!text || submitting || host.state.get().bootstrap?.session.status === "running") return;
     submitting = true;
     submit.disabled = true;
     host.state.patch({ error: "", liveText: "" });
@@ -105,8 +82,7 @@ function mount(container, host) {
       host.state.patch({ error: error.message });
     } finally {
       submitting = false;
-      submit.disabled =
-        host.state.get().bootstrap?.session.status === "running";
+      submit.disabled = host.state.get().bootstrap?.session.status === "running";
     }
   });
   textarea.addEventListener("keydown", (event) => {
@@ -130,86 +106,76 @@ function mount(container, host) {
     ),
   );
   const liveText = live.querySelector("pre");
-  const unsubscribe = host.state.subscribe(
-    ({ bootstrap, liveText: text, activeTool }) => {
-      if (!bootstrap) return;
-      const { session } = bootstrap;
-      const busy = session.status === "running";
-      submit.disabled = busy || submitting;
-      cancel.disabled = !busy;
-      clear.disabled = busy || !session.messages.length;
-      const serialized = JSON.stringify(session.messages);
-      const nearBottom =
-        ledger.scrollHeight - ledger.scrollTop - ledger.clientHeight < 100;
-      if (serialized !== lastMessages) {
-        lastMessages = serialized;
-        rows = session.messages.map((message, index) => {
-          const renderer = [...host.renderers.values()].find((entry) =>
-            entry.matches(message)
-          );
-          return el(
-            "article",
-            { class: `ledger-row ${message.role}` },
+  const unsubscribe = host.state.subscribe(({ bootstrap, liveText: text, activeTool }) => {
+    if (!bootstrap) return;
+    const { session } = bootstrap;
+    const busy = session.status === "running";
+    submit.disabled = busy || submitting;
+    cancel.disabled = !busy;
+    clear.disabled = busy || !session.messages.length;
+    const serialized = JSON.stringify(session.messages);
+    const nearBottom = ledger.scrollHeight - ledger.scrollTop - ledger.clientHeight < 100;
+    if (serialized !== lastMessages) {
+      lastMessages = serialized;
+      rows = session.messages.map((message, index) => {
+        const renderer = [...host.renderers.values()].find((entry) => entry.matches(message));
+        return el(
+          "article",
+          { class: `ledger-row ${message.role}` },
+          el("span", { class: "row-number" }, String(index + 1).padStart(2, "0")),
+          el(
+            "div",
+            {},
             el(
-              "span",
-              { class: "row-number" },
-              String(index + 1).padStart(2, "0"),
+              "div",
+              { class: "role" },
+              message.role === "user" ? "You / instruction" : message.role,
+            ),
+            renderer ? renderer.render(message, host) : defaultMessage(message),
+          ),
+        );
+      });
+      ledger.replaceChildren(...rows);
+      if (!rows.length) {
+        ledger.append(
+          el(
+            "section",
+            { class: "empty" },
+            el("h3", {}, "A workbench.\nYour way."),
+            el(
+              "p",
+              {},
+              "Give the agent a task. Inspect its work. Swap the pieces that make it yours.",
             ),
             el(
               "div",
-              {},
-              el(
-                "div",
-                { class: "role" },
-                message.role === "user" ? "You / instruction" : message.role,
-              ),
-              renderer
-                ? renderer.render(message, host)
-                : defaultMessage(message),
-            ),
-          );
-        });
-        ledger.replaceChildren(...rows);
-        if (!rows.length) {
-          ledger.append(
-            el(
-              "section",
-              { class: "empty" },
-              el("h3", {}, "A workbench.\nYour way."),
-              el(
-                "p",
-                {},
-                "Give the agent a task. Inspect its work. Swap the pieces that make it yours.",
-              ),
-              el(
-                "div",
-                { class: "starters" },
-                ...[
-                  "Read the files in this workspace and explain its structure.",
-                  "Create hello.txt with a short greeting, then read it back.",
-                ].map((prompt) =>
-                  button(prompt + " ↗", () => {
-                    textarea.value = prompt;
-                    resizeTextarea();
-                    textarea.focus();
-                  })
-                ),
+              { class: "starters" },
+              ...[
+                "Read the files in this workspace and explain its structure.",
+                "Create hello.txt with a short greeting, then read it back.",
+              ].map((prompt) =>
+                button(prompt + " ↗", () => {
+                  textarea.value = prompt;
+                  resizeTextarea();
+                  textarea.focus();
+                }),
               ),
             ),
-          );
-        }
+          ),
+        );
       }
-      live.remove();
-      if (busy || text) {
-        liveText.textContent = text ||
-          (activeTool
-            ? `${activeTool.name}\n${JSON.stringify(activeTool.args, null, 2)}`
-            : "Thinking…");
-        ledger.append(live);
-      }
-      if (nearBottom) ledger.scrollTop = ledger.scrollHeight;
-    },
-  );
+    }
+    live.remove();
+    if (busy || text) {
+      liveText.textContent =
+        text ||
+        (activeTool
+          ? `${activeTool.name}\n${JSON.stringify(activeTool.args, null, 2)}`
+          : "Thinking…");
+      ledger.append(live);
+    }
+    if (nearBottom) ledger.scrollTop = ledger.scrollHeight;
+  });
   const unregistry = host.onRegistryChange(() => {
     lastMessages = "";
     host.state.patch({});

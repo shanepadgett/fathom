@@ -1,7 +1,9 @@
-import { join } from "node:path";
-import { runProcess } from "../plugins/tools/process.ts";
-import type { McpService } from "./mcp.ts";
 import type { Approvals } from "./approvals.ts";
+import type { McpService } from "./mcp.ts";
+
+import { join } from "node:path";
+
+import { runProcess } from "../plugins/tools/process.ts";
 
 export class Scripts {
   private files = new Map<string, { path: string; runtime: string }>();
@@ -40,10 +42,10 @@ export class Scripts {
             runtime === "python3"
               ? "py"
               : runtime === "bash"
-              ? "sh"
-              : runtime === "node"
-              ? "mjs"
-              : "ts"
+                ? "sh"
+                : runtime === "node"
+                  ? "mjs"
+                  : "ts"
           }`,
         ),
       };
@@ -62,26 +64,21 @@ export class Scripts {
     const bridge = Deno.serve(
       { hostname: "127.0.0.1", port: 0, onListen() {} },
       async (request) => {
-        if (
-          request.method !== "POST" ||
-          request.headers.get("authorization") !== `Bearer ${token}`
-        ) return new Response("Denied", { status: 403 });
+        if (request.method !== "POST" || request.headers.get("authorization") !== `Bearer ${token}`)
+          return new Response("Denied", { status: 403 });
         try {
           const { name, args } = await request.json();
           await this.approvals.request(
             `MCP tool ${name}\n${JSON.stringify(args, null, 2)}`,
             executionSignal,
           );
-          return Response.json(
-            await this.mcp.call(name, args, executionSignal),
-          );
+          return Response.json(await this.mcp.call(name, args, executionSignal));
         } catch (error) {
           return Response.json({ error: String(error) }, { status: 400 });
         }
       },
     );
-    const facade =
-      `export const mcp = new Proxy({} as Record<string, (args: Record<string, unknown>) => Promise<unknown>>, { get: (_, name: string) => async (args: Record<string, unknown>) => {
+    const facade = `export const mcp = new Proxy({} as Record<string, (args: Record<string, unknown>) => Promise<unknown>>, { get: (_, name: string) => async (args: Record<string, unknown>) => {
       const response = await fetch("http://127.0.0.1:${bridge.addr.port}", {method:"POST",headers:{authorization:"Bearer ${token}","content-type":"application/json"},body:JSON.stringify({name,args})});
       const result = await response.json(); if (!response.ok) throw new Error(JSON.stringify(result)); return result;
     }});\n`;
@@ -91,18 +88,13 @@ export class Scripts {
       JSON.stringify({ imports: { "fathom:mcp": "./mcp.ts" } }),
     );
     try {
-      const command = file.runtime === "deno"
-        ? Deno.env.get("FATHOM_DENO") ?? "deno"
-        : file.runtime;
-      const argv = file.runtime === "deno"
-        ? ["run", "-A", "--config", join(dir, "deno.json"), file.path]
-        : [file.path];
-      return `scriptId=${id}\n${await runProcess(
-        command,
-        argv,
-        this.root,
-        signal,
-      )}`;
+      const command =
+        file.runtime === "deno" ? (Deno.env.get("FATHOM_DENO") ?? "deno") : file.runtime;
+      const argv =
+        file.runtime === "deno"
+          ? ["run", "-A", "--config", join(dir, "deno.json"), file.path]
+          : [file.path];
+      return `scriptId=${id}\n${await runProcess(command, argv, this.root, signal)}`;
     } finally {
       lifecycle.abort();
       await bridge.shutdown();

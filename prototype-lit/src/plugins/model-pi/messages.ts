@@ -1,4 +1,5 @@
 import type { AssistantMessage, Message } from "@earendil-works/pi-ai";
+
 import type { ModelMessage } from "../../contracts/model.ts";
 export function toPiMessages(messages: ModelMessage[]): Message[] {
   return messages.map((message): Message => {
@@ -17,9 +18,7 @@ export function toPiMessages(messages: ModelMessage[]): Message[] {
       };
     }
     if (message.reply.continuation?.adapter !== "pi-ai") {
-      throw new Error(
-        "This history belongs to another model adapter. Start a new session.",
-      );
+      throw new Error("This history belongs to another model adapter. Start a new session.");
     }
     return message.reply.continuation.value as AssistantMessage;
   });

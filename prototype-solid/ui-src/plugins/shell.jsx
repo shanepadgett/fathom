@@ -1,7 +1,8 @@
 import { createMemo, createSignal, For, onCleanup, onMount } from "solid-js";
 import { render } from "solid-js/web";
-import { useHostState, useRegistry } from "../core/component.js";
+
 import { ContextMeter } from "../components/context-meter.jsx";
+import { useHostState, useRegistry } from "../core/component.js";
 
 function View(props) {
   let node;
@@ -10,7 +11,13 @@ function View(props) {
     onCleanup(() => dispose?.());
   });
   return (
-    <section ref={node} class="extension-view" aria-label={props.view.title} />
+    <section
+      ref={(el) => {
+        node = el;
+      }}
+      class="extension-view"
+      aria-label={props.view.title}
+    />
   );
 }
 
@@ -42,12 +49,12 @@ function Shell(props) {
     !data()
       ? "Connecting"
       : !state.connected
-      ? "Reconnecting"
-      : data().session.status === "running"
-      ? "Working"
-      : data().session.status === "idle"
-      ? "Idle"
-      : data().session.status;
+        ? "Reconnecting"
+        : data().session.status === "running"
+          ? "Working"
+          : data().session.status === "idle"
+            ? "Idle"
+            : data().session.status;
   return (
     <>
       <div class="context-bar">
@@ -64,46 +71,37 @@ function Shell(props) {
         </div>
         <div>
           <span class="eyebrow">Model</span>
-          <span>
-            {data()
-              ? `${data().model.provider} / ${data().model.id}`
-              : "Connecting…"}
-          </span>
+          <span>{data() ? `${data().model.provider} / ${data().model.id}` : "Connecting…"}</span>
         </div>
         <div>
-          <label for="runtime" class="eyebrow">Runtime</label>
+          <label for="runtime" class="eyebrow">
+            Runtime
+          </label>
           <select
             id="runtime"
             aria-label="Runtime composition"
             aria-describedby="runtime-note"
             value={profiles().length ? data()?.profile : "custom"}
-            disabled={switching() || !profiles().length ||
-              data()?.session.status === "running"}
+            disabled={switching() || !profiles().length || data()?.session.status === "running"}
             onChange={switchProfile}
           >
             <For
               each={profiles()}
-              fallback={
-                <option value="custom">
-                  {data()?.runtime || "Connecting…"}
-                </option>
-              }
+              fallback={<option value="custom">{data()?.runtime || "Connecting…"}</option>}
             >
               {(name) => (
                 <option value={name}>
                   {name === "default"
                     ? "Default / pi-ai"
                     : name === "echo"
-                    ? "Echo / alternate runtime"
-                    : name}
+                      ? "Echo / alternate runtime"
+                      : name}
                 </option>
               )}
             </For>
           </select>
           <small id="runtime-note" class="runtime-note">
-            {profiles().length
-              ? "Switching starts a fresh session"
-              : "Custom composition"}
+            {profiles().length ? "Switching starts a fresh session" : "Custom composition"}
           </small>
         </div>
       </div>
@@ -137,6 +135,5 @@ function Shell(props) {
 }
 export default {
   id: "ui.shell",
-  activate: (host) =>
-    render(() => <Shell host={host} />, document.querySelector("#app")),
+  activate: (host) => render(() => <Shell host={host} />, document.querySelector("#app")),
 };

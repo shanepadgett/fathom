@@ -1,6 +1,7 @@
+import type { Readable } from "node:stream";
+
 import { spawn } from "node:child_process";
 import process from "node:process";
-import type { Readable } from "node:stream";
 async function capture(stream: Readable): Promise<string> {
   let text = "";
   let truncated = false;
@@ -28,7 +29,9 @@ export async function runBash(
   const kill = () => {
     try {
       if (child.pid) process.kill(-child.pid, "SIGKILL");
-    } catch { /* Process group already exited. */ }
+    } catch {
+      /* Process group already exited. */
+    }
   };
   const exited = new Promise<number>((resolve, reject) => {
     child.once("error", reject);

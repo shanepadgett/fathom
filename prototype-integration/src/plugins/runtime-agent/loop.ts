@@ -60,13 +60,9 @@ export async function runLoop(
     }
     signal.throwIfAborted();
     if (reply.stop === "length") {
-      throw new Error(
-        "Model output limit reached. Send a follow-up to continue.",
-      );
+      throw new Error("Model output limit reached. Send a follow-up to continue.");
     }
     if (!reply.calls.length) return;
   }
-  throw new Error(
-    "Prototype step limit (16) reached. Send a follow-up to continue.",
-  );
+  throw new Error("Prototype step limit (16) reached. Send a follow-up to continue.");
 }

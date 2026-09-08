@@ -1,9 +1,11 @@
+import type { ModelService } from "../src/contracts/model.ts";
+
 import { assert, assertEquals, assertRejects } from "@std/assert";
+
 import { runLoop } from "../src/plugins/runtime-agent/loop.ts";
 import { MemorySession } from "../src/plugins/session-memory.ts";
-import { Registry } from "../src/plugins/tools/registry.ts";
 import { runBash } from "../src/plugins/tools/process.ts";
-import type { ModelService } from "../src/contracts/model.ts";
+import { Registry } from "../src/plugins/tools/registry.ts";
 Deno.test("tool errors settle into history and allow the model to recover", async () => {
   const sessions = new MemorySession();
   const tools = new Registry();
@@ -53,11 +55,14 @@ Deno.test("cancellation settles remaining tool calls without executing them", as
     respond: () =>
       Promise.resolve({
         text: "",
-        calls: [{ id: "a", name: "cancel", arguments: {} }, {
-          id: "b",
-          name: "cancel",
-          arguments: {},
-        }],
+        calls: [
+          { id: "a", name: "cancel", arguments: {} },
+          {
+            id: "b",
+            name: "cancel",
+            arguments: {},
+          },
+        ],
         stop: "tools",
       }),
   };
@@ -88,11 +93,6 @@ Deno.test("bash cancellation closes shell children and output pipes", async () =
   }
 });
 Deno.test("bash timeout is visible in its result", async () => {
-  const result = await runBash(
-    "sleep 30 & wait",
-    Deno.cwd(),
-    new AbortController().signal,
-    100,
-  );
+  const result = await runBash("sleep 30 & wait", Deno.cwd(), new AbortController().signal, 100);
   assert(result.includes("timeout"));
 });

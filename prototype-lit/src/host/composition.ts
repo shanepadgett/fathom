@@ -1,18 +1,20 @@
-import desktop from "../plugins/desktop-window.ts";
-import context from "../plugins/context-default.ts";
+import type { HarnessPlugin } from "../kernel/plugin.ts";
+
 import { basename, dirname } from "node:path";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import type { HarnessPlugin } from "../kernel/plugin.ts";
-import sessions from "../plugins/session-memory.ts";
-import registry from "../plugins/tools/registry.ts";
-import read from "../plugins/tools/read.ts";
-import write from "../plugins/tools/write.ts";
-import edit from "../plugins/tools/edit.ts";
-import bash from "../plugins/tools/bash.ts";
+
+import context from "../plugins/context-default.ts";
+import desktop from "../plugins/desktop-window.ts";
+import { piPlugin } from "../plugins/model-pi/index.ts";
 import agent from "../plugins/runtime-agent/index.ts";
 import echo from "../plugins/runtime-echo.ts";
-import { piPlugin } from "../plugins/model-pi/index.ts";
+import sessions from "../plugins/session-memory.ts";
+import bash from "../plugins/tools/bash.ts";
+import edit from "../plugins/tools/edit.ts";
+import read from "../plugins/tools/read.ts";
+import registry from "../plugins/tools/registry.ts";
+import write from "../plugins/tools/write.ts";
 import { workspacePlugin } from "../plugins/workspace-local.ts";
 import { type AppConfig, appRoot, readComposition } from "./config.ts";
 export async function compose(config: AppConfig) {
@@ -64,9 +66,7 @@ export async function compose(config: AppConfig) {
       plugins.push(known);
       continue;
     }
-    const url = entry.startsWith("file:")
-      ? entry
-      : pathToFileURL(resolve(base, entry)).href;
+    const url = entry.startsWith("file:") ? entry : pathToFileURL(resolve(base, entry)).href;
     const module = await import(url);
     if (!module.default || typeof module.default.activate !== "function") {
       throw new Error(`Invalid plugin module: ${entry}`);

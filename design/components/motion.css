@@ -12,8 +12,7 @@
     max-height: calc(100dvh - 2 * var(--spacing-4));
     overflow: auto;
     opacity: 0;
-    transform: translateY(var(--motion-distance-small))
-      scale(var(--motion-scale-enter));
+    transform: translateY(var(--motion-distance-small)) scale(var(--motion-scale-enter));
     transition-property: opacity, transform, display, overlay;
     transition-duration: var(--motion-duration-fast);
     transition-timing-function: var(--ease-exit);
@@ -63,8 +62,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 0fr);
     overflow: hidden;
-    transition: grid-template-columns var(--motion-duration-normal)
-      var(--ease-standard);
+    transition: grid-template-columns var(--motion-duration-normal) var(--ease-standard);
   }
 
   ds-drawer[mode="push"][open] {
@@ -97,8 +95,7 @@
   @starting-style {
     ds-modal > dialog[open] {
       opacity: 0;
-      transform: translateY(var(--motion-distance-small))
-        scale(var(--motion-scale-enter));
+      transform: translateY(var(--motion-distance-small)) scale(var(--motion-scale-enter));
     }
     ds-drawer > dialog[open] {
       opacity: 0;
@@ -136,7 +133,8 @@
       interpolate-size: allow-keywords;
       height: 0;
       overflow: clip;
-      transition: height var(--motion-duration-normal) var(--ease-standard),
+      transition:
+        height var(--motion-duration-normal) var(--ease-standard),
         content-visibility var(--motion-duration-normal) allow-discrete;
     }
     ds-accordion > details[open]::details-content {

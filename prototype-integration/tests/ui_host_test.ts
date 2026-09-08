@@ -1,4 +1,5 @@
 import { assertEquals, assertRejects } from "@std/assert";
+
 import { createHost } from "../ui/core/host.js";
 import { createState } from "../ui/core/state.js";
 Deno.test("UI plugin failure rolls back contributions and permits replacement", async () => {

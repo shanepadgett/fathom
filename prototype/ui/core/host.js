@@ -40,18 +40,12 @@ export function createHost(state, transport) {
       if (!plugin?.id || typeof plugin.activate !== "function") {
         throw new Error("Invalid UI plugin");
       }
-      if (
-        plugin.apiVersion !== undefined && plugin.apiVersion !== host.apiVersion
-      ) {
-        throw new Error(
-          `UI plugin ${plugin.id} needs unsupported API ${plugin.apiVersion}`,
-        );
+      if (plugin.apiVersion !== undefined && plugin.apiVersion !== host.apiVersion) {
+        throw new Error(`UI plugin ${plugin.id} needs unsupported API ${plugin.apiVersion}`);
       }
       for (const dependency of plugin.requires || []) {
         if (!disposers.has(dependency)) {
-          throw new Error(
-            `UI plugin ${plugin.id} requires ${dependency} to be activated first`,
-          );
+          throw new Error(`UI plugin ${plugin.id} requires ${dependency} to be activated first`);
         }
       }
       if (disposers.has(plugin.id)) return;
@@ -67,10 +61,8 @@ export function createHost(state, transport) {
           subscribe: (listener) => track(state.subscribe(listener)),
         },
         registerView: (id, view) => track(host.registerView(id, view)),
-        registerRenderer: (id, renderer) =>
-          track(host.registerRenderer(id, renderer)),
-        registerCommand: (id, command) =>
-          track(host.registerCommand(id, command)),
+        registerRenderer: (id, renderer) => track(host.registerRenderer(id, renderer)),
+        registerCommand: (id, command) => track(host.registerCommand(id, command)),
         onRegistryChange: (listener) => track(host.onRegistryChange(listener)),
       };
       const cleanup = () => {
@@ -83,10 +75,7 @@ export function createHost(state, transport) {
           }
         }
         if (errors.length) {
-          throw new AggregateError(
-            errors,
-            `UI plugin ${plugin.id} cleanup failed`,
-          );
+          throw new AggregateError(errors, `UI plugin ${plugin.id} cleanup failed`);
         }
       };
       try {
@@ -97,10 +86,7 @@ export function createHost(state, transport) {
         try {
           cleanup();
         } catch (cleanupError) {
-          throw new AggregateError(
-            [error, cleanupError],
-            `UI plugin ${plugin.id} failed`,
-          );
+          throw new AggregateError([error, cleanupError], `UI plugin ${plugin.id} failed`);
         }
         throw error;
       }

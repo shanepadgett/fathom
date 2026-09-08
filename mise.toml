@@ -1,10 +1,16 @@
 [tools]
 deno = "2.9.6"
 markdownlint-cli2 = "0.23.2"
+oxlint = "1.81.0"
+oxfmt = "0.66.0"
 
 [tasks."lint:markdown"]
 description = "Lint markdown and apply fixes"
 run = "markdownlint-cli2 --fix"
+
+[tasks."lint:oxc"]
+description = "Apply oxlint safe fixes, then format with oxfmt"
+run = "oxlint --fix; oxfmt"
 
 [tasks.design]
 description = "Open the local design system"
