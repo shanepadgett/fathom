@@ -3,10 +3,13 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @import "./tokens.css";
 @import "./components/button.css";
+@import "./components/context-menu.css";
 @import "./components/dialog-overlay.css";
 @import "./components/drawer.css";
 @import "./components/accordion.css";
 @import "./composites/conversation-pane.css";
+@import "./composites/session-sidebar.css";
+@import "./composites/context-usage.css";
 @import "./layouts/workspace-shell.css";
 @import "./layouts/workspace-layout.css";
 @import "./layouts/workspace-body.css";

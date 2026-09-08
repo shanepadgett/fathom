@@ -1,0 +1,17 @@
+@layer components {
+  .session-sidebar-heading::before,
+  .session-sidebar-heading::after {
+    content: "";
+    @apply min-w-0 flex-1 border-t border-line;
+  }
+
+  .session-sidebar-controls::after {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-full h-4 opacity-0;
+    background: linear-gradient(to bottom, var(--color-surface), transparent);
+  }
+
+  session-sidebar[data-scrolled] .session-sidebar-controls::after {
+    @apply opacity-100;
+  }
+}

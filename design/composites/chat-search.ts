@@ -27,9 +27,9 @@ export class ChatSearchElement extends DesignElement {
     const { chats, projects } = this;
     return html`
       <search-surface
-        .label=${"Search chats"}
-        .heading=${"Recent chats"}
-        .field=${searchFieldPreview("Search chats\u2026", true, "All projects")}
+        .label=${"Search sessions"}
+        .heading=${"Recent sessions"}
+        .field=${searchFieldPreview("Search sessions\u2026", true, "All projects")}
         .results=${
           chats.length
             ? chats.map(
@@ -41,9 +41,9 @@ export class ChatSearchElement extends DesignElement {
                   ></chat-search-result>
                 `,
               )
-            : emptyState("No chats found")
+            : emptyState("No sessions found")
         }
-        .action=${"Open chat"}
+        .action=${"Open session"}
       ></search-surface>
     `;
   }

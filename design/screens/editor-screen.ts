@@ -1,3 +1,4 @@
+import { systemStatus } from "../fixtures/system-status.ts";
 import { html, nothing } from "lit";
 
 import { DesignElement } from "../components/design-element.ts";
@@ -54,8 +55,7 @@ export class EditorScreen extends DesignElement {
           </workspace-body>
 
           <workspace-status-bar
-            .status=${scenario.selectedChat.status ?? "Idle"}
-            .changed=${scenario.changes.count}
+            .system=${systemStatus}
             .context=${scenario.context}
           ></workspace-status-bar>
 

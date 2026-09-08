@@ -1,5 +1,7 @@
 import type { DesignEntry } from "./design-entry.ts";
 
+import { contextUsageExamples } from "../composites/context-usage.examples.ts";
+import { contextMenuExamples } from "../components/context-menu.examples.ts";
 import { accordionExamples } from "../components/accordion.examples.ts";
 import { buttonExamples } from "../components/button.examples.ts";
 import { drawerExamples } from "../components/drawer.examples.ts";
@@ -24,7 +26,23 @@ import { meterExamples } from "../primitives/meter.examples.ts";
 import { shortcutHintExamples } from "../primitives/shortcut-hint.examples.ts";
 import { tabStripExamples } from "../primitives/tab-strip.examples.ts";
 
+import { wordmarkExamples } from "../primitives/fathom-wordmark.examples.ts";
+
 export const components: DesignEntry[] = [
+  {
+    id: "context-menu",
+    name: "Context menu",
+    description: "Segmented actions with an optional companion agent button.",
+    category: "Primitives",
+    examples: contextMenuExamples,
+  },
+  {
+    id: "wordmark",
+    name: "Wordmark",
+    description: "Shared Fathom identity with bold lettering and an accent period.",
+    category: "Primitives",
+    examples: wordmarkExamples,
+  },
   {
     id: "workspace-controls",
     name: "Compact controls",
@@ -104,7 +122,7 @@ export const components: DesignEntry[] = [
     name: "Workspace chrome",
     description: "Header and footer shared across both workspace layouts.",
     category: "Composites",
-    examples: [...workspaceHeaderExamples, ...workspaceStatusBarExamples],
+    examples: [...workspaceHeaderExamples, ...workspaceStatusBarExamples, ...contextUsageExamples],
   },
   {
     id: "modal",

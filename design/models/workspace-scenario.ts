@@ -1,3 +1,4 @@
+import type { ContextUsage } from "./context-usage.ts";
 import type { Message } from "./conversation.ts";
 import type { Changes, FileNode } from "./files.ts";
 import type { InspectorData } from "./inspector.ts";
@@ -15,7 +16,7 @@ export interface WorkspaceScenario {
   expandedFolders: string[];
   searchChats: Chat[];
   changes: Changes;
-  context: { value: number; maximum: number };
+  context: ContextUsage;
   model: string;
   reasoning: string;
   path: string[];

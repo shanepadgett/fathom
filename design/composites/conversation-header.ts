@@ -24,7 +24,7 @@ export class ConversationHeaderElement extends DesignElement {
     return html`
       <header
         class="flex shrink-0 items-center justify-between gap-3 border-b border-line ${
-          presentation === "main" ? "h-16 px-6" : "h-12 pl-6 text-sm"
+          presentation === "main" ? "h-12 px-6" : "h-12 pl-6 text-sm"
         }"
       >
         <h2 class="min-w-0 truncate font-medium" title="${title}">${title}</h2>

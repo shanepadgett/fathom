@@ -16,7 +16,7 @@ export class BranchIdentityElement extends DesignElement {
     const { branch } = this;
     return html`
       <span class="flex min-w-0 items-center gap-1.5"
-        >${icon("git-branch")}<span class="truncate">${branch}</span></span
+        >${icon("git-branch")}<span class="truncate" title=${branch}>${branch}</span></span
       >
     `;
   }

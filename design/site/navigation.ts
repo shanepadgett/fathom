@@ -2,29 +2,28 @@ import type { DesignEntry } from "./design-entry.ts";
 
 import { html, type TemplateResult } from "lit";
 
-import { icon, type IconName } from "../primitives/icon.ts";
+import { icon } from "../primitives/icon.ts";
 import { components } from "./component-catalog.ts";
 import { screens } from "./screen-catalog.ts";
 
 const row =
   "viewer-nav-row flex min-h-8 min-w-0 items-center gap-2 rounded-control px-2 py-1.5 text-dense text-muted hover:bg-canvas hover:text-ink aria-[current=page]:bg-action/10 aria-[current=page]:font-medium aria-[current=page]:text-action";
 
-const link = (href: string, label: string, symbol?: IconName, fullLabel = label) => html`
+const link = (href: string, label: string, fullLabel = label) => html`
   <a class="${row}" href="${href}" title="${fullLabel}" aria-label="${fullLabel}"
-    >${symbol ? icon(symbol) : ""}<span class="min-w-0 break-words">${label}</span></a
+    ><span class="min-w-0 break-words">${label}</span></a
   >
 `;
 
 const group = (
   label: string,
-  symbol: IconName,
   entries: DesignEntry[],
   path: string,
   open = false,
 ) => html`
   <details class="viewer-nav-group" ?open=${open}>
     <summary class="${row}">
-      ${icon(symbol)}<span class="flex-1">${label}</span
+      <span class="flex-1">${label}</span
       ><span class="font-mono text-micro text-muted">${entries.length}</span
       >${icon("caret-right", "small")}
     </summary>
@@ -33,7 +32,6 @@ const group = (
         link(
           `#/${path}/${entry.id}`,
           path === "screens" ? (entry.name.split(" · ")[1] ?? "Overview") : entry.name,
-          undefined,
           entry.name,
         ),
       )}
@@ -43,7 +41,7 @@ const group = (
 
 const section = (label: string, href: string, body: TemplateResult | TemplateResult[]) => html`
   <section class="mt-6">
-    <h2 class="mb-2 px-2 text-micro font-medium uppercase tracking-widest text-muted">
+    <h2 class="mb-2 px-2 text-dense font-semibold uppercase tracking-wide text-ink">
       <a class="hover:text-ink" href="${href}">${label}</a>
     </h2>
     <div class="grid gap-1">${body}</div>
@@ -52,15 +50,14 @@ const section = (label: string, href: string, body: TemplateResult | TemplateRes
 
 export const viewerNavigation = () =>
   html`<div class="grid gap-1">
-      ${link("#/", "Overview", "folder-open")}${link("#/tokens", "Tokens", "brackets-curly")}
+      ${link("#/", "Overview")}${link("#/tokens", "Tokens")}
     </div>
     ${section(
       "Components",
       "#/components",
-      (["Primitives", "Composites", "Behavior demos"] as const).map((category, index) =>
+      (["Primitives", "Composites", "Behavior demos"] as const).map((category) =>
         group(
           category,
-          (["brackets-curly", "folder", "note-pencil"] as const)[index],
           components.filter((entry) => entry.category === category),
           "components",
         ),
@@ -68,15 +65,19 @@ export const viewerNavigation = () =>
     )}${section("Screens", "#/screens", [
       group(
         "Agent focus",
-        "chat-circle-text",
         screens.filter((entry) => entry.id.startsWith("agent-")),
         "screens",
         true,
       ),
       group(
         "Editor focus",
-        "code",
         screens.filter((entry) => entry.id.startsWith("editor-")),
+        "screens",
+        true,
+      ),
+      group(
+        "Chat focus",
+        screens.filter((entry) => entry.id.startsWith("chat-")),
         "screens",
         true,
       ),

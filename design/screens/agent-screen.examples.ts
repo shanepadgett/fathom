@@ -36,3 +36,19 @@ export const agentChatSearchExamples = [
     markup: html`<agent-screen state="chat-search"></agent-screen>`,
   },
 ];
+
+export const agentContextMenuExamples = [
+  {
+    name: "Thread and conversation menus",
+    markup: html`<agent-screen state="context-menus"></agent-screen>`,
+  },
+];
+
+
+export const agentContextBreakdownExamples = [
+  { name: "Context breakdown open", markup: html`<agent-screen state="context-breakdown"></agent-screen>` },
+];
+
+export const agentNewSessionExamples = [
+  { name: "New session", markup: html`<agent-screen state="new-session"></agent-screen>` },
+];

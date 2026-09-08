@@ -19,13 +19,13 @@ export class SessionInspectorElement extends DesignElement {
     const { data } = this;
     return html`
       <header
-        class="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-line px-4 font-medium"
+        class="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-line px-4 font-medium"
       >
         <span>Session</span>${iconButton("x", "Close session panel")}
       </header>
       <div
         data-inspector-content
-        class="min-h-0 flex-1 overflow-y-auto flex flex-col gap-6 p-4 text-sm"
+        class="min-h-0 flex-1 overflow-y-auto flex flex-col gap-4 p-4 text-sm"
       >
         <inspector-section
           .title=${"Usage"}
@@ -36,7 +36,7 @@ export class SessionInspectorElement extends DesignElement {
           .title=${"Tokens"}
           .content=${html`<metric-list .metrics=${data.tokens}></metric-list>`}
         ></inspector-section>
-        <inspector-section
+        ${data.servers?.length ? html`<inspector-section
           .title=${"Language servers"}
           .content=${html`
             <div class="flex flex-col gap-3">
@@ -47,13 +47,7 @@ export class SessionInspectorElement extends DesignElement {
             </div>
           `}
         ></inspector-section>
-        <inspector-section
-          .title=${"Environment"}
-          .content=${html`
-            <p>${data.environment}</p>
-            <p class="mt-2 text-muted">${data.environmentDetail}</p>
-          `}
-        ></inspector-section>
+        ` : nothing}
       </div>
     `;
   }

@@ -16,7 +16,7 @@ export class ProjectIdentityElement extends DesignElement {
     const { name } = this;
     return html`
       <span class="flex min-w-0 items-center gap-1.5"
-        >${icon("folder")}<span class="truncate">${name}</span></span
+        >${icon("folder")}<span class="truncate" title=${name}>${name}</span></span
       >
     `;
   }

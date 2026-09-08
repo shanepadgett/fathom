@@ -7,8 +7,10 @@ export interface Project {
 export interface Chat {
   id: string;
   title: string;
-  projectId: string;
-  branch: string;
+  projectId?: string;
+  branch?: string;
   time: string;
   status?: string;
+  activity?: "running" | "completed" | "attention";
+  unread?: boolean;
 }

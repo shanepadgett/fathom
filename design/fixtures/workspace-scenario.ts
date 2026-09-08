@@ -1,3 +1,4 @@
+import { contextUsage } from "./context-usage.ts";
 import type { WorkspaceScenario } from "../models/workspace-scenario.ts";
 
 import { changedFiles, files } from "./files.ts";
@@ -18,7 +19,7 @@ export const scenario: WorkspaceScenario = {
   searchChats: [chats[0], chats[1], chats[4]],
   changes: { count: changedFiles.length, added: 24, removed: 8 },
   selectedDiff: { added: 12, removed: 4 },
-  context: { value: 48, maximum: 200 },
+  context: contextUsage,
   model: "Claude Sonnet",
   reasoning: "Medium",
   path: ["src", "sessions", "session-store.ts"],

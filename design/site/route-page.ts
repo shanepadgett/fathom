@@ -3,6 +3,7 @@ import type { ViewerRoute } from "./viewer-route.ts";
 import { html, type TemplateResult } from "lit";
 
 import { icon } from "../primitives/icon.ts";
+import "../primitives/fathom-wordmark.ts";
 import "./tokens-view.ts";
 
 const homeImage = new URL("./assets/home-depth.jpg", import.meta.url).href;
@@ -41,8 +42,8 @@ export function routePage(route: ViewerRoute) {
         ></div>
         <section class="px-page-gutter pt-16 pb-12" aria-labelledby="home-introduction">
           <div class="relative mx-auto max-w-transcript">
-            <h1 class="mb-12 text-center text-wordmark font-bold leading-tight tracking-title">
-              Fathom<span class="text-action dark:text-teal-200">.</span>
+            <h1 class="mb-12 text-center text-wordmark leading-tight">
+              <fathom-wordmark></fathom-wordmark>
             </h1>
             <h2
               id="home-introduction"

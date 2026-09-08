@@ -8,6 +8,7 @@ import "./chat-list-item.ts";
 
 export class ChatListElement extends DesignElement {
   static override properties = {
+    mode: { type: String },
     chats: { attribute: false },
     projects: { attribute: false },
     selected: { type: String },
@@ -15,12 +16,14 @@ export class ChatListElement extends DesignElement {
 
   declare chats: Chat[];
   declare projects: Project[];
+  declare mode: "agent" | "chat";
   declare selected: string;
 
   constructor() {
     super();
     this.chats = [];
     this.projects = [];
+    this.mode = "agent";
     this.selected = "";
   }
 
@@ -32,8 +35,9 @@ export class ChatListElement extends DesignElement {
           ? chats.map(
               (chat) => html`
                 <chat-list-item
+                  .mode=${this.mode}
                   .chat=${chat}
-                  .project=${projects.find((project) => project.id === chat.projectId)!}
+                  .project=${projects.find((project) => project.id === chat.projectId)}
                   .selected=${chat.id === selected}
                 ></chat-list-item>
               `,

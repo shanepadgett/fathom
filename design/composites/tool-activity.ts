@@ -7,11 +7,13 @@ export class ToolActivityElement extends DesignElement {
   static override properties = {
     label: { type: String },
     duration: { type: String },
+    detail: { type: String },
     files: { attribute: false },
   };
 
   declare label: string;
   declare duration: string;
+  declare detail: string;
   declare files: string[];
 
   constructor() {
@@ -19,6 +21,7 @@ export class ToolActivityElement extends DesignElement {
     this.label = "";
     this.duration = "";
     this.files = [];
+    this.detail = "";
   }
 
   override render() {
@@ -29,7 +32,7 @@ export class ToolActivityElement extends DesignElement {
           <span class="flex items-center gap-1">${icon("check")}${label}</span
           ><span class="text-muted">${duration}</span>
         </p>
-        <p class="mt-2 break-words font-mono text-muted">${files.join(" · ")}</p>
+        <p class="mt-2 break-words text-muted ${this.detail ? "" : "font-mono"}">${this.detail || files.join(" · ")}</p>
       </div>
     `;
   }

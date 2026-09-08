@@ -10,6 +10,7 @@ import "./message-transcript.ts";
 
 export class ConversationPaneElement extends DesignElement {
   static override properties = {
+    mode: { type: String },
     title: { type: String },
     messages: { attribute: false },
     changes: { attribute: false },
@@ -18,6 +19,7 @@ export class ConversationPaneElement extends DesignElement {
     presentation: { type: String },
   };
 
+  declare mode: "agent" | "chat";
   declare title: string;
   declare messages: Message[];
   declare changes: Changes;
@@ -27,6 +29,7 @@ export class ConversationPaneElement extends DesignElement {
 
   constructor() {
     super();
+    this.mode = "agent";
     this.title = "";
     this.messages = [];
     this.model = "";
@@ -43,7 +46,7 @@ export class ConversationPaneElement extends DesignElement {
       <section
         data-component="conversation-pane"
         class="flex min-h-0 min-w-0 flex-1 flex-col"
-        aria-label="Agent conversation"
+        aria-label=${this.mode === "chat" ? "Chat conversation" : "Agent conversation"}
       >
         <conversation-header .title=${title} .presentation=${presentation}></conversation-header>
         <div class="relative grid min-h-0 flex-1 grid-cols-1 conversation-rows">

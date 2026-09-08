@@ -1,9 +1,14 @@
 import { html } from "lit";
 
 import { DesignElement } from "../components/design-element.ts";
-import { icon } from "../primitives/icon.ts";
 
-export type Focus = "agent" | "editor";
+export type Focus = "agent" | "editor" | "chat";
+
+const focusOptions = [
+  { focus: "editor", label: "Editor" },
+  { focus: "agent", label: "Agent" },
+  { focus: "chat", label: "Chat" },
+] as const;
 
 export class FocusSwitchElement extends DesignElement {
   static override properties = { mode: { type: String } };
@@ -22,17 +27,17 @@ export class FocusSwitchElement extends DesignElement {
         aria-label="Workspace focus"
         class="flex overflow-hidden rounded-control border border-line"
       >
-        ${(["agent", "editor"] as const).map(
-          (focus) => html`
+        ${focusOptions.map(
+          ({ focus, label }) => html`
             <button
               type="button"
-              aria-label="${focus === "agent" ? "Agent" : "Editor"} focus"
+              aria-label="${label} focus"
               aria-pressed="${mode === focus}"
-              class="flex h-8 w-10 items-center justify-center first:border-r first:border-line ${
+              class="flex h-8 px-3 text-dense items-center justify-center border-r border-line last:border-r-0 ${
                 mode === focus ? "bg-canvas text-action" : "text-muted hover:text-ink"
               }"
             >
-              ${icon(focus === "agent" ? "chat-circle-text" : "code", "toolbar")}
+              ${label}
             </button>
           `,
         )}

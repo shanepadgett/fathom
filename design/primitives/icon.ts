@@ -1,11 +1,15 @@
 import { html } from "lit";
 
 export type IconName =
+  | "push-pin"
+  | "archive"
+  | "tree-structure"
   | "sidebar-simple"
   | "folder"
   | "folder-open"
   | "git-branch"
   | "chat-circle-text"
+  | "robot"
   | "code"
   | "magnifying-glass"
   | "note-pencil"
@@ -17,6 +21,8 @@ export type IconName =
   | "file-text"
   | "brackets-curly"
   | "plus"
+  | "spinner-gap"
+  | "moon"
   | "stop"
   | "check"
   | "x"

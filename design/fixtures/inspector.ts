@@ -13,6 +13,4 @@ export const inspector: InspectorData = {
     ["Cache read", "35,200"],
   ],
   servers: ["TypeScript", "CSS"],
-  environment: "Local workspace",
-  environmentDetail: "2 tools running · 4 plugins",
 };
