@@ -8,6 +8,12 @@
             "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/markdown.py\"",
             "timeout": 60,
             "statusMessage": "Formatting Markdown"
+          },
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/design.py\"",
+            "timeout": 180,
+            "statusMessage": "Verifying design reference"
           }
         ]
       }
