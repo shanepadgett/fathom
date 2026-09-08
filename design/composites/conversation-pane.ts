@@ -55,14 +55,18 @@ export class ConversationPaneElement extends DesignElement {
           </div>
           <div
             data-composer-overlay
-            class="relative col-start-1 row-start-2 pb-6 pt-12 before:pointer-events-none before:absolute before:inset-0 before:overlay-glass before:composer-fade"
+            class="pointer-events-none relative col-start-1 row-start-2 pb-6 pt-12 before:absolute before:inset-y-0 before:left-0 before:right-6 before:overlay-glass before:composer-fade"
           >
             <div
               aria-hidden="true"
-              class="pointer-events-none absolute inset-0 composer-bottom-glass"
+              class="absolute inset-y-0 left-0 right-6 composer-bottom-glass"
             ></div>
             <div class="relative mx-auto w-full max-w-transcript px-6">
-              <message-composer .model=${model} .reasoning=${reasoning}></message-composer>
+              <message-composer
+                class="pointer-events-auto"
+                .model=${model}
+                .reasoning=${reasoning}
+              ></message-composer>
             </div>
           </div>
         </div>
