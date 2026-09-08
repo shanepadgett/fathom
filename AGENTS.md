@@ -1,19 +1,20 @@
-# Agent Rules
+# Repository Guidelines
 
-## Current Primary Focus: Technical Planning
+- Finish authorized work and verify it. Repo-local Codex lifecycle hooks run
+  automated fixes at turn completion; let them run automatically. No Git hooks.
+- Make routine decisions. Ask when scope, correctness, or permission is unclear.
+- Preserve unrelated work. Keep responses short and concrete.
+- Planning stays active until explicitly completed. It does not authorize
+  implementation; separately requested work can proceed.
 
-Requirements alignment is complete. Until explicitly completed, the primary
-focus across sessions is technical planning for the Fathom desktop/server
-coding harness. Follow `docs/technical/tracker.md` in order: technologies and
-versions, architecture and repository layout, then an ordered build plan.
+Read only matching standards before work. Reuse unchanged standards already
+read; reassess when scope changes. No folder preloading or recursive reading.
 
-### Guidelines for Agent Interactions
+| Standard                                                         | Read for                                                                 | Skip for                                                            |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| [Design system](docs/standards/design-system.md)                 | Editing or reviewing `design/`                                           | Reading designs or implementing app code                            |
+| [Technical planning](docs/standards/technical-planning.md)       | Changing requirements, architecture, technical decisions, or build plans | Implementing agreed work, editing previews, or consulting decisions |
+| [Standards maintenance](docs/standards/standards-maintenance.md) | Editing standards or `AGENTS.md` rules                                   | Following standards                                                 |
 
-- **No Walls of Text**: Keep responses concise, direct, and conversational. Tackle one feature/topic at a time.
-- **Maintain Planning Docs**:
-  - Keep the live planning tracker in `docs/technical/tracker.md` current.
-  - Record agreed technical decisions in `docs/technical/`.
-  - Use `docs/requirements/` as the baseline. Update requirements only when an agreed decision changes them.
-- **Iterative Clarification**: Plan one topic at a time. Agree on technologies and compatible versions before settling architecture and layout, then define build dependencies and tasks. Revisit choices when conflicts arise.
-- **Phase Boundary**: Stay in technical planning until explicitly completed. Planning does not authorize implementation.
-- **Use Automated Fix Tools**: Always use automated fix commands (e.g. `deno fmt`, `npx markdownlint-cli2 --fix`) for formatting and lint issues instead of manually editing files by hand.
+Read source and reference material as needed; that alone does not trigger
+maintenance standards.
