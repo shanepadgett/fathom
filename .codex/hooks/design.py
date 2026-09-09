@@ -1,4 +1,4 @@
-"""Format and verify the design reference at turn completion."""
+"""Format, type-check, and build the design reference at turn completion."""
 
 import json
 from pathlib import Path
@@ -25,7 +25,7 @@ def main():
     except (OSError, subprocess.TimeoutExpired, RuntimeError) as error:
         print(json.dumps({
             "decision": "block",
-            "reason": "Design verification failed. Fix the errors; the Stop hook will retry automatically.\n" + str(error),
+            "reason": "Design check or build failed. Fix the errors; the Stop hook will retry automatically.\n" + str(error),
         }))
 
 

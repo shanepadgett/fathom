@@ -13,7 +13,7 @@
             "type": "command",
             "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/design.py\"",
             "timeout": 180,
-            "statusMessage": "Verifying design reference"
+            "statusMessage": "Checking and building design reference"
           }
         ]
       }

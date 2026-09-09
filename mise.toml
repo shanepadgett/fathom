@@ -3,14 +3,24 @@ deno = "2.9.6"
 markdownlint-cli2 = "0.23.2"
 oxlint = "1.81.0"
 oxfmt = "0.66.0"
+"github:fallow-rs/fallow" = "3.23.0"
 
 [tasks."lint:markdown"]
 description = "Lint markdown and apply fixes"
 run = "markdownlint-cli2 --fix"
 
-[tasks."lint:oxc"]
-description = "Apply oxlint safe fixes, then format with oxfmt"
-run = "oxlint --fix; oxfmt"
+[tasks."lint:oxlint"]
+description = "Lint JavaScript and TypeScript with safe fixes"
+run = "oxlint --fix"
+
+[tasks."lint:oxfmt"]
+description = "Format source and config files with oxfmt"
+run = "oxfmt"
+
+[tasks."lint:fallow"]
+description = "Find dead code in the design reference"
+dir = "{{config_root}}/design"
+run = "fallow dead-code --unused-files --unused-exports --unused-types --unused-deps --unused-enum-members --unused-class-members --fail-on-issues --no-cache"
 
 [tasks.design]
 description = "Open the local design system"

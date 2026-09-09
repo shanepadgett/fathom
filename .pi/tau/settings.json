@@ -21,9 +21,27 @@
           "includeGlobs": ["**/*.md"]
         },
         {
-          "name": "Lint Oxc",
-          "details": "Apply oxlint safe fixes, then oxfmt. Best-effort auto-fix only.",
-          "command": "mise run lint:oxc",
+          "name": "Lint Oxlint",
+          "details": "Apply safe fixes. Report remaining lint errors before formatting.",
+          "command": "mise run lint:oxlint",
+          "includeGlobs": [
+            "**/*.ts",
+            "**/*.tsx",
+            "**/*.mts",
+            "**/*.cts",
+            "**/*.js",
+            "**/*.jsx",
+            "**/*.mjs",
+            "**/*.cjs",
+            "**/.oxlintrc.json",
+            "**/oxlint.config.*",
+            "mise.toml"
+          ]
+        },
+        {
+          "name": "Format Oxfmt",
+          "details": "Format files after lint fixes.",
+          "command": "mise run lint:oxfmt",
           "includeGlobs": [
             "**/*.ts",
             "**/*.tsx",
@@ -46,6 +64,13 @@
             "**/*.yaml",
             "**/*.toml"
           ]
+        },
+        {
+          "name": "Dead code",
+          "details": "Check design/ for unused code after fixes and formatting. Reports findings without deleting code.",
+          "command": "mise run lint:fallow",
+          "includeGlobs": ["design/**", "mise.toml"],
+          "excludeGlobs": ["design/vibe-lab.html"]
         }
       ]
     }

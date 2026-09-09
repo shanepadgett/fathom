@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/v3.23.0/schema.json",
+  // index.html loads these directly. Keep the roots explicit for Vite's / URLs.
+  "entry": ["main.ts", "styles.css", "vite.config.js"],
+  "ignorePatterns": ["dist/**", "node_modules/**", "vibe-lab.html"],
+  "usedClassMembers": [
+    // Lit reads this static declaration, rather than calling it in source code.
+    { "extends": "DesignElement", "members": ["properties"] },
+  ],
+}
