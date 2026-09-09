@@ -29,6 +29,11 @@ file; viewer behavior, data, examples, styles, and checks have separate owners.
 Source checks, build, and browser verification pass. All 60 before/after
 screenshots match exactly. Production architecture planning remains separate.
 
+The [remaining UI/UX checklist](ui-ux-checklist.md) catalogs requirement-backed
+design gaps against the current design source. It separates partial designs,
+missing flows, open presentation decisions, and deferred work. Review items one
+at a time; this catalog does not authorize implementation or close planning.
+
 ## 1. Technologies and Versions
 
 Current decisions are recorded in [technologies.md](technologies.md). Deno
