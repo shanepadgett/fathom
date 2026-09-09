@@ -32,7 +32,9 @@ export class ToolActivityElement extends DesignElement {
           <span class="flex items-center gap-1">${icon("check")}${label}</span
           ><span class="text-muted">${duration}</span>
         </p>
-        <p class="mt-2 break-words text-muted ${this.detail ? "" : "font-mono"}">${this.detail || files.join(" · ")}</p>
+        <p class="mt-2 break-words text-muted ${this.detail ? "" : "font-mono"}">
+          ${this.detail || files.join(" · ")}
+        </p>
       </div>
     `;
   }

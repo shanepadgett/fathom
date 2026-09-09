@@ -36,18 +36,21 @@ export class SessionInspectorElement extends DesignElement {
           .title=${"Tokens"}
           .content=${html`<metric-list .metrics=${data.tokens}></metric-list>`}
         ></inspector-section>
-        ${data.servers?.length ? html`<inspector-section
-          .title=${"Language servers"}
-          .content=${html`
-            <div class="flex flex-col gap-3">
-              ${data.servers.map(
-                (item) => html`<language-server-item .name=${item}></language-server-item>`,
-              )}
-              <p class="text-muted">0 errors · 1 warning</p>
-            </div>
-          `}
-        ></inspector-section>
-        ` : nothing}
+        ${
+          data.servers?.length
+            ? html`<inspector-section
+                .title=${"Language servers"}
+                .content=${html`
+                  <div class="flex flex-col gap-3">
+                    ${data.servers.map(
+                      (item) => html`<language-server-item .name=${item}></language-server-item>`,
+                    )}
+                    <p class="text-muted">0 errors · 1 warning</p>
+                  </div>
+                `}
+              ></inspector-section> `
+            : nothing
+        }
       </div>
     `;
   }

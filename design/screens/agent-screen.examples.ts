@@ -44,9 +44,11 @@ export const agentContextMenuExamples = [
   },
 ];
 
-
 export const agentContextBreakdownExamples = [
-  { name: "Context breakdown open", markup: html`<agent-screen state="context-breakdown"></agent-screen>` },
+  {
+    name: "Context breakdown open",
+    markup: html`<agent-screen state="context-breakdown"></agent-screen>`,
+  },
 ];
 
 export const agentNewSessionExamples = [

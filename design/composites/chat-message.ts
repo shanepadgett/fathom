@@ -22,7 +22,11 @@ const messageBlock = (block: MessageBlock, changes: Changes): TemplateResult => 
         ></tool-activity>
       `;
     case "research":
-      return html`<tool-activity .label=${block.label} .duration=${block.duration} .detail=${block.detail}></tool-activity>`;
+      return html`<tool-activity
+        .label=${block.label}
+        .duration=${block.duration}
+        .detail=${block.detail}
+      ></tool-activity>`;
     case "changes":
       return html`
         <change-summary .changes=${changes} .description=${block.description}></change-summary>

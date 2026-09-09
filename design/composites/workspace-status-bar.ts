@@ -1,5 +1,5 @@
-import type { SystemStatus } from "../models/system-status.ts";
 import type { ContextUsage } from "../models/context-usage.ts";
+import type { SystemStatus } from "../models/system-status.ts";
 
 import { html, nothing } from "lit";
 

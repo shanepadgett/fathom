@@ -10,13 +10,12 @@ import {
   agentNewSessionExamples,
   agentProjectPickerExamples,
 } from "../screens/agent-screen.examples.ts";
+import { chatFocusExamples, chatNoSessionExamples } from "../screens/chat-screen.examples.ts";
 import {
   editorChangesExamples,
   editorDrawerExamples,
   editorFocusExamples,
 } from "../screens/editor-screen.examples.ts";
-
-import { chatFocusExamples, chatNoSessionExamples } from "../screens/chat-screen.examples.ts";
 
 export const screens: DesignEntry[] = [
   {
@@ -36,7 +35,8 @@ export const screens: DesignEntry[] = [
   {
     id: "agent-focus-new-session",
     name: "Agent focus · New session",
-    description: "The new-session modal is open, ready to choose a project before starting a session.",
+    description:
+      "The new-session modal is open, ready to choose a project before starting a session.",
     examples: agentNewSessionExamples,
   },
   {
@@ -63,7 +63,8 @@ export const screens: DesignEntry[] = [
   {
     id: "agent-focus-context-menus",
     name: "Agent focus · Context menus",
-    description: "Thread and conversation menus shown together for comparison. Segments group navigation, thread actions, and archive; Rename includes an independent agent action. Actions are simulated.",
+    description:
+      "Thread and conversation menus shown together for comparison. Segments group navigation, thread actions, and archive; Rename includes an independent agent action. Actions are simulated.",
     examples: agentContextMenuExamples,
   },
   {
@@ -96,13 +97,15 @@ export const screens: DesignEntry[] = [
   {
     id: "chat-focus",
     name: "Chat focus · Session open",
-    description: "A web research conversation with chat history on the left and session usage and tokens on the right.",
+    description:
+      "A web research conversation with chat history on the left and session usage and tokens on the right.",
     examples: chatFocusExamples,
   },
   {
     id: "chat-focus-no-session",
     name: "Chat focus · Session closed",
-    description: "The same web research conversation with the session inspector closed, giving the chat more space.",
+    description:
+      "The same web research conversation with the session inspector closed, giving the chat more space.",
     examples: chatNoSessionExamples,
   },
 ];

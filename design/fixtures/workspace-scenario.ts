@@ -1,6 +1,6 @@
-import { contextUsage } from "./context-usage.ts";
 import type { WorkspaceScenario } from "../models/workspace-scenario.ts";
 
+import { contextUsage } from "./context-usage.ts";
 import { changedFiles, files } from "./files.ts";
 import { inspector } from "./inspector.ts";
 import { messages } from "./messages.ts";

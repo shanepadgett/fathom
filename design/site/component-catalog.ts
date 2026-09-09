@@ -1,15 +1,15 @@
 import type { DesignEntry } from "./design-entry.ts";
 
-import { contextUsageExamples } from "../composites/context-usage.examples.ts";
-import { contextMenuExamples } from "../components/context-menu.examples.ts";
 import { accordionExamples } from "../components/accordion.examples.ts";
 import { buttonExamples } from "../components/button.examples.ts";
+import { contextMenuExamples } from "../components/context-menu.examples.ts";
 import { drawerExamples } from "../components/drawer.examples.ts";
 import { modalExamples } from "../components/modal.examples.ts";
 import { changedFilesListExamples } from "../composites/changed-files-list.examples.ts";
 import { chatListItemExamples } from "../composites/chat-list-item.examples.ts";
 import { chatMessageExamples } from "../composites/chat-message.examples.ts";
 import { chatSearchExamples } from "../composites/chat-search.examples.ts";
+import { contextUsageExamples } from "../composites/context-usage.examples.ts";
 import { diffPaneExamples } from "../composites/diff-pane.examples.ts";
 import { editorPaneExamples } from "../composites/editor-pane.examples.ts";
 import { fileTreeExamples } from "../composites/file-tree.examples.ts";
@@ -22,11 +22,10 @@ import { workspaceHeaderExamples } from "../composites/workspace-header.examples
 import { workspaceStatusBarExamples } from "../composites/workspace-status-bar.examples.ts";
 import { buttonExamples as compactButtonExamples } from "../primitives/button.examples.ts";
 import { changeStatusExamples } from "../primitives/change-status.examples.ts";
+import { wordmarkExamples } from "../primitives/fathom-wordmark.examples.ts";
 import { meterExamples } from "../primitives/meter.examples.ts";
 import { shortcutHintExamples } from "../primitives/shortcut-hint.examples.ts";
 import { tabStripExamples } from "../primitives/tab-strip.examples.ts";
-
-import { wordmarkExamples } from "../primitives/fathom-wordmark.examples.ts";
 
 export const components: DesignEntry[] = [
   {

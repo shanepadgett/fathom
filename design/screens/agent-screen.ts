@@ -1,9 +1,9 @@
-import { systemStatus } from "../fixtures/system-status.ts";
 import { html, nothing } from "lit";
 
 import { ContextMenuElement } from "../components/context-menu.ts";
-import { conversationMenu, threadMenu } from "../fixtures/context-menus.ts";
 import { DesignElement } from "../components/design-element.ts";
+import { conversationMenu, threadMenu } from "../fixtures/context-menus.ts";
+import { diffLines } from "../fixtures/diff.ts";
 import "../composites/chat-search.ts";
 import "../composites/conversation-pane.ts";
 import "../composites/diff-pane.ts";
@@ -13,8 +13,8 @@ import "../composites/session-inspector.ts";
 import "../composites/session-sidebar.ts";
 import "../composites/workspace-header.ts";
 import "../composites/workspace-status-bar.ts";
-import { diffLines } from "../fixtures/diff.ts";
 import { pinnedProjects, pinnedSessions, pinnedSessionIds } from "../fixtures/pinned-sessions.ts";
+import { systemStatus } from "../fixtures/system-status.ts";
 import { scenario } from "../fixtures/workspace-scenario.ts";
 import "../layouts/workspace-body.ts";
 import "../layouts/workspace-drawer.ts";
@@ -25,7 +25,15 @@ import "../layouts/workspace-shell.ts";
 import "../layouts/workspace-sidebar.ts";
 
 /** Static states of one screen, not routes or application state. */
-export type AgentScreenState = "base" | "new-session" | "context-breakdown" | "no-session" | "diff" | "projects" | "chat-search" | "context-menus";
+export type AgentScreenState =
+  | "base"
+  | "new-session"
+  | "context-breakdown"
+  | "no-session"
+  | "diff"
+  | "projects"
+  | "chat-search"
+  | "context-menus";
 
 export class AgentScreen extends DesignElement {
   static override properties = { state: { type: String } };
@@ -41,19 +49,25 @@ export class AgentScreen extends DesignElement {
     const target = event.target as HTMLElement;
     const thread = target.closest<HTMLElement>("[data-chat-item]");
     const options = target.closest<HTMLElement>('button[aria-label="Conversation options"]');
-    const keyboard = event instanceof KeyboardEvent && (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10"));
+    const keyboard =
+      event instanceof KeyboardEvent &&
+      (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10"));
     if (thread && (event.type === "contextmenu" || keyboard)) {
       event.preventDefault();
-      this.querySelector<ContextMenuElement>('[data-thread-menu]')?.open(thread);
+      this.querySelector<ContextMenuElement>("[data-thread-menu]")?.open(thread);
     } else if (options && event.type === "click") {
-      this.querySelector<ContextMenuElement>('[data-conversation-menu]')?.open(options);
+      this.querySelector<ContextMenuElement>("[data-conversation-menu]")?.open(options);
     }
   }
 
   override render() {
     return html`
       <workspace-shell>
-        <workspace-layout @contextmenu=${this.openMenu} @click=${this.openMenu} @keydown=${this.openMenu}>
+        <workspace-layout
+          @contextmenu=${this.openMenu}
+          @click=${this.openMenu}
+          @keydown=${this.openMenu}
+        >
           <workspace-header mode="agent"></workspace-header>
 
           <workspace-body>
@@ -90,10 +104,22 @@ export class AgentScreen extends DesignElement {
           </workspace-body>
 
           <div class=${this.state === "context-menus" ? "absolute left-8 top-40 z-10" : "contents"}>
-            <ds-context-menu data-thread-menu .sections=${threadMenu} label="Thread options" .preview=${this.state === "context-menus"}></ds-context-menu>
+            <ds-context-menu
+              data-thread-menu
+              .sections=${threadMenu}
+              label="Thread options"
+              .preview=${this.state === "context-menus"}
+            ></ds-context-menu>
           </div>
-          <div class=${this.state === "context-menus" ? "absolute right-64 top-28 z-10" : "contents"}>
-            <ds-context-menu data-conversation-menu .sections=${conversationMenu} label="Conversation options" .preview=${this.state === "context-menus"}></ds-context-menu>
+          <div
+            class=${this.state === "context-menus" ? "absolute right-64 top-28 z-10" : "contents"}
+          >
+            <ds-context-menu
+              data-conversation-menu
+              .sections=${conversationMenu}
+              label="Conversation options"
+              .preview=${this.state === "context-menus"}
+            ></ds-context-menu>
           </div>
 
           <workspace-status-bar
@@ -120,11 +146,15 @@ export class AgentScreen extends DesignElement {
                 `
               : nothing
           }
-          ${this.state === "new-session" ? html`
-            <workspace-overlay aria-label="New session overlay">
-              <new-session .projects=${pinnedProjects}></new-session>
-            </workspace-overlay>
-          ` : nothing}
+          ${
+            this.state === "new-session"
+              ? html`
+                  <workspace-overlay aria-label="New session overlay">
+                    <new-session .projects=${pinnedProjects}></new-session>
+                  </workspace-overlay>
+                `
+              : nothing
+          }
           ${
             this.state === "projects"
               ? html`

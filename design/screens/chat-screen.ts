@@ -1,13 +1,13 @@
-import { systemStatus } from "../fixtures/system-status.ts";
 import { html, nothing } from "lit";
 
 import { DesignElement } from "../components/design-element.ts";
+import { chatScenario as scenario } from "../fixtures/chat-scenario.ts";
 import "../composites/conversation-pane.ts";
 import "../composites/session-inspector.ts";
 import "../composites/session-sidebar.ts";
 import "../composites/workspace-header.ts";
 import "../composites/workspace-status-bar.ts";
-import { chatScenario as scenario } from "../fixtures/chat-scenario.ts";
+import { systemStatus } from "../fixtures/system-status.ts";
 import "../layouts/workspace-body.ts";
 import "../layouts/workspace-layout.ts";
 import "../layouts/workspace-shell.ts";
@@ -34,14 +34,16 @@ export class ChatScreen extends DesignElement {
 
           <workspace-body>
             <workspace-sidebar placement="chats" role="complementary" aria-label="Chats">
-              <session-sidebar mode="chat"
+              <session-sidebar
+                mode="chat"
                 .pinned=${scenario.chats.slice(0, 2).map((chat) => chat.id)}
                 .chats=${scenario.chats}
                 .selected=${scenario.selectedChat.id}
               ></session-sidebar>
             </workspace-sidebar>
 
-            <conversation-pane mode="chat"
+            <conversation-pane
+              mode="chat"
               .title=${scenario.selectedChat.title}
               .messages=${scenario.messages}
               .changes=${scenario.changes}
@@ -68,7 +70,6 @@ export class ChatScreen extends DesignElement {
             .system=${systemStatus}
             .context=${scenario.context}
           ></workspace-status-bar>
-
         </workspace-layout>
       </workspace-shell>
     `;

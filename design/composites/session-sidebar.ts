@@ -54,27 +54,52 @@ export class SessionSidebarElement extends DesignElement {
     return html`
       <div data-component="session-sidebar">
         <div class="session-sidebar-controls sticky top-0 z-10 flow-root bg-surface">
-        <div class="flex h-10 items-center gap-2 px-3">
-          <div class="min-w-0 flex-1">
-            ${button({
-              label: this.mode === "agent" ? "Search sessions" : "Search chats",
-              content: html`${icon("magnifying-glass")}${this.mode === "agent" ? "Search sessions" : "Search chats"}`,
-              variant: "quiet",
-              size: "small",
-            })}
+          <div class="flex h-10 items-center gap-2 px-3">
+            <div class="min-w-0 flex-1">
+              ${button({
+                label: this.mode === "agent" ? "Search sessions" : "Search chats",
+                content: html`${icon("magnifying-glass")}${this.mode === "agent" ? "Search sessions" : "Search chats"}`,
+                variant: "quiet",
+                size: "small",
+              })}
+            </div>
+            ${iconButton("note-pencil", this.mode === "agent" ? "New session" : "New chat")}
           </div>
-          ${iconButton("note-pencil", this.mode === "agent" ? "New session" : "New chat")}
+          ${this.mode === "chat" ? nothing : html`<div class="mx-2 mb-2">${projectSelector("All projects")}</div>`}
         </div>
-        ${this.mode === "chat" ? nothing : html`<div class="mx-2 mb-2">${projectSelector("All projects")}</div>`}
-        </div>
-        ${pinnedChats.length ? html`
-          <section aria-label=${this.mode === "agent" ? "Pinned sessions" : "Pinned chats"} class="mb-4">
-            <h3 class="session-sidebar-heading flex items-center gap-2 px-4 py-2 text-center text-dense font-medium text-ink">${this.mode === "agent" ? "Pinned sessions" : "Pinned chats"}</h3>
-            <chat-list .mode=${this.mode} .chats=${pinnedChats} .projects=${projects} .selected=${selected}></chat-list>
-          </section>
-          <h3 class="session-sidebar-heading flex items-center gap-2 px-4 py-2 text-center text-dense font-medium text-ink">Recent</h3>
-        ` : nothing}
-        <chat-list .mode=${this.mode} .chats=${recentChats} .projects=${projects} .selected=${selected}></chat-list>
+        ${
+          pinnedChats.length
+            ? html`
+                <section
+                  aria-label=${this.mode === "agent" ? "Pinned sessions" : "Pinned chats"}
+                  class="mb-4"
+                >
+                  <h3
+                    class="session-sidebar-heading flex items-center gap-2 px-4 py-2 text-center text-dense font-medium text-ink"
+                  >
+                    ${this.mode === "agent" ? "Pinned sessions" : "Pinned chats"}
+                  </h3>
+                  <chat-list
+                    .mode=${this.mode}
+                    .chats=${pinnedChats}
+                    .projects=${projects}
+                    .selected=${selected}
+                  ></chat-list>
+                </section>
+                <h3
+                  class="session-sidebar-heading flex items-center gap-2 px-4 py-2 text-center text-dense font-medium text-ink"
+                >
+                  Recent
+                </h3>
+              `
+            : nothing
+        }
+        <chat-list
+          .mode=${this.mode}
+          .chats=${recentChats}
+          .projects=${projects}
+          .selected=${selected}
+        ></chat-list>
       </div>
     `;
   }

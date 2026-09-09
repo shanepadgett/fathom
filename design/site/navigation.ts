@@ -15,12 +15,7 @@ const link = (href: string, label: string, fullLabel = label) => html`
   >
 `;
 
-const group = (
-  label: string,
-  entries: DesignEntry[],
-  path: string,
-  open = false,
-) => html`
+const group = (label: string, entries: DesignEntry[], path: string, open = false) => html`
   <details class="viewer-nav-group" ?open=${open}>
     <summary class="${row}">
       <span class="flex-1">${label}</span
@@ -49,9 +44,7 @@ const section = (label: string, href: string, body: TemplateResult | TemplateRes
 `;
 
 export const viewerNavigation = () =>
-  html`<div class="grid gap-1">
-      ${link("#/", "Overview")}${link("#/tokens", "Tokens")}
-    </div>
+  html`<div class="grid gap-1">${link("#/", "Overview")}${link("#/tokens", "Tokens")}</div>
     ${section(
       "Components",
       "#/components",

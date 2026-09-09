@@ -9,5 +9,3 @@ export const chatFocusExamples = [
 export const chatNoSessionExamples = [
   { name: "Chat workspace", markup: html`<chat-screen state="no-session"></chat-screen>` },
 ];
-
-
