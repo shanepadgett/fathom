@@ -5,8 +5,8 @@ backend plugin lifecycles. pi-ai handles model requests and OAuth. Our code owns
 the agent loop, context assembly, tool execution, session state, and UI
 composition.
 
-This is a UI comparison clone. The backend stays unchanged. See
-[comparison notes](../docs/technical/ui-comparison.md) for findings and scope.
+This prototype uses Solid for the UI. The backend stays unchanged from
+`prototype/`.
 
 ## Run
 
