@@ -17,25 +17,12 @@ export class ContextMenuElement extends DesignElement {
   declare sections: ContextMenuSection[];
   declare label: string;
   declare preview: boolean;
-  private anchor: HTMLElement | null = null;
 
   constructor() {
     super();
     this.sections = [];
     this.label = "Options";
     this.preview = false;
-  }
-
-  async open(anchor: HTMLElement) {
-    this.anchor = anchor;
-    await this.updateComplete;
-    const menu = this.querySelector<HTMLElement>("[role=menu]");
-    if (!menu || this.preview) return;
-    menu.showPopover();
-    const rect = anchor.getBoundingClientRect();
-    menu.style.left = `${Math.max(8, Math.min(rect.left, innerWidth - menu.offsetWidth - 8))}px`;
-    menu.style.top = `${Math.max(8, Math.min(rect.bottom + 4, innerHeight - menu.offsetHeight - 8))}px`;
-    menu.querySelector<HTMLButtonElement>("button")?.focus();
   }
 
   private keydown(event: KeyboardEvent) {
@@ -53,7 +40,6 @@ export class ContextMenuElement extends DesignElement {
     }
     if (event.key === "Escape" && !this.preview) {
       this.querySelector<HTMLElement>("[role=menu]")?.hidePopover();
-      this.anchor?.focus();
     }
   }
 
@@ -61,7 +47,6 @@ export class ContextMenuElement extends DesignElement {
     this.dispatchEvent(new CustomEvent("menu-action", { detail: { id }, bubbles: true }));
     if (!this.preview) {
       this.querySelector<HTMLElement>("[role=menu]")?.hidePopover();
-      this.anchor?.focus();
     }
   }
 

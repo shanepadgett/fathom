@@ -1,85 +1,78 @@
 # Design
 
-Run `mise run design` from the repository root. The reference opens at
-`http://127.0.0.1:5175`. Deno runs Vite and Tailwind v4; Lit renders the
-components. This is a static design reference, not the production frontend.
+A static visual reference for implementing Fathom. This is not the production
+frontend. Lit renders the designs; it does not choose the production framework.
 
-## Start With a Screen
+Run `mise run design` from the repository root and open
+`http://127.0.0.1:5175`.
 
-- [`screens/agent-screen.ts`](screens/agent-screen.ts) registers
-  `<agent-screen>`. Its template shows the header, session sidebar,
-  conversation, inspector, footer, and optional overlays.
-- [`screens/editor-screen.ts`](screens/editor-screen.ts) registers
-  `<editor-screen>`. Its template shows the file sidebar, editor, footer, and
-  optional conversation drawer.
-- [`screens/agent-screen.examples.ts`](screens/agent-screen.examples.ts) and
-  [`screens/editor-screen.examples.ts`](screens/editor-screen.examples.ts)
-  select the eight displayed states. They are previews, not screen
-  implementations.
+## Start with a screen
 
-Follow a tag into its same-named module to see the next level of composition.
-For example, `<conversation-pane>` contains `<conversation-header>`,
-`<message-transcript>`, and `<message-composer>`. The transcript contains
-`<chat-message>` elements. These boundaries describe how the app can be
-assembled in Solid or another framework; Lit does not select that framework for
-production.
+The `screens/` folder contains the agent, editor, and chat workspaces. Each
+`*-screen.ts` shows its main pieces directly. Its adjacent `*.examples.ts`
+owns the named states, descriptions, stable links, and preview markup.
+`site/screen-catalog.ts` only collects them.
 
-## Ownership
+Open a state in the viewer, then use **Screen only** to remove the viewer chrome.
+The older `no-session` URLs remain valid; their actual state is **Inspector
+closed**, not an empty conversation.
 
-| Path                   | Owns                                                                                       |
-| ---------------------- | ------------------------------------------------------------------------------------------ |
-| `tokens.css`           | Shared visual values and theme roles                                                       |
-| `primitives/`          | Small Lit templates for icons, native controls, status, meters, and hints                  |
-| `components/`          | Light-DOM base, button wrapper, shared resizing, and isolated behavior demos               |
-| `composites/`          | One registered UI component per file, with private helpers and nearby examples             |
-| `layouts/`             | Structural elements, sidebar sizing, and adjacent geometry CSS                             |
-| `screens/`             | Registered screen components, fixture selection, and visible state                         |
-| `models/`, `fixtures/` | Subject-specific presentation records and fixtures; `workspace-scenario.ts` assembles them |
-| `site/`                | Viewer shell, sidebar, catalogs, routes, theme control, and token inspection               |
-| `verification/`        | Source rules and real-browser component and visual checks                                  |
+## Where things belong
 
-Components use light DOM so Tailwind and the token system remain shared.
-`DesignElement` gives visual component hosts `display: contents`; their native
-HTML owns semantics and appearance. Structural layout elements instead own their
-boxes through shared CSS. Their authored children stay in place. They do not
-emulate Shadow DOM slots or move child nodes.
+| Path                   | Owns                                                               |
+| ---------------------- | ------------------------------------------------------------------ |
+| `tokens.css`           | Shared product colors, typography, spacing, and effects            |
+| `primitives/`          | Small controls, icons, status marks, and template helpers          |
+| `composites/`          | Meaningful UI pieces, with nearby examples and CSS                 |
+| `layouts/`             | Workspace geometry and local sidebar/drawer resizing               |
+| `screens/`             | Visible composition and named design states                        |
+| `models/`, `fixtures/` | Typed presentation data and realistic sample content               |
+| `components/`          | Light-DOM base, shared controls, and isolated behavior demos       |
+| `site/`                | Viewer navigation, catalogs, theme control, and viewer-only styles |
 
-Pass records with Lit property bindings such as
-`.messages=${scenario.messages}`. Use attributes for simple named presentations,
-such as `presentation="drawer"`. Lit properties use `declare` fields and
-constructor defaults so TypeScript class fields do not hide Lit's property
-accessors.
+Follow a custom tag to its same-named file. Small fragments can be plain Lit
+templates. Geometry-only wrappers use native markup and named CSS classes;
+they do not need registered elements.
 
-`site/component-catalog.ts` and `site/screen-catalog.ts` own preview metadata,
-not markup. Example files sit beside the components they show. `styles.css`
-contains global setup and imports owner-specific styles. The resize handle owns
-pointer/keyboard input; each layout or drawer supplies its bounds.
+Components receive data through Lit properties, such as
+`.messages=${scenario.messages}`. Fixtures stay in screens and examples.
+Light DOM shares Tailwind utilities and product tokens. Use `declare` fields
+and constructor defaults for Lit properties.
 
-## Preview Behavior
+## Editing a design
 
-Application actions are simulated. Folder expansion, selected tabs, and overlays
-are supplied screen states. Sidebar visibility and pane resizing work locally
-within each preview. Functional modal, drawer, and accordion demos stay separate
-from workspace screens.
+Read the [design standard](../docs/standards/design-system.md). Change the
+smallest owner of the design decision. Keep the screen template readable rather
+than hiding it behind configuration or rendering helpers.
 
-The viewer supports both themes and narrow windows. Each screen detail page has
-a **Screen only** link that fills the viewport without viewer chrome. The
-floating **Back to details** link returns to its catalog page.
+Describe what is open, selected, or different in the adjacent screen example.
+Application actions are simulated. Sidebar toggling and resizing help inspect
+the design; functional control demos stay separate from screen states.
 
-## Verification
+Product tokens belong in `tokens.css`. Viewer-only values belong in
+`site/viewer-tokens.css` and are excluded from the product token catalog.
 
-From `design/`, run `deno task check` and `deno task build`. With the design
-server running, `python3 verification/browser.py` checks all eight states in
-both themes and two widths, plus isolated module loading, component contracts,
-navigation, and resizing. Browser scenarios live in
-`verification/browser_cases/`; the runner and driver stay separate. It saves
-screenshots in `/tmp/fathom-component-verification`; set `FATHOM_VERIFY_OUTPUT`
-to keep a separate before/after set.
+## Checking your work
 
-Before editing, read the
-[design system standard](../docs/standards/design-system.md). The
-[architecture record](../docs/technical/component-architecture.md) explains the
-conversion and its limits.
+From `design/`, run `deno task check` for types and `deno task build` for the
+static site. There are no tests or screenshot comparison tools.
 
-`vibe-lab.html` is an archived visual experiment, not part of the maintained
-catalog or a source for new component styles.
+From the repository root, run `mise run lint:fallow` to find unused files,
+exports, types, dependencies, and class members in `design/` only. Fallow is
+pinned in `mise.toml`; install it with `mise install` if needed. The check reports
+findings and fails without deleting anything. It does not run duplication,
+complexity, or style analysis. Its configuration names the viewer entry points
+and accounts for Lit's runtime use of static `properties` declarations.
+
+Fallow 3.23.0 also auto-detects `fixtures/` as Vitest entry points in this Vite
+project. It cannot currently flag an unused fixture file. Treat dependency
+results cautiously too: this project uses Deno's import map, not `package.json`.
+Review findings before removing code; this is not proof that every unused item
+has been found.
+
+Review affected screens and component examples in the browser, in both themes
+and at wide and narrow widths. Look at long content, truncation, overlays, and
+resized panes. The workspace keeps its desktop minimum width and scrolls
+horizontally when the preview is narrower; this is not a mobile app design.
+
+`vibe-lab.html` is an archived experiment, not a source for new styles.

@@ -22,8 +22,7 @@ export function tokenSections(names: string[]): TokenSection[] {
           name.startsWith("--grid-") ||
           name.startsWith("--blur-"),
       ),
-      description:
-        "Named app and preview dimensions, grids, and effects. Components consume these through Tailwind utilities.",
+      description: "Shared product dimensions and effects. Viewer-only values are excluded.",
     },
     {
       title: "Durations",

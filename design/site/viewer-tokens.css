@@ -1,0 +1,32 @@
+/* Viewer-only values; not part of the product design vocabulary. */
+@theme static {
+  --spacing-viewer-workspace-preview: calc(var(--spacing) * 192);
+  --spacing-viewer-component-preview: calc(var(--spacing) * 128);
+  --spacing-viewer-page-gutter: clamp(1.5rem, 3vw, 3rem);
+  --container-viewer-token-value: 22ch;
+}
+
+/* App-specific utility categories: semantic grids for the reference viewer. */
+@theme static {
+  --grid-viewer-token-roles: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  --grid-viewer-token-row: minmax(15rem, 1fr) minmax(0, 2fr);
+  --grid-viewer-token-detail: minmax(0, 1fr) auto;
+  --grid-viewer-token-palette: repeat(5, minmax(13rem, 1fr));
+  --grid-viewer-component-example: minmax(7rem, 1fr) 3fr;
+}
+
+@utility grid-cols-token-roles {
+  grid-template-columns: var(--grid-viewer-token-roles);
+}
+@utility grid-cols-token-row {
+  grid-template-columns: var(--grid-viewer-token-row);
+}
+@utility grid-cols-token-detail {
+  grid-template-columns: var(--grid-viewer-token-detail);
+}
+@utility grid-cols-token-palette {
+  grid-template-columns: var(--grid-viewer-token-palette);
+}
+@utility grid-cols-component-example {
+  grid-template-columns: var(--grid-viewer-component-example);
+}

@@ -5,7 +5,7 @@ export interface TabItem {
   label: string;
 }
 
-export const tab = (item: TabItem, selected: string) => html`
+const tab = (item: TabItem, selected: string) => html`
   <button
     type="button"
     aria-pressed="${item.id === selected}"

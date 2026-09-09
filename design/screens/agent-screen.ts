@@ -1,6 +1,6 @@
 import { html, nothing } from "lit";
 
-import { ContextMenuElement } from "../components/context-menu.ts";
+import "../components/context-menu.ts";
 import { DesignElement } from "../components/design-element.ts";
 import { conversationMenu, threadMenu } from "../fixtures/context-menus.ts";
 import { diffLines } from "../fixtures/diff.ts";
@@ -16,12 +16,8 @@ import "../composites/workspace-status-bar.ts";
 import { pinnedProjects, pinnedSessions, pinnedSessionIds } from "../fixtures/pinned-sessions.ts";
 import { systemStatus } from "../fixtures/system-status.ts";
 import { scenario } from "../fixtures/workspace-scenario.ts";
-import "../layouts/workspace-body.ts";
 import "../layouts/workspace-drawer.ts";
 import "../layouts/workspace-layout.ts";
-import "../layouts/workspace-overlay.ts";
-import "../layouts/workspace-scrim.ts";
-import "../layouts/workspace-shell.ts";
 import "../layouts/workspace-sidebar.ts";
 
 /** Static states of one screen, not routes or application state. */
@@ -29,7 +25,7 @@ export type AgentScreenState =
   | "base"
   | "new-session"
   | "context-breakdown"
-  | "no-session"
+  | "inspector-closed"
   | "diff"
   | "projects"
   | "chat-search"
@@ -45,32 +41,13 @@ export class AgentScreen extends DesignElement {
     this.state = "base";
   }
 
-  private openMenu(event: MouseEvent | KeyboardEvent) {
-    const target = event.target as HTMLElement;
-    const thread = target.closest<HTMLElement>("[data-chat-item]");
-    const options = target.closest<HTMLElement>('button[aria-label="Conversation options"]');
-    const keyboard =
-      event instanceof KeyboardEvent &&
-      (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10"));
-    if (thread && (event.type === "contextmenu" || keyboard)) {
-      event.preventDefault();
-      this.querySelector<ContextMenuElement>("[data-thread-menu]")?.open(thread);
-    } else if (options && event.type === "click") {
-      this.querySelector<ContextMenuElement>("[data-conversation-menu]")?.open(options);
-    }
-  }
-
   override render() {
     return html`
-      <workspace-shell>
-        <workspace-layout
-          @contextmenu=${this.openMenu}
-          @click=${this.openMenu}
-          @keydown=${this.openMenu}
-        >
+      <div class="workspace-shell">
+        <workspace-layout>
           <workspace-header mode="agent"></workspace-header>
 
-          <workspace-body>
+          <div class="workspace-body">
             <workspace-sidebar placement="chats" role="complementary" aria-label="Project sessions">
               <session-sidebar
                 .pinned=${pinnedSessionIds}
@@ -89,7 +66,7 @@ export class AgentScreen extends DesignElement {
             ></conversation-pane>
 
             ${
-              this.state === "no-session"
+              this.state === "inspector-closed"
                 ? nothing
                 : html`
                     <workspace-sidebar
@@ -101,26 +78,28 @@ export class AgentScreen extends DesignElement {
                     </workspace-sidebar>
                   `
             }
-          </workspace-body>
+          </div>
 
-          <div class=${this.state === "context-menus" ? "absolute left-8 top-40 z-10" : "contents"}>
-            <ds-context-menu
-              data-thread-menu
-              .sections=${threadMenu}
-              label="Thread options"
-              .preview=${this.state === "context-menus"}
-            ></ds-context-menu>
-          </div>
-          <div
-            class=${this.state === "context-menus" ? "absolute right-64 top-28 z-10" : "contents"}
-          >
-            <ds-context-menu
-              data-conversation-menu
-              .sections=${conversationMenu}
-              label="Conversation options"
-              .preview=${this.state === "context-menus"}
-            ></ds-context-menu>
-          </div>
+          ${
+            this.state === "context-menus"
+              ? html`
+                  <div class="absolute left-8 top-40 z-10">
+                    <ds-context-menu
+                      .sections=${threadMenu}
+                      label="Thread options"
+                      preview
+                    ></ds-context-menu>
+                  </div>
+                  <div class="absolute right-64 top-28 z-10">
+                    <ds-context-menu
+                      .sections=${conversationMenu}
+                      label="Conversation options"
+                      preview
+                    ></ds-context-menu>
+                  </div>
+                `
+              : nothing
+          }
 
           <workspace-status-bar
             .system=${systemStatus}
@@ -131,7 +110,7 @@ export class AgentScreen extends DesignElement {
           ${
             this.state === "diff"
               ? html`
-                  <workspace-scrim>
+                  <div class="workspace-scrim">
                     <workspace-drawer kind="diff" role="region" aria-label="File diff overlay">
                       <diff-pane
                         .path=${scenario.path}
@@ -142,16 +121,16 @@ export class AgentScreen extends DesignElement {
                         .drawer=${true}
                       ></diff-pane>
                     </workspace-drawer>
-                  </workspace-scrim>
+                  </div>
                 `
               : nothing
           }
           ${
             this.state === "new-session"
               ? html`
-                  <workspace-overlay aria-label="New session overlay">
+                  <div class="workspace-overlay" aria-label="New session overlay">
                     <new-session .projects=${pinnedProjects}></new-session>
-                  </workspace-overlay>
+                  </div>
                 `
               : nothing
           }
@@ -167,17 +146,17 @@ export class AgentScreen extends DesignElement {
           ${
             this.state === "chat-search"
               ? html`
-                  <workspace-overlay aria-label="Chat search overlay">
+                  <div class="workspace-overlay" aria-label="Chat search overlay">
                     <chat-search
                       .chats=${scenario.searchChats}
                       .projects=${pinnedProjects}
                     ></chat-search>
-                  </workspace-overlay>
+                  </div>
                 `
               : nothing
           }
         </workspace-layout>
-      </workspace-shell>
+      </div>
     `;
   }
 }

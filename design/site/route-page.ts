@@ -40,7 +40,7 @@ export function routePage(route: ViewerRoute) {
           class="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-transparent to-canvas to-85%"
           aria-hidden="true"
         ></div>
-        <section class="px-page-gutter pt-16 pb-12" aria-labelledby="home-introduction">
+        <section class="px-viewer-page-gutter pt-16 pb-12" aria-labelledby="home-introduction">
           <div class="relative mx-auto max-w-transcript">
             <h1 class="mb-12 text-center text-wordmark leading-tight">
               <fathom-wordmark></fathom-wordmark>
@@ -72,7 +72,10 @@ export function routePage(route: ViewerRoute) {
           </div>
         </section>
 
-        <section class="mx-auto max-w-7xl px-page-gutter pt-6 pb-12" aria-label="Design reference">
+        <section
+          class="mx-auto max-w-7xl px-viewer-page-gutter pt-6 pb-12"
+          aria-label="Design reference"
+        >
           <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <a
               href="#/tokens"
@@ -181,7 +184,7 @@ export function routePage(route: ViewerRoute) {
                         <iframe
                           title="${entry.name}: ${example.name}"
                           src="./index.html?preview=${entry.id}&example=${index}"
-                          class="block h-component-preview w-full rounded-lg border border-line bg-canvas"
+                          class="block h-viewer-component-preview w-full rounded-lg border border-line bg-canvas"
                         ></iframe>
                       `
                     : example.markup

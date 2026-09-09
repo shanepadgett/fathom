@@ -8,13 +8,11 @@ import "../composites/session-sidebar.ts";
 import "../composites/workspace-header.ts";
 import "../composites/workspace-status-bar.ts";
 import { systemStatus } from "../fixtures/system-status.ts";
-import "../layouts/workspace-body.ts";
 import "../layouts/workspace-layout.ts";
-import "../layouts/workspace-shell.ts";
 import "../layouts/workspace-sidebar.ts";
 
 /** Static states of one screen, not routes or application state. */
-export type ChatScreenState = "base" | "no-session";
+export type ChatScreenState = "base" | "inspector-closed";
 
 export class ChatScreen extends DesignElement {
   static override properties = { state: { type: String } };
@@ -28,11 +26,11 @@ export class ChatScreen extends DesignElement {
 
   override render() {
     return html`
-      <workspace-shell>
+      <div class="workspace-shell">
         <workspace-layout>
           <workspace-header mode="chat"></workspace-header>
 
-          <workspace-body>
+          <div class="workspace-body">
             <workspace-sidebar placement="chats" role="complementary" aria-label="Chats">
               <session-sidebar
                 mode="chat"
@@ -52,7 +50,7 @@ export class ChatScreen extends DesignElement {
             ></conversation-pane>
 
             ${
-              this.state === "no-session"
+              this.state === "inspector-closed"
                 ? nothing
                 : html`
                     <workspace-sidebar
@@ -64,14 +62,14 @@ export class ChatScreen extends DesignElement {
                     </workspace-sidebar>
                   `
             }
-          </workspace-body>
+          </div>
 
           <workspace-status-bar
             .system=${systemStatus}
             .context=${scenario.context}
           ></workspace-status-bar>
         </workspace-layout>
-      </workspace-shell>
+      </div>
     `;
   }
 }

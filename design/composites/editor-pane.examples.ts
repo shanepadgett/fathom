@@ -8,7 +8,7 @@ export const editorPaneExamples = [
   {
     name: "Editor",
     markup: html`
-      <div class="flex h-workspace-preview">
+      <div class="flex h-viewer-workspace-preview">
         <editor-pane
           .files=${[scenario.changedFiles[0], scenario.changedFiles[2]]}
           .selected=${scenario.selectedFile}

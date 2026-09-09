@@ -89,16 +89,12 @@
   --spacing-diff-drawer: calc(var(--spacing) * 152);
   --spacing-conversation-drawer: calc(var(--spacing) * 144);
   --spacing-search-panel: calc(var(--spacing) * 136);
-  --spacing-workspace-preview: calc(var(--spacing) * 192);
   --spacing-workspace-minimum: calc(var(--spacing) * 272);
   --container-transcript: 60rem;
   --blur-workspace: 0.125rem;
   --blur-composer: 0.25rem;
-  --spacing-component-preview: calc(var(--spacing) * 128);
   --spacing-dialog: calc(var(--spacing) * 128);
   --spacing-demo-drawer: calc(var(--spacing) * 104);
-  --spacing-page-gutter: clamp(1.5rem, 3vw, 3rem);
-  --container-token-value: 22ch;
   --leading-title: 1.15;
   --tracking-title: -0.04em;
 
@@ -162,18 +158,18 @@
   color-scheme: light;
   --animate-spin: spin 1s linear infinite;
 
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   --motion-duration-fast: 120ms;
   --motion-duration-normal: 200ms;
   --motion-duration-slow: 300ms;
   --motion-distance-small: 0.5rem;
   --motion-scale-enter: 0.98;
   --overlay-opacity: 0.7;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -198,31 +194,6 @@
   --color-warning: var(--color-amber-400);
   --color-danger: var(--color-red-400);
   --color-info: var(--color-teal-300);
-}
-
-/* App-specific utility categories: semantic grids for the reference viewer. */
-@theme static {
-  --grid-token-roles: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  --grid-token-row: minmax(15rem, 1fr) minmax(0, 2fr);
-  --grid-token-detail: minmax(0, 1fr) auto;
-  --grid-token-palette: repeat(5, minmax(13rem, 1fr));
-  --grid-component-example: minmax(7rem, 1fr) 3fr;
-}
-
-@utility grid-cols-token-roles {
-  grid-template-columns: var(--grid-token-roles);
-}
-@utility grid-cols-token-row {
-  grid-template-columns: var(--grid-token-row);
-}
-@utility grid-cols-token-detail {
-  grid-template-columns: var(--grid-token-detail);
-}
-@utility grid-cols-token-palette {
-  grid-template-columns: var(--grid-token-palette);
-}
-@utility grid-cols-component-example {
-  grid-template-columns: var(--grid-component-example);
 }
 
 /* Motion utilities keep the reduced-motion token overrides in effect. */

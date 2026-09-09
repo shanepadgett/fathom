@@ -9,7 +9,8 @@ complete technical planning.
   those elements and supply fixtures and states; `site/` owns the viewer.
 - Use Lit templates and light-DOM Web Components. Keep major component trees
   visible in `render()`, not hidden behind string builders or layout recipes.
-  Small primitive templates are fine; not every span needs a custom element.
+  Use native markup for geometry and small templates for simple visual fragments.
+  Register components when they own meaningful UI or behavior, not just a wrapper.
 - Give each registered component its own tag-named file (omit `ds-` for the base
   controls). Keep private helpers with their owner and import rendered children
   directly. Keep examples and owner-specific CSS beside that owner; `styles.css`
@@ -24,5 +25,7 @@ complete technical planning.
   keyboard controls, both themes, and reduced motion.
 - Keep app data and actions simulated unless requested. Sidebar toggling and
   shared resizing are allowed; keep standalone behavior demos isolated.
+- This is a visual reference, not an application. Keep type checking and building;
+  do not add tests, source-rule checks, or screenshot comparison machinery.
 - Update relevant examples and catalog entries. Check realistic content, narrow
   panes, overlays, and both themes.

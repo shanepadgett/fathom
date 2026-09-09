@@ -112,8 +112,8 @@ function tokenRow(definition: TokenSection, name: string, value: string) {
         <code
           class=${
             family
-              ? "max-w-token-value wrap-anywhere text-right font-sans text-base text-muted md:text-right max-md:text-left"
-              : "max-w-token-value wrap-anywhere text-right text-base text-muted"
+              ? "max-w-viewer-token-value wrap-anywhere text-right font-sans text-base text-muted md:text-right max-md:text-left"
+              : "max-w-viewer-token-value wrap-anywhere text-right text-base text-muted"
           }
         >
           ${family ? value.split(",")[0].replaceAll('"', "") : value}

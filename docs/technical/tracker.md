@@ -14,20 +14,14 @@ in `design/`. Deep teal and the Tech sparse font stack are selected; token
 defaults are ready for component review. This does not complete the planning
 phase or change the production frontend decision.
 
-The workspace screen baseline has been reviewed through iterative design edits.
-The approved [component architecture](component-architecture.md) is implemented
-in the local design reference. The user then authorized its full conversion to
-Lit-based light-DOM Web Components, with visible screen composition and unchanged
-visuals. Two registered screen families cover eight static states. Local
-verification includes component contracts and browser checks. Production
-architecture planning remains separate.
-
-The user requested an audit and plan for files with multiple concerns in the
-design reference. [Design file boundaries](design-file-boundaries.md) records
-the findings and completed migration. Each registered component has its own
-file; viewer behavior, data, examples, styles, and checks have separate owners.
-Source checks, build, and browser verification pass. All 60 before/after
-screenshots match exactly. Production architecture planning remains separate.
+The approved [component architecture](component-architecture.md) uses Lit with
+visible screen composition. Following the user's cleanup approval, geometry-only
+wrappers use native markup, simple fragments use templates, and screen examples
+own their state descriptions. Viewer-only tokens are separate from product tokens.
+The user explicitly requested no tests: only type checking, building, and direct
+visual review remain. The earlier [file boundary migration](design-file-boundaries.md)
+is historical context, not a requirement to register every visual grouping.
+Production architecture planning remains separate.
 
 The [remaining UI/UX checklist](ui-ux-checklist.md) catalogs requirement-backed
 design gaps against the current design source. It separates partial designs,

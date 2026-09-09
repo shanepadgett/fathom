@@ -1,5 +1,5 @@
 @layer components {
-  workspace-overlay {
+  .workspace-overlay {
     @apply absolute inset-0 z-30 flex items-start justify-center overflow-hidden
       pt-24 overlay-glass;
   }

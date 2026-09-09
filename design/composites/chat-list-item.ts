@@ -4,8 +4,8 @@ import { html, nothing } from "lit";
 
 import { DesignElement } from "../components/design-element.ts";
 import { icon } from "../primitives/icon.ts";
-import "./branch-identity.ts";
-import "./project-identity.ts";
+import { branchIdentity } from "./branch-identity.ts";
+import { projectIdentity } from "./project-identity.ts";
 
 function sessionStatus(chat: Chat, selected: boolean) {
   const unread = chat.unread && !selected;
@@ -89,8 +89,7 @@ export class ChatListItemElement extends DesignElement {
         aria-current=${selected ? "true" : nothing}
       >
         <div class="flex items-center justify-between gap-1.5 text-micro text-muted">
-          <project-identity .name=${project.name}></project-identity
-          ><span class="shrink-0">${chat.time}</span>
+          ${projectIdentity(project.name)}<span class="shrink-0">${chat.time}</span>
         </div>
         <p
           class="mt-1 truncate text-dense ${selected ? "text-action" : "text-ink"}"
@@ -99,10 +98,7 @@ export class ChatListItemElement extends DesignElement {
           ${chat.title}
         </p>
         <div class="mt-1 flex min-w-0 items-center justify-between gap-1.5 text-micro text-muted">
-          ${chat.branch ? html`<branch-identity .branch=${chat.branch}></branch-identity>` : nothing}${sessionStatus(
-            chat,
-            selected,
-          )}
+          ${chat.branch ? branchIdentity(chat.branch) : nothing}${sessionStatus(chat, selected)}
         </div>
       </div>
     `;

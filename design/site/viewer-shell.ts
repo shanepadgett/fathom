@@ -72,7 +72,7 @@ export const viewerShell = () => html`
     <main
       id="content"
       data-main
-      class="min-h-dvh p-12 px-page-gutter pt-20 md:ml-60 md:pt-12 has-[[data-overview]]:p-0"
+      class="min-h-dvh p-12 px-viewer-page-gutter pt-20 md:ml-60 md:pt-12 has-[[data-overview]]:p-0"
       tabindex="-1"
     >
       <div data-content class="mx-auto max-w-7xl has-[[data-overview]]:max-w-none"></div>
