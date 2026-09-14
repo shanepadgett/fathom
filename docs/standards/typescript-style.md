@@ -15,14 +15,6 @@ add them for you.
 4. Private helpers
 5. Public exports
 
-## Spacing
-
-- One blank line after the import block
-- One blank line between each group in the file order list
-- One blank line between sibling top-level functions or consts when either body
-  is more than a couple of lines
-- Do not pack many top-level exports with no air between them
-
 ## Imports
 
 - Type imports before value imports
