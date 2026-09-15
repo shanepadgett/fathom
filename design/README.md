@@ -6,9 +6,9 @@ frontend. Lit renders the designs; it does not choose the production framework.
 See the [agent chat design inventory](chat-design-inventory.md) for conversation
 components, content types, and states to explore.
 
-In the viewer, **Components → Composites → Message structure and identity**
+In the viewer, **Components → Messages**
 contains the first nine studies from that inventory, each on its own page.
-Composite pages use catalog `subgroup` labels in the sidebar and component index.
+Components are grouped by subject in the sidebar and component index.
 Examples remain beside their owning components; existing page URLs stay stable.
 
 Run `mise run design` from the repository root and open
@@ -27,16 +27,16 @@ closed**, not an empty conversation.
 
 ## Where things belong
 
-| Path                   | Owns                                                               |
-| ---------------------- | ------------------------------------------------------------------ |
-| `tokens.css`           | Shared product colors, typography, spacing, and effects            |
-| `primitives/`          | Small controls, icons, status marks, and template helpers          |
-| `composites/`          | Meaningful UI pieces, with nearby examples and CSS                 |
-| `layouts/`             | Workspace geometry and local sidebar/drawer resizing               |
-| `screens/`             | Visible composition and named design states                        |
-| `models/`, `fixtures/` | Typed presentation data and realistic sample content               |
-| `components/`          | Light-DOM base, shared controls, and isolated behavior demos       |
-| `site/`                | Viewer navigation, catalogs, theme control, and viewer-only styles |
+| Path                    | Owns                                                               |
+| ----------------------- | ------------------------------------------------------------------ |
+| `tokens.css`            | Shared product colors, typography, spacing, and effects            |
+| `primitives/`           | General UI controls, indicators, icons, and text labels            |
+| `components/<subject>/` | Components grouped by messages, navigation, tools, editor, etc.    |
+| `layouts/`              | Workspace geometry and local sidebar/drawer resizing               |
+| `screens/`              | Visible composition and named design states                        |
+| `models/`, `fixtures/`  | Typed presentation data and realistic sample content               |
+| `foundation/`           | Shared light-DOM element base; no product UI                       |
+| `site/`                 | Viewer navigation, catalogs, theme control, and viewer-only styles |
 
 Follow a custom tag to its same-named file. Small fragments can be plain Lit
 templates. Geometry-only wrappers use native markup and named CSS classes;
@@ -47,6 +47,16 @@ Components receive data through Lit properties, such as
 Light DOM shares Tailwind utilities and product tokens. Use `declare` fields
 and constructor defaults for Lit properties.
 
+Primitives are general UI building blocks: buttons, icons, tabs, meters, chips,
+accordions, menus, dialogs, drawers, and text labels. A primitive can use other
+primitives; its purpose is generic UI, not a product concept.
+
+Other components live in subject folders under `components/`: `messages/`,
+`composer/`, `navigation/`, `tools/`, `editor/`, and `workspace/`. These groups
+are peers of Primitives in the viewer. Place components by what they represent,
+regardless of size or how many other components they use. Behavior examples
+and preview drivers live beside their owners.
+
 ## Editing a design
 
 Read the [design standard](../docs/standards/design-system.md). Change the
@@ -55,7 +65,7 @@ than hiding it behind configuration or rendering helpers.
 
 Describe what is open, selected, or different in the adjacent screen example.
 Application actions are simulated. Sidebar toggling and resizing help inspect
-the design; functional control demos stay separate from screen states.
+the design; control interactions are demonstrated beside their component owner.
 
 Product tokens belong in `tokens.css`. Viewer-only values belong in
 `site/viewer-tokens.css` and are excluded from the product token catalog.

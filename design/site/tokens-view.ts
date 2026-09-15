@@ -1,6 +1,6 @@
 import { html } from "lit";
 
-import { DesignElement } from "../components/design-element.ts";
+import { DesignElement } from "../foundation/design-element.ts";
 import { tokenNames } from "./token-discovery.ts";
 import { section } from "./token-samples.ts";
 import { categories, tokenSections } from "./token-sections.ts";

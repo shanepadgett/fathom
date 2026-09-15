@@ -2,7 +2,7 @@
 
 A catalog for ideating on everything visible in and immediately around the
 conversation: messages, work in progress, results, decisions, and the composer.
-Each row is a design surface to think through. Some can share a composite;
+Each row is a design surface to think through. Some can share a component;
 others may only need a small variation of an existing piece.
 
 This is a working idea list. Inclusion does not make an item an accepted product
@@ -31,8 +31,7 @@ The catalog below mixes those needs with additional candidates for discussion.
 
 ## 1. Message structure and identity
 
-Initial static studies are available in the design viewer under **Composites →
-Message structure and identity**, with one page per surface below. These are
+Initial static studies are available in the design viewer under **Components → Messages**, with one page per surface below. These are
 starting points for discussion; the controls do not perform application actions.
 
 Current direction: a working agent shimmers in the message identity. Long user
@@ -218,7 +217,7 @@ For each family, decide:
 - Which actions are available while running, after completion, and in history?
 - Does it appear as a message, a block within a message, or a run-level event?
 - How does it remain understandable when collapsed or when content is missing?
-- Can an existing composite own it, or does it need a distinct component?
+- Can an existing component own it, or does it need a distinct component?
 
 Additional stress scenarios: a long research answer with citations, ten parallel
 tools with one failure, multiple subagents, a large truncated log, an artifact

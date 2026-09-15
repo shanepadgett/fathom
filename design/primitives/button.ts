@@ -1,6 +1,6 @@
-import { html, type TemplateResult } from "lit";
+import { html, nothing, type TemplateResult } from "lit";
 
-import "../components/button.ts";
+import { DesignElement } from "../foundation/design-element.ts";
 
 export interface ButtonOptions {
   label: string;
@@ -23,3 +23,10 @@ export const button = ({
     </button></ds-button
   >
 `;
+
+/** Native children retain their labels, events, and form semantics. */
+export class DesignButton extends DesignElement {
+  override render() { return nothing; }
+}
+
+customElements.define("ds-button", DesignButton);

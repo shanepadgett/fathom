@@ -3,7 +3,7 @@ import type { ViewerRoute } from "./viewer-route.ts";
 import { html, type TemplateResult } from "lit";
 
 import { icon } from "../primitives/icon.ts";
-import "../primitives/fathom-wordmark.ts";
+import "../components/workspace/fathom-wordmark.ts";
 import "./tokens-view.ts";
 
 const homeImage = new URL("./assets/home-depth.jpg", import.meta.url).href;
@@ -204,12 +204,7 @@ export function routePage(route: ViewerRoute) {
         ? html`<div>${[...new Set(entries.map((item) => item.category ?? "Screens"))].map((category) => html`
             <section class="mb-12">
               <h2 class="mb-4 text-xl font-medium">${category}</h2>
-              ${[...new Set(entries.filter((item) => (item.category ?? "Screens") === category).map((item) => item.subgroup))].map((subgroup) => html`
-                <div class="mb-6">
-                  ${subgroup ? html`<h3 class="mb-3 text-base text-muted">${subgroup}</h3>` : null}
-                  ${entries.filter((item) => (item.category ?? "Screens") === category && item.subgroup === subgroup).map((item) => indexLink(`#/${group}/${item.id}`, item.name))}
-                </div>
-              `)}
+              ${entries.filter((item) => (item.category ?? "Screens") === category).map((item) => indexLink(`#/${group}/${item.id}`, item.name))}
             </section>
           `)}</div>`
         : html`<p class="text-muted">No screens yet.</p>`;
@@ -220,7 +215,7 @@ export function routePage(route: ViewerRoute) {
   if (route.kind === "home") return body;
   return html`
     <header class="mb-6">
-      ${route.entry?.subgroup ? html`<p class="mb-3 text-sm text-muted">${route.entry.category} / ${route.entry.subgroup}</p>` : null}
+      ${route.entry?.category ? html`<p class="mb-3 text-sm text-muted">${route.entry.category}</p>` : null}
       <div class="flex flex-wrap items-center justify-between gap-4">
         <h1 class="text-title font-medium leading-title tracking-title">${title}</h1>
         ${

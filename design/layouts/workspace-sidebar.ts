@@ -1,7 +1,7 @@
 import { html } from "lit";
 
-import { DesignElement } from "../components/design-element.ts";
-import "../components/edge-resizer.ts";
+import { DesignElement } from "../foundation/design-element.ts";
+import "../primitives/edge-resizer.ts";
 import { sidebarBounds } from "./sidebar-sizing.ts";
 
 class WorkspaceSidebar extends DesignElement {

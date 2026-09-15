@@ -4,9 +4,12 @@ For changes and reviews in `design/`. Skip for reading designs or implementing
 application code. This reference does not settle production architecture or
 complete technical planning.
 
-- Reuse existing pieces. Tokens own visual values; primitives own basic UI;
-  composites group it; layouts own geometry; registered screens visibly compose
-  those elements and supply fixtures and states; `site/` owns the viewer.
+- Reuse existing pieces. Tokens own visual values; primitives own general UI
+  building blocks such as buttons, accordions, chips, tabs, menus, and text.
+  A primitive may use other primitives. Group product components by subject
+  under `components/`, not by composition depth. Layouts own geometry;
+  registered screens visibly compose components and supply fixtures and states;
+  `site/` owns the viewer.
 - Use Lit templates and light-DOM Web Components. Keep major component trees
   visible in `render()`, not hidden behind string builders or layout recipes.
   Use native markup for geometry and small templates for simple visual fragments.
@@ -24,7 +27,8 @@ complete technical planning.
 - Reuse buttons, Phosphor icons, and state recipes. Preserve accessible names,
   keyboard controls, both themes, and reduced motion.
 - Keep app data and actions simulated unless requested. Sidebar toggling and
-  shared resizing are allowed; keep standalone behavior demos isolated.
+  shared resizing are allowed. Keep behavior examples beside their component
+  owner, not in a separate catalog category.
 - This is a visual reference, not an application. Keep type checking and building;
   do not add tests, source-rule checks, or screenshot comparison machinery.
 - Update relevant examples and catalog entries. Check realistic content, narrow

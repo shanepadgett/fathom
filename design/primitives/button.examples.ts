@@ -1,21 +1,24 @@
 import { html } from "lit";
 
-import { button } from "./button.ts";
-import { iconButton } from "./icon-button.ts";
-import { selectorButton } from "./selector-button.ts";
+import "./button.ts";
 
 export const buttonExamples = [
   {
-    name: "Controls",
+    name: "Primary",
+    markup: html`<ds-button><button type="button">Continue</button></ds-button>`,
+  },
+  {
+    name: "Secondary",
     markup: html`
-      <div class="flex flex-wrap items-center gap-3">
-        ${button({
-          label: "Action",
-        })}${iconButton("note-pencil", "New chat")}${selectorButton(
-          "Claude Sonnet",
-          "Medium",
-        )}${button({ label: "Unavailable", disabled: true })}
-      </div>
+      <ds-button variant="secondary"><button type="button">Continue</button></ds-button>
     `,
+  },
+  {
+    name: "Quiet",
+    markup: html`<ds-button variant="quiet"><button type="button">Continue</button></ds-button>`,
+  },
+  {
+    name: "Disabled",
+    markup: html`<ds-button><button type="button" disabled>Continue</button></ds-button>`,
   },
 ];

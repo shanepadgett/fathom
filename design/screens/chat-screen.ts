@@ -1,12 +1,12 @@
 import { html, nothing } from "lit";
 
-import { DesignElement } from "../components/design-element.ts";
+import { DesignElement } from "../foundation/design-element.ts";
 import { chatScenario as scenario } from "../fixtures/chat-scenario.ts";
-import "../composites/conversation-pane.ts";
-import "../composites/session-inspector.ts";
-import "../composites/session-sidebar.ts";
-import "../composites/workspace-header.ts";
-import "../composites/workspace-status-bar.ts";
+import "../components/messages/conversation-pane.ts";
+import "../components/workspace/session-inspector.ts";
+import "../components/navigation/session-sidebar.ts";
+import "../components/workspace/workspace-header.ts";
+import "../components/workspace/workspace-status-bar.ts";
 import { systemStatus } from "../fixtures/system-status.ts";
 import "../layouts/workspace-layout.ts";
 import "../layouts/workspace-sidebar.ts";

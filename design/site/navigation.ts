@@ -4,6 +4,7 @@ import { html, type TemplateResult } from "lit";
 
 import { icon } from "../primitives/icon.ts";
 import { components } from "./component-catalog.ts";
+import { componentCategories } from "./design-entry.ts";
 import { screens } from "./screen-catalog.ts";
 
 const row =
@@ -23,17 +24,11 @@ const group = (label: string, entries: DesignEntry[], path: string, open = false
       >${icon("caret-right", "small")}
     </summary>
     <div class="ml-4 grid gap-0.5 border-l border-line py-1 pl-2">
-      ${[...new Set(entries.map((entry) => entry.subgroup))].map((subgroup) =>
-        subgroup
-          ? group(subgroup, entries.filter((entry) => entry.subgroup === subgroup).map((entry) => ({ ...entry, subgroup: undefined })), path)
-          : entries.filter((entry) => !entry.subgroup).map((entry) =>
-        link(
-          `#/${path}/${entry.id}`,
-          path === "screens" ? (entry.name.split(" · ")[1] ?? "Overview") : entry.name,
-          entry.name,
-        ),
-      ),
-      )}
+      ${entries.map((entry) => link(
+        `#/${path}/${entry.id}`,
+        path === "screens" ? (entry.name.split(" · ")[1] ?? "Overview") : entry.name,
+        entry.name,
+      ))}
     </div>
   </details>
 `;
@@ -52,7 +47,7 @@ export const viewerNavigation = () =>
     ${section(
       "Components",
       "#/components",
-      (["Primitives", "Composites", "Behavior demos"] as const).map((category) =>
+      componentCategories.map((category) =>
         group(
           category,
           components.filter((entry) => entry.category === category),

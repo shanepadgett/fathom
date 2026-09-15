@@ -1,7 +1,7 @@
 import { html } from "lit";
 
-import "../components/button.ts";
-import "../components/edge-resizer.ts";
+import "../primitives/button.ts";
+import "../primitives/edge-resizer.ts";
 import { icon } from "../primitives/icon.ts";
 import { viewerNavigation } from "./navigation.ts";
 import { viewerSidebarBounds } from "./viewer-sidebar.ts";

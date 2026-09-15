@@ -1,6 +1,6 @@
 import { nothing } from "lit";
 
-import { DesignElement } from "../components/design-element.ts";
+import { DesignElement } from "../foundation/design-element.ts";
 
 class WorkspaceLayout extends DesignElement {
   override connectedCallback() {

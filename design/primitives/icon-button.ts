@@ -1,6 +1,6 @@
 import { html, nothing } from "lit";
 
-import "../components/button.ts";
+import "./button.ts";
 import { icon, type IconName } from "./icon.ts";
 
 export const iconButton = (
