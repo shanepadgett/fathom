@@ -7,7 +7,11 @@ export const pinnedProjects: Project[] = [
   { id: "atlas", name: "Atlas documentation platform", path: "~/dev/atlas" },
   { id: "harbor", name: "Harbor", path: "~/dev/harbor" },
   { id: "orbit", name: "Orbit mobile", path: "~/dev/orbit" },
-  { id: "metrics", name: "Infrastructure metrics dashboard", path: "~/dev/metrics" },
+  {
+    id: "metrics",
+    name: "Infrastructure metrics dashboard",
+    path: "~/dev/metrics",
+  },
 ];
 
 export const pinnedSessions: Chat[] = [

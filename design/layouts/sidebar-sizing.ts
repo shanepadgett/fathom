@@ -5,9 +5,11 @@ export function sidebarBounds(panel: HTMLElement) {
   const workspace = panel.closest<HTMLElement>("workspace-layout");
   let available = workspace?.clientWidth ?? innerWidth;
   if (workspace) {
-    for (const sibling of panel.parentElement!.querySelectorAll<HTMLElement>(
-      ":scope > workspace-sidebar",
-    )) {
+    for (
+      const sibling of panel.parentElement!.querySelectorAll<HTMLElement>(
+        ":scope > workspace-sidebar",
+      )
+    ) {
       if (sibling !== panel) available -= sibling.getBoundingClientRect().width;
     }
     available -= 320;

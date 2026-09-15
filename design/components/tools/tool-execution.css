@@ -11,12 +11,17 @@
     /* Both ends expose only the flat mask, so the loop resets invisibly. */
     mask-size: 300% 100%;
     mask-repeat: no-repeat;
-    animation: tool-execution-shimmer var(--motion-duration-shimmer) linear infinite;
+    animation: tool-execution-shimmer var(--motion-duration-shimmer) linear
+      infinite;
   }
 
   @keyframes tool-execution-shimmer {
-    from { mask-position: 100% 0; }
-    to { mask-position: 0% 0; }
+    from {
+      mask-position: 100% 0;
+    }
+    to {
+      mask-position: 0% 0;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

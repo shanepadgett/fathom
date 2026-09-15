@@ -14,14 +14,17 @@ export class MetricListElement extends DesignElement {
   override render() {
     const { metrics } = this;
     return html`<dl class="flex flex-col gap-3">
-      ${metrics.map(
-        ([label, value]) => html`
-          <div class="flex justify-between gap-3">
-            <dt>${label}</dt>
-            <dd>${value}</dd>
-          </div>
-        `,
-      )}
+      ${
+      metrics.map(
+        ([label, value]) =>
+          html`
+            <div class="flex justify-between gap-3">
+              <dt>${label}</dt>
+              <dd>${value}</dd>
+            </div>
+          `,
+      )
+    }
     </dl>`;
   }
 }

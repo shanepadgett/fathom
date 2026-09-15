@@ -9,4 +9,12 @@ export interface DesignEntry {
   examples: { name: string; markup: TemplateResult }[];
 }
 
-export const componentCategories = ["Primitives", "Messages", "Composer", "Navigation", "Tools and execution", "Editor and review", "Workspace"] as const;
+export const componentCategories = [
+  "Primitives",
+  "Messages",
+  "Composer",
+  "Navigation",
+  "Tools and execution",
+  "Editor and review",
+  "Workspace",
+] as const;

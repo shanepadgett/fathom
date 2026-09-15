@@ -40,15 +40,18 @@ export class DiffPaneElement extends DesignElement {
     return html`
       <section aria-label="File diff" class="min-h-0 flex-1 overflow-y-auto">
         <header
-          class="flex ${
-            drawer ? "h-12 pl-6" : "h-16 px-6"
-          } items-center justify-between border-b border-line font-medium"
+          class="flex ${drawer
+            ? "h-12 pl-6"
+            : "h-16 px-6"} items-center justify-between border-b border-line font-medium"
         >
           <span>Changed files <span class="ml-3 text-sm text-muted">${count}</span></span
           >${drawer ? drawerControl("diff", true) : ""}
         </header>
         <file-breadcrumbs .path=${path}></file-breadcrumbs>
-        <div class="border-b border-line px-6 py-2">${diffStat(added, removed)}</div>
+        <div class="border-b border-line px-6 py-2">${diffStat(
+          added,
+          removed,
+        )}</div>
         <diff-preview .lines=${lines}></diff-preview>
         <p class="px-6 text-sm text-muted">Showing 1 of ${count} changed files</p>
       </section>

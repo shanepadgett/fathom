@@ -12,9 +12,28 @@ export const messageHeaderExamples = [
     ["17. Rising bubbles", "bubbles"],
   ].map(([name, animation]) => ({
     name,
-    markup: html`<message-header .message=${{ ...messageStructure.update, working: true }} .animation=${animation}></message-header>`,
+    markup: html`<message-header .message=${{
+      ...messageStructure.update,
+      working: true,
+    }} .animation=${animation}></message-header>`,
   })),
-  { name: "Response finished", markup: html`<message-header .message=${{ ...messageStructure.update, working: false }}></message-header>` },
-  { name: "User", markup: html`<message-header .message=${messageStructure.user}></message-header>` },
-  { name: "Edited prompt", markup: html`<message-header .message=${{ ...messageStructure.user, edited: true }}></message-header>` },
+  {
+    name: "Response finished",
+    markup: html`<message-header .message=${{
+      ...messageStructure.update,
+      working: false,
+    }}></message-header>`,
+  },
+  {
+    name: "User",
+    markup:
+      html`<message-header .message=${messageStructure.user}></message-header>`,
+  },
+  {
+    name: "Edited prompt",
+    markup: html`<message-header .message=${{
+      ...messageStructure.user,
+      edited: true,
+    }}></message-header>`,
+  },
 ];

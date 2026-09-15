@@ -31,15 +31,18 @@ export class FileItemElement extends DesignElement {
     return html`
       <div
         data-file-row
-        class="flex h-6 min-w-0 items-center gap-1.5 rounded-sm pr-2 ${tree ? "pl-5" : "pl-2"} ${
-          selected ? "bg-action/10 text-action" : "text-ink hover:bg-canvas"
-        }"
+        class="flex h-6 min-w-0 items-center gap-1.5 rounded-sm pr-2 ${tree
+          ? "pl-5"
+          : "pl-2"} ${selected
+          ? "bg-action/10 text-action"
+          : "text-ink hover:bg-canvas"}"
         aria-current=${selected ? "true" : nothing}
         title="${file.name}"
       >
         <span class="flex shrink-0 ${selected ? "text-action" : "text-muted"}"
           >${icon(file.icon ?? "file-text")}</span
-        ><span class="min-w-0 flex-1 truncate">${file.name}</span>${changeStatus(file.status)}
+        ><span class="min-w-0 flex-1 truncate">${file
+          .name}</span>${changeStatus(file.status)}
       </div>
     `;
   }

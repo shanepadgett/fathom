@@ -9,7 +9,7 @@ export const modalExamples = [
     name: "Open and close",
     markup: html`
       <ds-modal
-        >${background}
+      >${background}
         <ds-button><button type="button" data-open>Open modal</button></ds-button>
         <dialog aria-labelledby="modal-title" closedby="any">
           <h2 id="modal-title" class="text-2xl font-semibold tracking-tight">Ready to review</h2>

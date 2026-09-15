@@ -7,16 +7,21 @@ import "./tool-execution.ts";
 
 // Only the preview cycles state; the execution component receives presentation data.
 export class ToolExecutionDemoElement extends DesignElement {
-  static override properties = { frames: { attribute: false }, frame: { state: true } };
+  static override properties = {
+    frames: { attribute: false },
+    frame: { state: true },
+  };
   declare frames: ToolBatch[];
   declare private frame: number;
   private timer?: ReturnType<typeof setInterval>;
   private motion?: MediaQueryList;
   private syncMotion = () => {
     clearInterval(this.timer);
-    if (!this.motion?.matches) this.timer = setInterval(() => {
-      this.frame = (this.frame + 1) % Math.max(this.frames.length, 1);
-    }, 2400);
+    if (!this.motion?.matches) {
+      this.timer = setInterval(() => {
+        this.frame = (this.frame + 1) % Math.max(this.frames.length, 1);
+      }, 2400);
+    }
   };
 
   constructor() {
@@ -39,7 +44,11 @@ export class ToolExecutionDemoElement extends DesignElement {
   }
 
   override render() {
-    return this.frames.length ? html`<tool-execution .batch=${this.frames[this.frame % this.frames.length]}></tool-execution>` : nothing;
+    return this.frames.length
+      ? html`<tool-execution .batch=${
+        this.frames[this.frame % this.frames.length]
+      }></tool-execution>`
+      : nothing;
   }
 }
 

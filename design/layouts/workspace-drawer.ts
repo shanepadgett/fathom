@@ -5,7 +5,8 @@ import "../primitives/edge-resizer.ts";
 
 class WorkspaceDrawer extends DesignElement {
   private bounds = () => {
-    const available = this.closest<HTMLElement>("workspace-layout")?.clientWidth ?? innerWidth;
+    const available =
+      this.closest<HTMLElement>("workspace-layout")?.clientWidth ?? innerWidth;
     const max = Math.max(1, Math.min(1200, available - 80));
     return { min: Math.min(280, max), max };
   };

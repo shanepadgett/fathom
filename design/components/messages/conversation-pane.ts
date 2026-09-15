@@ -46,15 +46,19 @@ export class ConversationPaneElement extends DesignElement {
       <section
         data-component="conversation-pane"
         class="flex min-h-0 min-w-0 flex-1 flex-col"
-        aria-label=${this.mode === "chat" ? "Chat conversation" : "Agent conversation"}
+        aria-label=${this.mode === "chat"
+          ? "Chat conversation"
+          : "Agent conversation"}
       >
-        <conversation-header .title=${title} .presentation=${presentation}></conversation-header>
+        <conversation-header .title=${title}
+          .presentation=${presentation}></conversation-header>
         <div class="relative grid min-h-0 flex-1 grid-cols-1 conversation-rows">
           <div
             data-conversation-scroll
             class="col-start-1 row-span-2 row-start-1 min-h-0 overflow-y-auto pb-56"
           >
-            <message-transcript .messages=${messages} .changes=${changes}></message-transcript>
+            <message-transcript .messages=${messages}
+              .changes=${changes}></message-transcript>
           </div>
           <div
             data-composer-overlay

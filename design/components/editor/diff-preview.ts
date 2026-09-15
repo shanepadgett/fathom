@@ -23,7 +23,9 @@ export class DiffPreviewElement extends DesignElement {
     const { lines } = this;
     return html`
       <div class="overflow-auto py-6 font-mono text-sm leading-relaxed">
-        ${lines.map((line) => html`<pre class="px-6 ${lineColors[line.kind]}">${line.text}</pre>`)}
+        ${lines.map((line) =>
+          html`<pre class="px-6 ${lineColors[line.kind]}">${line.text}</pre>`
+        )}
       </div>
     `;
   }

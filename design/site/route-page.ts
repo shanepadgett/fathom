@@ -7,15 +7,15 @@ import "../components/workspace/fathom-wordmark.ts";
 import "./tokens-view.ts";
 
 const homeImage = new URL("./assets/home-depth.jpg", import.meta.url).href;
-const homeLightImage = new URL("./assets/home-depth-light.jpg", import.meta.url).href;
+const homeLightImage =
+  new URL("./assets/home-depth-light.jpg", import.meta.url).href;
 
 function indexLink(href: string, label: string) {
   return html`
     <a
       class="flex items-baseline justify-between border-b border-line py-6 text-base first:border-t hover:text-muted"
       href="${href}"
-      >${label}<span aria-hidden="true">↗</span></a
-    >
+    >${label}<span aria-hidden="true">↗</span></a>
   `;
 }
 
@@ -40,7 +40,8 @@ export function routePage(route: ViewerRoute) {
           class="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-transparent to-canvas to-85%"
           aria-hidden="true"
         ></div>
-        <section class="px-viewer-page-gutter pt-16 pb-12" aria-labelledby="home-introduction">
+        <section class="px-viewer-page-gutter pt-16 pb-12"
+          aria-labelledby="home-introduction">
           <div class="relative mx-auto max-w-transcript">
             <h1 class="mb-12 text-center text-wordmark leading-tight">
               <fathom-wordmark></fathom-wordmark>
@@ -84,7 +85,8 @@ export function routePage(route: ViewerRoute) {
               <div class="flex h-24 items-center gap-2" aria-hidden="true">
                 <span class="h-10 w-10 rounded-full bg-action"></span>
                 <span class="h-10 w-10 rounded-full bg-muted"></span>
-                <span class="h-10 w-10 rounded-full border border-line bg-canvas"></span>
+                <span
+                  class="h-10 w-10 rounded-full border border-line bg-canvas"></span>
               </div>
               <div class="mt-6 flex items-center justify-between gap-2">
                 <h3 class="text-xl font-medium">Tokens</h3>
@@ -102,8 +104,7 @@ export function routePage(route: ViewerRoute) {
               <div class="flex h-24 items-center gap-2" aria-hidden="true">
                 <span
                   class="flex h-10 w-10 items-center justify-center rounded-control border border-line bg-canvas text-action"
-                  >${icon("plus", "large")}</span
-                >
+                >${icon("plus", "large")}</span>
                 <span
                   class="flex h-10 flex-1 items-center gap-2 rounded-control border border-line bg-canvas px-3"
                 >
@@ -156,57 +157,64 @@ export function routePage(route: ViewerRoute) {
     if (entry) {
       if (group === "screens") {
         screenActions = entry.examples.map(
-          (example, index) => html`
-            <a
-              class="ds-button shrink-0"
-              href="./index.html?screen=${entry.id}&example=${index}"
-              aria-label="Screen only: ${example.name}"
-              >${entry.examples.length > 1 ? example.name + " · " : ""}Screen only ↗</a
-            >
-          `,
+          (example, index) =>
+            html`
+              <a
+                class="ds-button shrink-0"
+                href="./index.html?screen=${entry.id}&example=${index}"
+                aria-label="Screen only: ${example.name}"
+              >${entry.examples.length > 1
+                ? example.name + " · "
+                : ""}Screen only ↗</a>
+            `,
         );
       }
       body = html`
         ${entry.examples.map(
-          (example, index) => html`
-            <section
-              class="${
-                group === "screens"
+          (example, index) =>
+            html`
+              <section
+                class="${group === "screens"
                   ? "grid grid-cols-1 gap-3 py-4"
-                  : "grid grid-cols-1 items-center gap-3 border-t border-line py-8 md:grid-cols-component-example md:gap-6"
-              }"
-            >
-              ${group === "screens" ? null : html`<h2 class="text-base text-muted">${example.name}</h2>`}
-              <div class="relative min-w-0">
-                ${
-                  entry.id === "modal" || entry.id === "drawer"
+                  : "grid grid-cols-1 items-center gap-3 border-t border-line py-8 md:grid-cols-component-example md:gap-6"}"
+              >
+                ${group === "screens"
+                  ? null
+                  : html`<h2 class="text-base text-muted">${example.name}</h2>`}
+                <div class="relative min-w-0">
+                  ${entry.id === "modal" || entry.id === "drawer"
                     ? html`
-                        <iframe
-                          title="${entry.name}: ${example.name}"
-                          src="./index.html?preview=${entry.id}&example=${index}"
-                          class="block h-viewer-component-preview w-full rounded-lg border border-line bg-canvas"
-                        ></iframe>
-                      `
-                    : example.markup
-                }
-              </div>
-            </section>
-          `,
+                      <iframe
+                        title="${entry.name}: ${example.name}"
+                        src="./index.html?preview=${entry.id}&example=${index}"
+                        class="block h-viewer-component-preview w-full rounded-lg border border-line bg-canvas"
+                      ></iframe>
+                    `
+                    : example.markup}
+                </div>
+              </section>
+            `,
         )}
-        ${
-          group !== "screens" && entry.examples.length
-            ? html`<div class="border-b border-line" aria-hidden="true"></div>`
-            : null
-        }
+        ${group !== "screens" && entry.examples.length
+          ? html`<div class="border-b border-line" aria-hidden="true"></div>`
+          : null}
       `;
     } else if (route.kind === "index" && entries) {
       body = entries.length
-        ? html`<div>${[...new Set(entries.map((item) => item.category ?? "Screens"))].map((category) => html`
-            <section class="mb-12">
-              <h2 class="mb-4 text-xl font-medium">${category}</h2>
-              ${entries.filter((item) => (item.category ?? "Screens") === category).map((item) => indexLink(`#/${group}/${item.id}`, item.name))}
-            </section>
-          `)}</div>`
+        ? html`<div>${
+          [...new Set(entries.map((item) => item.category ?? "Screens"))].map((
+            category,
+          ) =>
+            html`
+              <section class="mb-12">
+                <h2 class="mb-4 text-xl font-medium">${category}</h2>
+                ${entries.filter((item) =>
+                  (item.category ?? "Screens") === category
+                ).map((item) => indexLink(`#/${group}/${item.id}`, item.name))}
+              </section>
+            `
+          )
+        }</div>`
         : html`<p class="text-muted">No screens yet.</p>`;
     } else {
       body = html`<a href="#/" class="underline">Overview</a>`;
@@ -215,16 +223,18 @@ export function routePage(route: ViewerRoute) {
   if (route.kind === "home") return body;
   return html`
     <header class="mb-6">
-      ${route.entry?.category ? html`<p class="mb-3 text-sm text-muted">${route.entry.category}</p>` : null}
+      ${route.entry?.category
+        ? html`<p class="mb-3 text-sm text-muted">${route.entry.category}</p>`
+        : null}
       <div class="flex flex-wrap items-center justify-between gap-4">
         <h1 class="text-title font-medium leading-title tracking-title">${title}</h1>
-        ${
-          screenActions.length
-            ? html`<div class="flex flex-wrap gap-2">${screenActions}</div>`
-            : null
-        }
+        ${screenActions.length
+          ? html`<div class="flex flex-wrap gap-2">${screenActions}</div>`
+          : null}
       </div>
-      ${description ? html`<p class="mt-3 text-muted">${description}</p>` : null}
+      ${description
+        ? html`<p class="mt-3 text-muted">${description}</p>`
+        : null}
     </header>
     ${body}
   `;

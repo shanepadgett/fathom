@@ -29,10 +29,14 @@ export class ToolActivityElement extends DesignElement {
     return html`
       <details class="my-4 text-sm text-muted">
         <summary class="flex justify-between gap-4">
-          <span class="flex items-center gap-1">${icon("caret-right")}${label}</span
+          <span class="flex items-center gap-1">${icon(
+            "caret-right",
+          )}${label}</span
           ><span class="text-muted">${duration}</span>
         </summary>
-        <p class="mt-2 break-words text-muted ${this.detail ? "" : "font-mono"}">
+        <p class="mt-2 break-words text-muted ${this.detail
+          ? ""
+          : "font-mono"}">
           ${this.detail || files.join(" · ")}
         </p>
       </details>

@@ -6,24 +6,23 @@ frontend. Lit renders the designs; it does not choose the production framework.
 See the [agent chat design inventory](chat-design-inventory.md) for conversation
 components, content types, and states to explore.
 
-In the viewer, **Components → Messages**
-contains the first nine studies from that inventory, each on its own page.
-Components are grouped by subject in the sidebar and component index.
-Examples remain beside their owning components; existing page URLs stay stable.
+In the viewer, **Components → Messages** contains the first nine studies from
+that inventory, each on its own page. Components are grouped by subject in the
+sidebar and component index. Examples remain beside their owning components;
+existing page URLs stay stable.
 
-Run `mise run design` from the repository root and open
-`http://127.0.0.1:5175`.
+Run `mise run design` from the repository root and open `http://127.0.0.1:5175`.
 
 ## Start with a screen
 
 The `screens/` folder contains the agent, editor, and chat workspaces. Each
-`*-screen.ts` shows its main pieces directly. Its adjacent `*.examples.ts`
-owns the named states, descriptions, stable links, and preview markup.
+`*-screen.ts` shows its main pieces directly. Its adjacent `*.examples.ts` owns
+the named states, descriptions, stable links, and preview markup.
 `site/screen-catalog.ts` only collects them.
 
-Open a state in the viewer, then use **Screen only** to remove the viewer chrome.
-The older `no-session` URLs remain valid; their actual state is **Inspector
-closed**, not an empty conversation.
+Open a state in the viewer, then use **Screen only** to remove the viewer
+chrome. The older `no-session` URLs remain valid; their actual state is
+**Inspector closed**, not an empty conversation.
 
 ## Where things belong
 
@@ -39,13 +38,13 @@ closed**, not an empty conversation.
 | `site/`                 | Viewer navigation, catalogs, theme control, and viewer-only styles |
 
 Follow a custom tag to its same-named file. Small fragments can be plain Lit
-templates. Geometry-only wrappers use native markup and named CSS classes;
-they do not need registered elements.
+templates. Geometry-only wrappers use native markup and named CSS classes; they
+do not need registered elements.
 
 Components receive data through Lit properties, such as
-`.messages=${scenario.messages}`. Fixtures stay in screens and examples.
-Light DOM shares Tailwind utilities and product tokens. Use `declare` fields
-and constructor defaults for Lit properties.
+`.messages=${scenario.messages}`. Fixtures stay in screens and examples. Light
+DOM shares Tailwind utilities and product tokens. Use `declare` fields and
+constructor defaults for Lit properties.
 
 Primitives are general UI building blocks: buttons, icons, tabs, meters, chips,
 accordions, menus, dialogs, drawers, and text labels. A primitive can use other
@@ -54,8 +53,8 @@ primitives; its purpose is generic UI, not a product concept.
 Other components live in subject folders under `components/`: `messages/`,
 `composer/`, `navigation/`, `tools/`, `editor/`, and `workspace/`. These groups
 are peers of Primitives in the viewer. Place components by what they represent,
-regardless of size or how many other components they use. Behavior examples
-and preview drivers live beside their owners.
+regardless of size or how many other components they use. Behavior examples and
+preview drivers live beside their owners.
 
 ## Editing a design
 
@@ -77,10 +76,11 @@ static site. There are no tests or screenshot comparison tools.
 
 From the repository root, run `mise run lint:fallow` to find unused files,
 exports, types, dependencies, and class members in `design/` only. Fallow is
-pinned in `mise.toml`; install it with `mise install` if needed. The check reports
-findings and fails without deleting anything. It does not run duplication,
-complexity, or style analysis. Its configuration names the viewer entry points
-and accounts for Lit's runtime use of static `properties` declarations.
+pinned in `mise.toml`; install it with `mise install` if needed. The check
+reports findings and fails without deleting anything. It does not run
+duplication, complexity, or style analysis. Its configuration names the viewer
+entry points and accounts for Lit's runtime use of static `properties`
+declarations.
 
 Fallow 3.23.0 also auto-detects `fixtures/` as Vitest entry points in this Vite
 project. It cannot currently flag an unused fixture file. Treat dependency

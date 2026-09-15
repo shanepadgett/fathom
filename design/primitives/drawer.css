@@ -22,7 +22,8 @@
   }
 
   ds-drawer[mode="push"][open] {
-    grid-template-columns: minmax(0, 1fr) minmax(0, var(--resized-panel-width, 1fr));
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--resized-panel-width,
+      1fr));
   }
 
   ds-drawer[mode="push"] > [data-content] {
@@ -32,7 +33,8 @@
   ds-drawer[mode="push"] > [data-panel] {
     /* The workspace sets the height, even while this column collapses. */
     contain: size;
-    @apply min-w-0 min-h-0 overflow-visible invisible duration-motion-normal transition-discrete;
+    @apply min-w-0 min-h-0 overflow-visible invisible duration-motion-normal
+      transition-discrete;
     transition-property: visibility;
   }
 

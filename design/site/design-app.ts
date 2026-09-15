@@ -39,7 +39,10 @@ class DesignApp extends HTMLElement {
   private renderRoute(focus = false) {
     const path = location.hash.slice(1) || "/";
     const route = viewerRoute(path);
-    render(routePage(route), this.querySelector<HTMLElement>("[data-content]")!);
+    render(
+      routePage(route),
+      this.querySelector<HTMLElement>("[data-content]")!,
+    );
     document.title = `${route.title} — Fathom`;
     selectNavigation(this, path);
     if (focus) {

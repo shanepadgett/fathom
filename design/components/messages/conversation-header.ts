@@ -23,16 +23,15 @@ export class ConversationHeaderElement extends DesignElement {
     const { title, presentation } = this;
     return html`
       <header
-        class="flex shrink-0 items-center justify-between gap-3 border-b border-line ${
-          presentation === "main" ? "h-12 px-6" : "h-12 pl-6 text-sm"
-        }"
+        class="flex shrink-0 items-center justify-between gap-3 border-b border-line ${presentation ===
+            "main"
+          ? "h-12 px-6"
+          : "h-12 pl-6 text-sm"}"
       >
         <h2 class="min-w-0 truncate font-medium" title="${title}">${title}</h2>
-        ${
-          presentation === "main"
-            ? iconButton("dots-three", "Conversation options")
-            : drawerControl("agent", true)
-        }
+        ${presentation === "main"
+          ? iconButton("dots-three", "Conversation options")
+          : drawerControl("agent", true)}
       </header>
     `;
   }

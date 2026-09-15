@@ -56,24 +56,23 @@ export class EditorScreen extends DesignElement {
             .context=${scenario.context}
           ></workspace-status-bar>
 
-          ${
-            this.state === "agent"
-              ? html`
-                  <div class="workspace-scrim">
-                    <workspace-drawer kind="conversation" role="region" aria-label="Agent overlay">
-                      <conversation-pane
-                        .title=${scenario.selectedChat.title}
-                        .messages=${scenario.messages}
-                        .changes=${scenario.changes}
-                        .model=${scenario.model}
-                        .reasoning=${scenario.reasoning}
-                        presentation="drawer"
-                      ></conversation-pane>
-                    </workspace-drawer>
-                  </div>
-                `
-              : nothing
-          }
+          ${this.state === "agent"
+            ? html`
+              <div class="workspace-scrim">
+                <workspace-drawer kind="conversation" role="region"
+                  aria-label="Agent overlay">
+                  <conversation-pane
+                    .title=${scenario.selectedChat.title}
+                    .messages=${scenario.messages}
+                    .changes=${scenario.changes}
+                    .model=${scenario.model}
+                    .reasoning=${scenario.reasoning}
+                    presentation="drawer"
+                  ></conversation-pane>
+                </workspace-drawer>
+              </div>
+            `
+            : nothing}
         </workspace-layout>
       </div>
     `;

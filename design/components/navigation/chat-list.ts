@@ -31,19 +31,22 @@ export class ChatListElement extends DesignElement {
     const { chats, projects, selected } = this;
     return html`<div class="flex flex-col gap-1 px-2">
       ${
-        chats.length
-          ? chats.map(
-              (chat) => html`
-                <chat-list-item
-                  .mode=${this.mode}
-                  .chat=${chat}
-                  .project=${projects.find((project) => project.id === chat.projectId)}
-                  .selected=${chat.id === selected}
-                ></chat-list-item>
-              `,
-            )
-          : emptyState("No chats yet")
-      }
+      chats.length
+        ? chats.map(
+          (chat) =>
+            html`
+              <chat-list-item
+                .mode=${this.mode}
+                .chat=${chat}
+                .project=${projects.find((project) =>
+                  project.id === chat.projectId
+                )}
+                .selected=${chat.id === selected}
+              ></chat-list-item>
+            `,
+        )
+        : emptyState("No chats yet")
+    }
     </div>`;
   }
 }

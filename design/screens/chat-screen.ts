@@ -49,19 +49,16 @@ export class ChatScreen extends DesignElement {
               .reasoning=${scenario.reasoning}
             ></conversation-pane>
 
-            ${
-              this.state === "inspector-closed"
-                ? nothing
-                : html`
-                    <workspace-sidebar
-                      placement="inspector"
-                      role="complementary"
-                      aria-label="Session inspector"
-                    >
-                      <session-inspector .data=${scenario.inspector}></session-inspector>
-                    </workspace-sidebar>
-                  `
-            }
+            ${this.state === "inspector-closed" ? nothing : html`
+              <workspace-sidebar
+                placement="inspector"
+                role="complementary"
+                aria-label="Session inspector"
+              >
+                <session-inspector .data=${scenario
+                  .inspector}></session-inspector>
+              </workspace-sidebar>
+            `}
           </div>
 
           <workspace-status-bar

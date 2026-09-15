@@ -6,10 +6,12 @@
 
   :is(ds-modal, ds-drawer) > dialog {
     @apply fixed m-auto border border-line rounded-lg bg-canvas p-6 text-ink
-      shadow-md overflow-auto opacity-0 duration-motion-fast ease-exit transition-discrete;
+      shadow-md overflow-auto opacity-0 duration-motion-fast ease-exit
+      transition-discrete;
     width: min(var(--spacing-dialog), calc(100% - 2 * var(--spacing-4)));
     max-height: calc(100dvh - 2 * var(--spacing-4));
-    transform: translateY(var(--motion-distance-small)) scale(var(--motion-scale-enter));
+    transform: translateY(var(--motion-distance-small))
+      scale(var(--motion-scale-enter));
     transition-property: opacity, transform, display, overlay;
   }
 
@@ -18,7 +20,8 @@
   }
 
   :is(ds-modal, ds-drawer) > dialog::backdrop {
-    @apply overlay-glass opacity-0 duration-motion-normal ease-standard transition-discrete;
+    @apply overlay-glass opacity-0 duration-motion-normal ease-standard
+      transition-discrete;
     transition-property: opacity, display, overlay;
   }
 
@@ -29,7 +32,8 @@
   @starting-style {
     ds-modal > dialog[open] {
       @apply opacity-0;
-      transform: translateY(var(--motion-distance-small)) scale(var(--motion-scale-enter));
+      transform: translateY(var(--motion-distance-small))
+        scale(var(--motion-scale-enter));
     }
   }
 

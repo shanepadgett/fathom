@@ -36,7 +36,10 @@ export const agentScreens: DesignEntry[] = [
     description:
       "The new-session modal is open, ready to choose a project before starting a session.",
     examples: [
-      { name: "New session", markup: html`<agent-screen state="new-session"></agent-screen>` },
+      {
+        name: "New session",
+        markup: html`<agent-screen state="new-session"></agent-screen>`,
+      },
     ],
   },
   {
@@ -90,7 +93,8 @@ export const agentScreens: DesignEntry[] = [
   {
     id: "agent-focus-context-breakdown",
     name: "Agent focus · Context breakdown",
-    description: "Context usage with its breakdown open and a compaction marker at 80% capacity.",
+    description:
+      "Context usage with its breakdown open and a compaction marker at 80% capacity.",
     examples: [
       {
         name: "Context breakdown open",

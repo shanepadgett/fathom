@@ -21,13 +21,21 @@ export class StreamingResponseElement extends DesignElement {
       chunks.push(this.text.slice(offset, offset + size));
       offset += size;
     }
-    return html`<p>
-      <span class="sr-only">${this.text}</span>
-      <span aria-hidden="true">${chunks.map((chunk, index) => html`<span
-        class="streaming-response-chunk"
-        style=${styleMap({ "--word-reveal": `${index / Math.max(chunks.length, 1) * 38}%` })}
-      >${chunk}</span>`)}</span>
-    </p>`;
+    return html`
+      <p>
+        <span class="sr-only">${this.text}</span>
+        <span aria-hidden="true">${chunks.map((chunk, index) =>
+          html`
+            <span
+              class="streaming-response-chunk"
+              style=${styleMap({
+                "--word-reveal": `${index / Math.max(chunks.length, 1) * 38}%`,
+              })}
+            >${chunk}</span>
+          `
+        )}</span>
+      </p>
+    `;
   }
 }
 

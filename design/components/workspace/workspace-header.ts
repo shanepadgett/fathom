@@ -24,16 +24,22 @@ export class WorkspaceHeaderElement extends DesignElement {
         class="relative flex h-12 shrink-0 items-center justify-between border-b border-line bg-surface pl-4"
       >
         <div class="flex min-w-0 items-center gap-6">
-          <fathom-wordmark></fathom-wordmark>${iconButton("sidebar-simple", "Close sidebar", {
-            sidebarToggle: true,
-            toolbar: true,
-          })}
+          <fathom-wordmark></fathom-wordmark>${iconButton(
+            "sidebar-simple",
+            "Close sidebar",
+            {
+              sidebarToggle: true,
+              toolbar: true,
+            },
+          )}
         </div>
         <div class="absolute left-1/2 -translate-x-1/2">
           <focus-switch .mode=${mode}></focus-switch>
         </div>
         <div class="flex h-full items-center">
-          ${mode === "chat" ? nothing : drawerControl(mode === "editor" ? "agent" : "diff")}
+          ${mode === "chat"
+            ? nothing
+            : drawerControl(mode === "editor" ? "agent" : "diff")}
         </div>
       </header>
     `;

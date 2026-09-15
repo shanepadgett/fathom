@@ -32,11 +32,14 @@ export class ChatSearchResultElement extends DesignElement {
     }
     const { chat, project, selected } = this;
     return resultFrame(
-      html`<span class="text-muted">${icon("chat-circle-text", "large")}</span>`,
+      html`<span class="text-muted">${
+        icon("chat-circle-text", "large")
+      }</span>`,
       html`
         <p class="truncate text-sm" title="${chat.title}">${chat.title}</p>
         <div class="mt-1 text-xs text-muted">
-          <chat-metadata .project=${project.name} .branch=${chat.branch}></chat-metadata>
+          <chat-metadata .project=${project.name} .branch=${chat
+            .branch}></chat-metadata>
         </div>
       `,
       chat.time,

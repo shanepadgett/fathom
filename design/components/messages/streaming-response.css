@@ -1,15 +1,23 @@
 @layer components {
   .streaming-response-chunk {
-    animation: streaming-response-reveal var(--motion-duration-stream-preview) infinite;
-    animation-timing-function: linear(0 0%, 0 var(--word-reveal), 1 calc(var(--word-reveal) + 5%), 1 80%, 0 92%, 0 100%);
+    animation: streaming-response-reveal var(--motion-duration-stream-preview)
+      infinite;
+    animation-timing-function: linear(0 0%, 0 var(--word-reveal), 1
+      calc(var(--word-reveal) + 5%), 1 80%, 0 92%, 0 100%);
   }
 
   @keyframes streaming-response-reveal {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .streaming-response-chunk { animation: none; }
+    .streaming-response-chunk {
+      animation: none;
+    }
   }
 }

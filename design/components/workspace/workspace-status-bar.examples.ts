@@ -16,9 +16,11 @@ export const workspaceStatusBarExamples = [
   },
   {
     name: "All quiet",
-    markup: html`<workspace-status-bar
-      .system=${{ runningAgents: 0 }}
-      .context=${scenario.context}
-    ></workspace-status-bar>`,
+    markup: html`
+      <workspace-status-bar
+        .system=${{ runningAgents: 0 }}
+        .context=${scenario.context}
+      ></workspace-status-bar>
+    `,
   },
 ];

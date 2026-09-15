@@ -15,9 +15,13 @@ class WorkspaceLayout extends DesignElement {
 
   private toggleSidebar = (event: MouseEvent) => {
     if (!(event.target instanceof Element)) return;
-    const button = event.target.closest<HTMLButtonElement>("[data-sidebar-toggle]");
+    const button = event.target.closest<HTMLButtonElement>(
+      "[data-sidebar-toggle]",
+    );
     if (!button || button.closest("workspace-layout") !== this) return;
-    const sidebar = this.querySelector<HTMLElement>(".workspace-body > workspace-sidebar");
+    const sidebar = this.querySelector<HTMLElement>(
+      ".workspace-body > workspace-sidebar",
+    );
     if (!sidebar) return;
     sidebar.hidden = !sidebar.hidden;
     button.setAttribute("aria-expanded", String(!sidebar.hidden));

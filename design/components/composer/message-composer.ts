@@ -23,7 +23,8 @@ export class ComposerElement extends DesignElement {
   override render() {
     const { model, reasoning } = this;
     return html`
-      <div data-component="composer" class="rounded-lg border border-line bg-surface p-4">
+      <div data-component="composer"
+        class="rounded-lg border border-line bg-surface p-4">
         <p class="min-h-12 text-muted">Ask a follow-up or steer the current run…</p>
         <div class="flex flex-wrap items-center justify-between gap-3 text-sm">
           ${button({

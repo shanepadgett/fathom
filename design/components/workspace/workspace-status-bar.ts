@@ -35,10 +35,15 @@ export class WorkspaceStatusBarElement extends DesignElement {
         class="flex min-h-12 shrink-0 items-center justify-between gap-6 border-t border-line bg-surface px-4 text-sm"
       >
         <run-status
-          .label=${system.runningAgents ? `${system.runningAgents} ${system.runningAgents === 1 ? "agent" : "agents"} running` : "All quiet"}
+          .label=${system.runningAgents
+            ? `${system.runningAgents} ${
+              system.runningAgents === 1 ? "agent" : "agents"
+            } running`
+            : "All quiet"}
           .tone=${system.runningAgents ? "success" : "neutral"}
         ></run-status>
-        <context-usage .data=${context} .open=${this.contextOpen}></context-usage>
+        <context-usage .data=${context} .open=${this
+          .contextOpen}></context-usage>
       </footer>
     `;
   }

@@ -34,11 +34,17 @@ export const codeLines: CodeLine[] = [
   },
   { tokens: [" "] },
   {
-    tokens: [{ text: "export const", tone: "action" }, " sessions = createStore<Session>();"],
+    tokens: [
+      { text: "export const", tone: "action" },
+      " sessions = createStore<Session>();",
+    ],
   },
   { tokens: [" "] },
   {
-    tokens: [{ text: "export async function", tone: "action" }, " loadSessions() {"],
+    tokens: [
+      { text: "export async function", tone: "action" },
+      " loadSessions() {",
+    ],
   },
   {
     tokens: [
@@ -64,7 +70,10 @@ export const codeLines: CodeLine[] = [
     ],
   },
   {
-    tokens: [{ text: "export async function", tone: "action" }, " renameSession("],
+    tokens: [
+      { text: "export async function", tone: "action" },
+      " renameSession(",
+    ],
   },
   { tokens: ["  id: ", { text: "string", tone: "warning" }, ","] },
   { tokens: ["  title: ", { text: "string", tone: "warning" }, ","] },

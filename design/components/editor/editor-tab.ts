@@ -27,11 +27,12 @@ export class EditorTabElement extends DesignElement {
     const { file, selected } = this;
     return html`
       <div
-        class="flex items-center gap-3 border-r border-line px-4 ${
-          selected ? "border-t-2 border-t-action bg-canvas" : "text-muted"
-        }"
+        class="flex items-center gap-3 border-r border-line px-4 ${selected
+          ? "border-t-2 border-t-action bg-canvas"
+          : "text-muted"}"
       >
-        <button type="button" aria-pressed="${selected}" class="truncate">${file.name}</button
+        <button type="button" aria-pressed="${selected}" class="truncate">${file
+          .name}</button
         >${changeStatus(file.status)}${iconButton("x", `Close ${file.name}`)}
       </div>
     `;

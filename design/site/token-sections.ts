@@ -7,7 +7,12 @@ export interface TokenSection {
   prefix?: string;
 }
 
-export const categories = ["Colors", "Typography", "Layout & effects", "Animation"];
+export const categories = [
+  "Colors",
+  "Typography",
+  "Layout & effects",
+  "Animation",
+];
 
 export function tokenSections(names: string[]): TokenSection[] {
   return [
@@ -22,7 +27,8 @@ export function tokenSections(names: string[]): TokenSection[] {
           name.startsWith("--grid-") ||
           name.startsWith("--blur-"),
       ),
-      description: "Shared product dimensions and effects. Viewer-only values are excluded.",
+      description:
+        "Shared product dimensions and effects. Viewer-only values are excluded.",
     },
     {
       title: "Durations",
@@ -45,7 +51,9 @@ export function tokenSections(names: string[]): TokenSection[] {
       category: "Animation",
       kind: "motion",
       tokens: [...names].filter(
-        (name) => name.startsWith("--motion-distance-") || name.startsWith("--motion-scale-"),
+        (name) =>
+          name.startsWith("--motion-distance-") ||
+          name.startsWith("--motion-scale-"),
       ),
       description:
         "Small movement and subtle scale for modal entrances. Full-width drawer travel belongs to the component, not a distance token.",
@@ -54,15 +62,19 @@ export function tokenSections(names: string[]): TokenSection[] {
       title: "Color scales",
       category: "Colors",
       kind: "palette",
-      description: "Deep teal with neutral grays. Each column runs from 50 to 950.",
+      description:
+        "Deep teal with neutral grays. Each column runs from 50 to 950.",
       tokens: [...names].filter((name) => /^--color-.+-\d+$/.test(name)),
     },
     {
       title: "Color roles",
       category: "Colors",
       kind: "roles",
-      description: "The values used by components. These follow the light / dark switch.",
-      tokens: [...names].filter((name) => name.startsWith("--color-") && !/-\d+$/.test(name)),
+      description:
+        "The values used by components. These follow the light / dark switch.",
+      tokens: [...names].filter((name) =>
+        name.startsWith("--color-") && !/-\d+$/.test(name)
+      ),
     },
     {
       title: "Font families",
@@ -83,7 +95,8 @@ export function tokenSections(names: string[]): TokenSection[] {
       category: "Typography",
       kind: "weight",
       prefix: "--font-weight-",
-      description: "UI weights in Space Grotesk. Code uses Fragment Mono at 400.",
+      description:
+        "UI weights in Space Grotesk. Code uses Fragment Mono at 400.",
     },
     {
       title: "Line heights",

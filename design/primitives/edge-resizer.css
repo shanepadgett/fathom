@@ -13,7 +13,8 @@
   edge-resizer::after {
     content: "";
     @apply pointer-events-none absolute inset-y-0 left-1/2 w-resize-line
-      -translate-x-1/2 bg-focus opacity-0 shadow-resize-glow duration-motion-fast;
+      -translate-x-1/2 bg-focus opacity-0 shadow-resize-glow
+      duration-motion-fast;
     transition-property: opacity;
   }
 

@@ -28,18 +28,20 @@ export class FocusSwitchElement extends DesignElement {
         class="flex overflow-hidden rounded-control border border-line"
       >
         ${focusOptions.map(
-          ({ focus, label }) => html`
-            <button
-              type="button"
-              aria-label="${label} focus"
-              aria-pressed="${mode === focus}"
-              class="flex h-8 px-3 text-dense items-center justify-center border-r border-line last:border-r-0 ${
-                mode === focus ? "bg-canvas text-action" : "text-muted hover:text-ink"
-              }"
-            >
-              ${label}
-            </button>
-          `,
+          ({ focus, label }) =>
+            html`
+              <button
+                type="button"
+                aria-label="${label} focus"
+                aria-pressed="${mode === focus}"
+                class="flex h-8 px-3 text-dense items-center justify-center border-r border-line last:border-r-0 ${mode ===
+                    focus
+                  ? "bg-canvas text-action"
+                  : "text-muted hover:text-ink"}"
+              >
+                ${label}
+              </button>
+            `,
         )}
       </div>
     `;

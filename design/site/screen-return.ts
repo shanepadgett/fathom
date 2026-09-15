@@ -24,8 +24,7 @@ export function setupScreenReturn() {
       // Measure the stationary wrapper, never the animated link.
       const bounds = control.getBoundingClientRect();
       const margin = bounds.height;
-      nearby =
-        event.clientX >= bounds.left - margin &&
+      nearby = event.clientX >= bounds.left - margin &&
         event.clientX <= bounds.right + margin &&
         event.clientY >= bounds.top - margin;
       update();

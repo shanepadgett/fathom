@@ -7,7 +7,9 @@ class DesignDrawer extends DialogOverlay {
     for (const handle of this.querySelectorAll<EdgeResizer>("edge-resizer")) {
       if (handle.closest("ds-drawer") !== this) continue;
       handle.bounds = () => {
-        const available = this.getAttribute("mode") === "push" ? this.clientWidth : innerWidth;
+        const available = this.getAttribute("mode") === "push"
+          ? this.clientWidth
+          : innerWidth;
         const max = Math.max(1, Math.min(1200, available - 80));
         return { min: Math.min(280, max), max };
       };
@@ -26,7 +28,10 @@ class DesignDrawer extends DialogOverlay {
       event.target.parentElement?.matches("[data-panel]") &&
       event.target.closest("ds-drawer") === this
     ) {
-      this.style.setProperty("--resized-panel-width", `${(event as CustomEvent<number>).detail}px`);
+      this.style.setProperty(
+        "--resized-panel-width",
+        `${(event as CustomEvent<number>).detail}px`,
+      );
     }
   };
 
@@ -36,7 +41,10 @@ class DesignDrawer extends DialogOverlay {
       return;
     }
     const target = event.target;
-    if (!(target instanceof Element) || target.closest("ds-modal, ds-drawer") !== this) return;
+    if (
+      !(target instanceof Element) ||
+      target.closest("ds-modal, ds-drawer") !== this
+    ) return;
     const panel = this.querySelector<HTMLElement>(":scope > [data-panel]");
     const trigger = this.querySelector<HTMLButtonElement>("[data-open]");
     if (!panel || !trigger || !target.closest("[data-open], [data-close]")) {

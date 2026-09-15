@@ -16,10 +16,20 @@ import { drawerExamples } from "../primitives/drawer.examples.ts";
 import { modalExamples } from "../primitives/modal.examples.ts";
 import { changedFilesListExamples } from "../components/editor/changed-files-list.examples.ts";
 import { chatListItemExamples } from "../components/navigation/chat-list-item.examples.ts";
-import { agentMessageExamples, chatMessageExamples, messageDeliveryExamples, messageRevisionExamples, referencedMessageExamples, userMessageExamples } from "../components/messages/chat-message.examples.ts";
+import {
+  agentMessageExamples,
+  chatMessageExamples,
+  messageDeliveryExamples,
+  messageRevisionExamples,
+  referencedMessageExamples,
+  userMessageExamples,
+} from "../components/messages/chat-message.examples.ts";
 import { messageActionsExamples } from "../components/messages/message-actions.examples.ts";
 import { messageHeaderExamples } from "../components/messages/message-header.examples.ts";
-import { messageBoundaryExamples, turnGroupingExamples } from "../components/messages/message-transcript.examples.ts";
+import {
+  messageBoundaryExamples,
+  turnGroupingExamples,
+} from "../components/messages/message-transcript.examples.ts";
 import { chatSearchExamples } from "../components/navigation/chat-search.examples.ts";
 import { contextUsageExamples } from "../components/workspace/context-usage.examples.ts";
 import { diffPaneExamples } from "../components/editor/diff-pane.examples.ts";
@@ -41,22 +51,77 @@ import { shortcutHintExamples } from "../primitives/shortcut-hint.examples.ts";
 import { tabStripExamples } from "../primitives/tab-strip.examples.ts";
 
 const entries: DesignEntry[] = [
-  { id: "meter", name: "Meter", category: "Primitives", description: "A labeled value within a range.", examples: meterExamples },
-  { id: "shortcut-hint", name: "Shortcut hint", category: "Primitives", description: "Keyboard keys and their action.", examples: shortcutHintExamples },
-  { id: "metric-list", name: "Metric list", category: "Primitives", description: "Reusable label and value pairs.", examples: metricListExamples },
-  { id: "diff-preview", name: "Diff preview", category: "Editor and review", description: "Standalone added, removed, and context lines.", examples: diffPreviewExamples },
-  { id: "code-preview", name: "Code preview", category: "Editor and review", description: "Standalone numbered and highlighted code.", examples: codePreviewExamples },
-  { id: "chip", name: "Chip", category: "Primitives", description: "Compact non-interactive label.", examples: chipExamples },
-  { id: "message-attachments", name: "Message attachments", category: "Messages", description: "Image previews, file chips, and annotation counts shared by message surfaces.", examples: messageAttachmentsExamples },
-  { id: "tabs", name: "Tabs", category: "Primitives", description: "Standalone segmented navigation control.", examples: tabStripExamples },
   {
-    id: "tool-execution", name: "Tool execution", category: "Tools and execution",
-    description: "Active tool, last result, thinking, and completed batches. Expand each call to inspect arguments and resizable output. The live preview repeats.",
+    id: "meter",
+    name: "Meter",
+    category: "Primitives",
+    description: "A labeled value within a range.",
+    examples: meterExamples,
+  },
+  {
+    id: "shortcut-hint",
+    name: "Shortcut hint",
+    category: "Primitives",
+    description: "Keyboard keys and their action.",
+    examples: shortcutHintExamples,
+  },
+  {
+    id: "metric-list",
+    name: "Metric list",
+    category: "Primitives",
+    description: "Reusable label and value pairs.",
+    examples: metricListExamples,
+  },
+  {
+    id: "diff-preview",
+    name: "Diff preview",
+    category: "Editor and review",
+    description: "Standalone added, removed, and context lines.",
+    examples: diffPreviewExamples,
+  },
+  {
+    id: "code-preview",
+    name: "Code preview",
+    category: "Editor and review",
+    description: "Standalone numbered and highlighted code.",
+    examples: codePreviewExamples,
+  },
+  {
+    id: "chip",
+    name: "Chip",
+    category: "Primitives",
+    description: "Compact non-interactive label.",
+    examples: chipExamples,
+  },
+  {
+    id: "message-attachments",
+    name: "Message attachments",
+    category: "Messages",
+    description:
+      "Image previews, file chips, and annotation counts shared by message surfaces.",
+    examples: messageAttachmentsExamples,
+  },
+  {
+    id: "tabs",
+    name: "Tabs",
+    category: "Primitives",
+    description: "Standalone segmented navigation control.",
+    examples: tabStripExamples,
+  },
+  {
+    id: "tool-execution",
+    name: "Tool execution",
+    category: "Tools and execution",
+    description:
+      "Active tool, last result, thinking, and completed batches. Expand each call to inspect arguments and resizable output. The live preview repeats.",
     examples: toolExecutionExamples,
   },
   {
-    id: "change-summary", name: "Change card", category: "Editor and review",
-    description: "Per-file changes with derived totals and an expandable file list. Review and undo are visual controls in this design reference.",
+    id: "change-summary",
+    name: "Change card",
+    category: "Editor and review",
+    description:
+      "Per-file changes with derived totals and an expandable file list. Review and undo are visual controls in this design reference.",
     examples: changeSummaryExamples,
   },
   {
@@ -69,7 +134,8 @@ const entries: DesignEntry[] = [
   {
     id: "wordmark",
     name: "Wordmark",
-    description: "Shared Fathom identity with bold lettering and an accent period.",
+    description:
+      "Shared Fathom identity with bold lettering and an accent period.",
     category: "Workspace",
     examples: wordmarkExamples,
   },
@@ -91,7 +157,8 @@ const entries: DesignEntry[] = [
   {
     id: "chat-navigation",
     name: "Chat navigation",
-    description: "Shared project and branch identities with compact, single-line chat titles.",
+    description:
+      "Shared project and branch identities with compact, single-line chat titles.",
     category: "Navigation",
     examples: [...sessionSidebarExamples, ...chatListItemExamples],
   },
@@ -122,63 +189,72 @@ const entries: DesignEntry[] = [
   {
     id: "user-message",
     name: "User message",
-    description: "Short and long prompts, attached context, and an attachment-only message. Static design study; actions are simulated.",
+    description:
+      "Short and long prompts, attached context, and an attachment-only message. Static design study; actions are simulated.",
     category: "Messages",
     examples: userMessageExamples,
   },
   {
     id: "agent-message",
     name: "Agent message",
-    description: "Progress updates, a looping streaming response, final answers, and mixed content. Static design study; actions are simulated.",
+    description:
+      "Progress updates, a looping streaming response, final answers, and mixed content. Static design study; actions are simulated.",
     category: "Messages",
     examples: agentMessageExamples,
   },
   {
     id: "message-identity",
     name: "Message identity",
-    description: "Five shortlisted working animations. Original option numbers are preserved. Working responses omit timestamps; finished responses show them.",
+    description:
+      "Five shortlisted working animations. Original option numbers are preserved. Working responses omit timestamps; finished responses show them.",
     category: "Messages",
     examples: messageHeaderExamples,
   },
   {
     id: "turn-grouping",
     name: "Turn grouping",
-    description: "Agent messages interleaved with collapsed file-operation counts. Static design study; actions are simulated.",
+    description:
+      "Agent messages interleaved with collapsed file-operation counts. Static design study; actions are simulated.",
     category: "Messages",
     examples: turnGroupingExamples,
   },
   {
     id: "message-actions",
     name: "Message actions",
-    description: "Visible action rows for user and agent messages, including unavailable actions while responding. Static design study; actions are simulated.",
+    description:
+      "Visible action rows for user and agent messages, including unavailable actions while responding. Static design study; actions are simulated.",
     category: "Messages",
     examples: messageActionsExamples,
   },
   {
     id: "message-revisions",
     name: "Message revisions",
-    description: "Edited prompts, alternate answers, and an edit-and-resend surface. Static design study; actions are simulated.",
+    description:
+      "Edited prompts, alternate answers, and an edit-and-resend surface. Static design study; actions are simulated.",
     category: "Messages",
     examples: messageRevisionExamples,
   },
   {
     id: "referenced-message",
     name: "Referenced message",
-    description: "Quoted excerpts with source context and an unavailable-source fallback. Static design study; actions are simulated.",
+    description:
+      "Quoted excerpts with source context and an unavailable-source fallback. Static design study; actions are simulated.",
     category: "Messages",
     examples: referencedMessageExamples,
   },
   {
     id: "message-delivery",
     name: "Delivery state",
-    description: "Sending, queued, received, failed, and retrying messages. Static design study; actions are simulated.",
+    description:
+      "Sending, queued, received, failed, and retrying messages. Static design study; actions are simulated.",
     category: "Messages",
     examples: messageDeliveryExamples,
   },
   {
     id: "message-boundaries",
     name: "Message boundaries",
-    description: "Consecutive messages, unread dividers, and resumed history. Static design study; actions are simulated.",
+    description:
+      "Consecutive messages, unread dividers, and resumed history. Static design study; actions are simulated.",
     category: "Messages",
     examples: messageBoundaryExamples,
   },
@@ -192,21 +268,24 @@ const entries: DesignEntry[] = [
   {
     id: "composer",
     name: "Composer",
-    description: "Floating composer surface with shared compact controls; no application actions.",
+    description:
+      "Floating composer surface with shared compact controls; no application actions.",
     category: "Composer",
     examples: [...messageComposerExamples],
   },
   {
     id: "editor-pane",
     name: "Editor pane",
-    description: "File tabs, compact breadcrumbs, static code, and editor status.",
+    description:
+      "File tabs, compact breadcrumbs, static code, and editor status.",
     category: "Editor and review",
     examples: [...editorPaneExamples],
   },
   {
     id: "diff-pane",
     name: "Diff pane",
-    description: "Shared breadcrumb and change statistics with static diff lines.",
+    description:
+      "Shared breadcrumb and change statistics with static diff lines.",
     category: "Editor and review",
     examples: [...diffPaneExamples],
   },
@@ -222,7 +301,11 @@ const entries: DesignEntry[] = [
     name: "Workspace chrome",
     description: "Header and footer shared across both workspace layouts.",
     category: "Workspace",
-    examples: [...workspaceHeaderExamples, ...workspaceStatusBarExamples, ...contextUsageExamples],
+    examples: [
+      ...workspaceHeaderExamples,
+      ...workspaceStatusBarExamples,
+      ...contextUsageExamples,
+    ],
   },
   {
     id: "modal",
@@ -242,7 +325,8 @@ const entries: DesignEntry[] = [
     id: "accordion",
     category: "Primitives",
     name: "Accordion",
-    description: "Expandable sections. Allow one or multiple sections to stay open.",
+    description:
+      "Expandable sections. Allow one or multiple sections to stay open.",
     examples: accordionExamples,
   },
   {
@@ -256,5 +340,7 @@ const entries: DesignEntry[] = [
 
 export const components = componentCategories.flatMap((category) => {
   const group = entries.filter((entry) => entry.category === category);
-  return category === "Primitives" ? group.sort((a, b) => a.name.localeCompare(b.name)) : group;
+  return category === "Primitives"
+    ? group.sort((a, b) => a.name.localeCompare(b.name))
+    : group;
 });

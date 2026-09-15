@@ -15,10 +15,9 @@ const gitStatuses: Record<GitStatus, [string, Tone]> = {
 export const changeStatus = (status?: GitStatus) =>
   status
     ? html`
-        <span
-          class="shrink-0 text-micro ${tones[gitStatuses[status][1]]}"
-          aria-label="${gitStatuses[status][0]}"
-          >${status}</span
-        >
-      `
+      <span
+        class="shrink-0 text-micro ${tones[gitStatuses[status][1]]}"
+        aria-label="${gitStatuses[status][0]}"
+      >${status}</span>
+    `
     : "";

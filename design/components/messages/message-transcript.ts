@@ -31,7 +31,8 @@ export class TranscriptElement extends DesignElement {
         class="mx-auto w-full max-w-transcript flex flex-col gap-8 px-6 py-8"
       >
         ${messages.map(
-          (item) => html`<chat-message .item=${item} .changes=${changes}></chat-message>`,
+          (item) =>
+            html`<chat-message .item=${item} .changes=${changes}></chat-message>`,
         )}
       </div>
     `;

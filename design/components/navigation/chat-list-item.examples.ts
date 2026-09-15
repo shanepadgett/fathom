@@ -21,7 +21,8 @@ export const chatListItemExamples = [
           .project=${scenario.projects[0]}
           .selected=${true}
         ></chat-list-item>
-        <chat-list-item .chat=${longChat} .project=${scenario.projects[0]}></chat-list-item>
+        <chat-list-item .chat=${longChat} .project=${scenario
+          .projects[0]}></chat-list-item>
       </div>
     `,
   },
