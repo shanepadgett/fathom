@@ -27,15 +27,15 @@ export class ToolActivityElement extends DesignElement {
   override render() {
     const { label, duration, files } = this;
     return html`
-      <div class="my-6 border-y border-line py-3 text-sm">
-        <p class="flex justify-between gap-4">
-          <span class="flex items-center gap-1">${icon("check")}${label}</span
+      <details class="my-4 text-sm text-muted">
+        <summary class="flex justify-between gap-4">
+          <span class="flex items-center gap-1">${icon("caret-right")}${label}</span
           ><span class="text-muted">${duration}</span>
-        </p>
+        </summary>
         <p class="mt-2 break-words text-muted ${this.detail ? "" : "font-mono"}">
           ${this.detail || files.join(" · ")}
         </p>
-      </div>
+      </details>
     `;
   }
 }

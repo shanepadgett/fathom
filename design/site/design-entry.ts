@@ -6,5 +6,6 @@ export interface DesignEntry {
   name: string;
   description: string;
   category?: "Primitives" | "Composites" | "Behavior demos";
+  subgroup?: string;
   examples: { name: string; markup: TemplateResult }[];
 }

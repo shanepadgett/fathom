@@ -3,6 +3,14 @@
 A static visual reference for implementing Fathom. This is not the production
 frontend. Lit renders the designs; it does not choose the production framework.
 
+See the [agent chat design inventory](chat-design-inventory.md) for conversation
+components, content types, and states to explore.
+
+In the viewer, **Components → Composites → Message structure and identity**
+contains the first nine studies from that inventory, each on its own page.
+Composite pages use catalog `subgroup` labels in the sidebar and component index.
+Examples remain beside their owning components; existing page URLs stay stable.
+
 Run `mise run design` from the repository root and open
 `http://127.0.0.1:5175`.
 

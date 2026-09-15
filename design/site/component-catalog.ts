@@ -1,5 +1,7 @@
 import type { DesignEntry } from "./design-entry.ts";
 
+import { changeSummaryExamples } from "../composites/change-summary.examples.ts";
+import { toolExecutionExamples } from "../composites/tool-execution.examples.ts";
 import { accordionExamples } from "../components/accordion.examples.ts";
 import { buttonExamples } from "../components/button.examples.ts";
 import { contextMenuExamples } from "../components/context-menu.examples.ts";
@@ -7,7 +9,10 @@ import { drawerExamples } from "../components/drawer.examples.ts";
 import { modalExamples } from "../components/modal.examples.ts";
 import { changedFilesListExamples } from "../composites/changed-files-list.examples.ts";
 import { chatListItemExamples } from "../composites/chat-list-item.examples.ts";
-import { chatMessageExamples } from "../composites/chat-message.examples.ts";
+import { agentMessageExamples, chatMessageExamples, messageDeliveryExamples, messageRevisionExamples, referencedMessageExamples, userMessageExamples } from "../composites/chat-message.examples.ts";
+import { messageActionsExamples } from "../composites/message-actions.examples.ts";
+import { messageHeaderExamples } from "../composites/message-header.examples.ts";
+import { messageBoundaryExamples, turnGroupingExamples } from "../composites/message-transcript.examples.ts";
 import { chatSearchExamples } from "../composites/chat-search.examples.ts";
 import { contextUsageExamples } from "../composites/context-usage.examples.ts";
 import { diffPaneExamples } from "../composites/diff-pane.examples.ts";
@@ -17,6 +22,7 @@ import { messageComposerExamples } from "../composites/message-composer.examples
 import { projectPickerExamples } from "../composites/project-picker.examples.ts";
 import { sessionInspectorExamples } from "../composites/session-inspector.examples.ts";
 import { sessionSidebarExamples } from "../composites/session-sidebar.examples.ts";
+import { toolSummaryExamples } from "../composites/tool-summary.examples.ts";
 import { toolActivityExamples } from "../composites/tool-activity.examples.ts";
 import { workspaceHeaderExamples } from "../composites/workspace-header.examples.ts";
 import { workspaceStatusBarExamples } from "../composites/workspace-status-bar.examples.ts";
@@ -28,6 +34,16 @@ import { shortcutHintExamples } from "../primitives/shortcut-hint.examples.ts";
 import { tabStripExamples } from "../primitives/tab-strip.examples.ts";
 
 export const components: DesignEntry[] = [
+  {
+    id: "tool-execution", name: "Tool execution", category: "Composites", subgroup: "Tools and execution",
+    description: "Active tool, last result, thinking, and completed batches. Expand each call to inspect arguments and resizable output. The live preview repeats.",
+    examples: toolExecutionExamples,
+  },
+  {
+    id: "change-summary", name: "Change card", category: "Composites", subgroup: "Editor and review",
+    description: "Per-file changes with derived totals and an expandable file list. Review and undo are visual controls in this design reference.",
+    examples: changeSummaryExamples,
+  },
   {
     id: "context-menu",
     name: "Context menu",
@@ -62,6 +78,7 @@ export const components: DesignEntry[] = [
     name: "Chat navigation",
     description: "Shared project and branch identities with compact, single-line chat titles.",
     category: "Composites",
+    subgroup: "Workspace navigation",
     examples: [...sessionSidebarExamples, ...chatListItemExamples],
   },
   {
@@ -70,6 +87,7 @@ export const components: DesignEntry[] = [
     description:
       "Static project and chat search share the surface, search line, and keyboard footer.",
     category: "Composites",
+    subgroup: "Workspace navigation",
     examples: [...projectPickerExamples, ...chatSearchExamples],
   },
   {
@@ -78,6 +96,7 @@ export const components: DesignEntry[] = [
     description:
       "Dense file rows are shared by the tree and Changes list. Expansion is a supplied preview state.",
     category: "Composites",
+    subgroup: "Workspace navigation",
     examples: [...fileTreeExamples, ...changedFilesListExamples],
   },
   {
@@ -86,13 +105,95 @@ export const components: DesignEntry[] = [
     description:
       "Messages compose authored prose, tool activity, change summaries, and run status.",
     category: "Composites",
-    examples: [...chatMessageExamples, ...toolActivityExamples],
+    subgroup: "Message structure and identity",
+    examples: chatMessageExamples,
+  },
+  {
+    id: "user-message",
+    name: "User message",
+    description: "Short and long prompts, attached context, and an attachment-only message. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: userMessageExamples,
+  },
+  {
+    id: "agent-message",
+    name: "Agent message",
+    description: "Progress updates, a looping streaming response, final answers, and mixed content. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: agentMessageExamples,
+  },
+  {
+    id: "message-identity",
+    name: "Message identity",
+    description: "Five shortlisted working animations. Original option numbers are preserved. Working responses omit timestamps; finished responses show them.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: messageHeaderExamples,
+  },
+  {
+    id: "turn-grouping",
+    name: "Turn grouping",
+    description: "Agent messages interleaved with collapsed file-operation counts. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: turnGroupingExamples,
+  },
+  {
+    id: "message-actions",
+    name: "Message actions",
+    description: "Visible action rows for user and agent messages, including unavailable actions while responding. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: messageActionsExamples,
+  },
+  {
+    id: "message-revisions",
+    name: "Message revisions",
+    description: "Edited prompts, alternate answers, and an edit-and-resend surface. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: messageRevisionExamples,
+  },
+  {
+    id: "referenced-message",
+    name: "Referenced message",
+    description: "Quoted excerpts with source context and an unavailable-source fallback. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: referencedMessageExamples,
+  },
+  {
+    id: "message-delivery",
+    name: "Delivery state",
+    description: "Sending, queued, received, failed, and retrying messages. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: messageDeliveryExamples,
+  },
+  {
+    id: "message-boundaries",
+    name: "Message boundaries",
+    description: "Consecutive messages, unread dividers, and resumed history. Static design study; actions are simulated.",
+    category: "Composites",
+    subgroup: "Message structure and identity",
+    examples: messageBoundaryExamples,
+  },
+  {
+    id: "tool-activity",
+    name: "Tool activity",
+    description: "Completed tool summaries with files and research detail.",
+    category: "Composites",
+    subgroup: "Tools and execution",
+    examples: [...toolSummaryExamples, ...toolActivityExamples],
   },
   {
     id: "composer",
     name: "Composer",
     description: "Floating composer surface with shared compact controls; no application actions.",
     category: "Composites",
+    subgroup: "Composer",
     examples: [...messageComposerExamples],
   },
   {
@@ -100,6 +201,7 @@ export const components: DesignEntry[] = [
     name: "Editor pane",
     description: "File tabs, compact breadcrumbs, static code, and editor status.",
     category: "Composites",
+    subgroup: "Editor and review",
     examples: [...editorPaneExamples],
   },
   {
@@ -107,6 +209,7 @@ export const components: DesignEntry[] = [
     name: "Diff pane",
     description: "Shared breadcrumb and change statistics with static diff lines.",
     category: "Composites",
+    subgroup: "Editor and review",
     examples: [...diffPaneExamples],
   },
   {
@@ -114,6 +217,7 @@ export const components: DesignEntry[] = [
     name: "Session inspector",
     description: "Sections and metric lists for session information.",
     category: "Composites",
+    subgroup: "Workspace status",
     examples: [...sessionInspectorExamples],
   },
   {
@@ -121,6 +225,7 @@ export const components: DesignEntry[] = [
     name: "Workspace chrome",
     description: "Header and footer shared across both workspace layouts.",
     category: "Composites",
+    subgroup: "Workspace status",
     examples: [...workspaceHeaderExamples, ...workspaceStatusBarExamples, ...contextUsageExamples],
   },
   {

@@ -9,7 +9,14 @@ export interface FileNode {
   children?: FileNode[];
 }
 
+export interface FileChange {
+  path: string;
+  added: number;
+  removed: number;
+}
+
 export interface Changes {
+  files?: FileChange[];
   count: number;
   added: number;
   removed: number;

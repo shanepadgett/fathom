@@ -15,7 +15,7 @@ const link = (href: string, label: string, fullLabel = label) => html`
   >
 `;
 
-const group = (label: string, entries: DesignEntry[], path: string, open = false) => html`
+const group = (label: string, entries: DesignEntry[], path: string, open = false): TemplateResult => html`
   <details class="viewer-nav-group" ?open=${open}>
     <summary class="${row}">
       <span class="flex-1">${label}</span
@@ -23,12 +23,16 @@ const group = (label: string, entries: DesignEntry[], path: string, open = false
       >${icon("caret-right", "small")}
     </summary>
     <div class="ml-4 grid gap-0.5 border-l border-line py-1 pl-2">
-      ${entries.map((entry) =>
+      ${[...new Set(entries.map((entry) => entry.subgroup))].map((subgroup) =>
+        subgroup
+          ? group(subgroup, entries.filter((entry) => entry.subgroup === subgroup).map((entry) => ({ ...entry, subgroup: undefined })), path)
+          : entries.filter((entry) => !entry.subgroup).map((entry) =>
         link(
           `#/${path}/${entry.id}`,
           path === "screens" ? (entry.name.split(" · ")[1] ?? "Overview") : entry.name,
           entry.name,
         ),
+      ),
       )}
     </div>
   </details>

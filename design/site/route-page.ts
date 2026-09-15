@@ -201,7 +201,17 @@ export function routePage(route: ViewerRoute) {
       `;
     } else if (route.kind === "index" && entries) {
       body = entries.length
-        ? html`<div>${entries.map((item) => indexLink(`#/${group}/${item.id}`, item.name))}</div>`
+        ? html`<div>${[...new Set(entries.map((item) => item.category ?? "Screens"))].map((category) => html`
+            <section class="mb-12">
+              <h2 class="mb-4 text-xl font-medium">${category}</h2>
+              ${[...new Set(entries.filter((item) => (item.category ?? "Screens") === category).map((item) => item.subgroup))].map((subgroup) => html`
+                <div class="mb-6">
+                  ${subgroup ? html`<h3 class="mb-3 text-base text-muted">${subgroup}</h3>` : null}
+                  ${entries.filter((item) => (item.category ?? "Screens") === category && item.subgroup === subgroup).map((item) => indexLink(`#/${group}/${item.id}`, item.name))}
+                </div>
+              `)}
+            </section>
+          `)}</div>`
         : html`<p class="text-muted">No screens yet.</p>`;
     } else {
       body = html`<a href="#/" class="underline">Overview</a>`;
@@ -210,6 +220,7 @@ export function routePage(route: ViewerRoute) {
   if (route.kind === "home") return body;
   return html`
     <header class="mb-6">
+      ${route.entry?.subgroup ? html`<p class="mb-3 text-sm text-muted">${route.entry.category} / ${route.entry.subgroup}</p>` : null}
       <div class="flex flex-wrap items-center justify-between gap-4">
         <h1 class="text-title font-medium leading-title tracking-title">${title}</h1>
         ${

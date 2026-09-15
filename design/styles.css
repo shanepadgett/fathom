@@ -9,6 +9,10 @@
 @import "./components/drawer.css";
 @import "./components/accordion.css";
 @import "./composites/conversation-pane.css";
+@import "./composites/message-header.css";
+@import "./composites/tool-execution.css";
+@import "./composites/chat-message.css";
+@import "./composites/streaming-response.css";
 @import "./composites/session-sidebar.css";
 @import "./composites/context-usage.css";
 @import "./layouts/workspace-shell.css";

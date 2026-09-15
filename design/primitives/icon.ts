@@ -1,6 +1,7 @@
 import { html } from "lit";
 
 export type IconName =
+  | "arrow-counter-clockwise"
   | "push-pin"
   | "archive"
   | "tree-structure"

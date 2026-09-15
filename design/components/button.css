@@ -11,7 +11,7 @@
   }
 
   ds-button[variant="secondary"] > button {
-    @apply border-line bg-transparent text-ink;
+    @apply border-control-line bg-transparent text-ink;
   }
 
   ds-button[variant="quiet"] > button {
