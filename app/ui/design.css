@@ -1,0 +1,105 @@
+@layer theme, base, app-legacy, components, utilities;
+@import "tailwindcss";
+@import "@phosphor-icons/web/regular";
+@import "./assets/fonts/fonts.css";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@import "../../design/tokens.css";
+@import "../../design/primitives/button.css";
+@import "../../design/primitives/context-menu.css";
+@import "../../design/components/messages/conversation-pane.css";
+@import "../../design/components/messages/message-header.css";
+@import "../../design/components/tools/tool-execution.css";
+@import "../../design/components/messages/chat-message.css";
+@import "../../design/components/messages/streaming-response.css";
+@import "../../design/components/navigation/session-sidebar.css";
+@import "../../design/components/workspace/context-usage.css";
+@import "../../design/primitives/edge-resizer.css";
+@import "./styles.css";
+
+@layer base {
+  body {
+    @apply m-0 bg-canvas font-sans text-base leading-normal text-ink
+      antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-focus;
+  }
+  a {
+    @apply text-inherit no-underline;
+  }
+  button,
+  summary {
+    @apply cursor-pointer;
+  }
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
+  code {
+    @apply font-mono text-base;
+  }
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+/* Compatibility names resolve to the one shared token source during porting. */
+:root {
+  --canvas: var(--color-canvas);
+  --surface: var(--color-surface);
+  --raised: var(--color-surface);
+  --ink: var(--color-ink);
+  --muted: var(--color-muted);
+  --line: var(--color-line);
+  --action: var(--color-action);
+  --action-ink: var(--color-on-action);
+  --danger: var(--color-danger);
+  --hover: color-mix(in srgb, var(--color-action) 5%, transparent);
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-canvas);
+}
+
+@layer components {
+  .workspace-drawer-panel {
+    animation: workspace-drawer-enter var(--duration-motion-slow, 240ms)
+      ease-out;
+  }
+  .contents > edge-resizer {
+    display: none;
+  }
+  @keyframes workspace-drawer-enter {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .workspace-drawer-panel {
+      animation: none;
+    }
+  }
+}
+
+@layer components {
+  .search-dialog::backdrop {
+    @apply overlay-glass;
+  }
+  .search-dialog {
+    max-height: calc(100dvh - 7rem);
+  }
+  .search-surface-input:focus {
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+@layer components {
+  .fathom-file-highlight {
+    @apply bg-action/10;
+  }
+}

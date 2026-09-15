@@ -21,6 +21,9 @@ node_modules/
 dist/
 build/
 coverage/
+app/public/
+app/native/
+app/.desktop.local.json
 *.tsbuildinfo
 
 # Design browser verification
@@ -30,3 +33,6 @@ design/verification/**/__pycache__/
 .env
 .env.*
 !.env.example
+
+# Local lifecycle check evidence
+.codex/verification/

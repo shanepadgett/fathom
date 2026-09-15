@@ -4,8 +4,16 @@
   automated fixes at turn completion; let them run automatically. No Git hooks.
 - Make routine decisions. Ask when scope, correctness, or permission is unclear.
 - Preserve unrelated work. Keep responses short and concrete.
-- Planning stays active until explicitly completed. It does not authorize
-  implementation; separately requested work can proceed.
+- Production implementation is active. Track delivery and direct-use evidence
+  in `docs/technical/implementation.md`. Do not add tests; use the running app.
+- Use Fathom itself to build parts of Fathom with OpenAI GPT-6 Astra, then
+  review and exercise the changes. This is a standing development requirement.
+- Use ChatGPT GPT-5.6 Luna for simple chat and agent functionality checks;
+  reserve Astra for substantive implementation work through Fathom.
+- Build and use the native desktop app for verification. A Chrome-hosted UI
+  does not satisfy desktop verification.
+- Match the approved `design/` components, screens, Tailwind styles and tokens
+  component by component. Do not substitute approximate styling.
 
 Read only matching standards before work. Reuse unchanged standards already
 read; reassess when scope changes. No folder preloading or recursive reading.
