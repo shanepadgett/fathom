@@ -6,43 +6,38 @@ import { DiffPreview } from "./diff-preview.tsx";
 import { Button, IconButton } from "./primitives.tsx";
 import { TabStrip } from "./tab-strip.tsx";
 
-function DiffViewport(
-  props: {
-    projectId?: string;
-    document: DiffDocument;
-    theme: string;
-    fill?: boolean;
-    mode: "inline" | "split";
-    selectMode(mode: "inline" | "split"): void;
-  },
-) {
+function DiffViewport(props: {
+  projectId?: string;
+  document: DiffDocument;
+  theme: string;
+  fill?: boolean;
+  mode: "inline" | "split";
+  selectMode(mode: "inline" | "split"): void;
+}) {
   const [loading, setLoading] = createSignal(true);
   const [failure, setFailure] = createSignal("");
   let element!: HTMLDivElement;
-  let engine:
-    | ReturnType<typeof import("./diff-engine.ts").mountDiff>
-    | undefined;
+  let engine: ReturnType<typeof import("./diff-engine.ts").mountDiff> | undefined;
   let disposed = false;
   onMount(() => {
-    void import("./diff-engine.ts").then((module) => {
-      if (disposed) return;
-      engine = module.mountDiff(
-        element,
-        props.document,
-        props.theme,
-        props.projectId,
-      );
-      engine.update(props.theme, props.mode === "split");
-    }).catch((error) => {
-      if (!disposed) {
-        setFailure(error instanceof Error ? error.message : String(error));
-      }
-    }).finally(() => {
-      if (!disposed) setLoading(false);
-    });
+    void import("./diff-engine.ts")
+      .then((module) => {
+        if (disposed) return;
+        engine = module.mountDiff(element, props.document, props.theme, props.projectId);
+        engine.update(props.theme, props.mode === "split");
+      })
+      .catch((error) => {
+        if (!disposed) {
+          setFailure(error instanceof Error ? error.message : String(error));
+        }
+      })
+      .finally(() => {
+        if (!disposed) setLoading(false);
+      });
   });
   createEffect(() => {
-    const theme = props.theme, split = props.mode === "split";
+    const theme = props.theme,
+      split = props.mode === "split";
     engine?.update(theme, split);
   });
   onCleanup(() => {
@@ -57,10 +52,13 @@ function DiffViewport(
       <div class="flex shrink-0 items-center border-b border-line">
         <div class="min-w-0 flex-1">
           <TabStrip
-            items={[{ id: "inline", label: "Inline" }, {
-              id: "split",
-              label: "Side by side",
-            }]}
+            items={[
+              { id: "inline", label: "Inline" },
+              {
+                id: "split",
+                label: "Side by side",
+              },
+            ]}
             selected={props.mode}
             select={props.selectMode}
             label="Diff presentation"
@@ -94,21 +92,18 @@ function DiffViewport(
   );
 }
 
-export function FileDiff(
-  props: {
-    projectId?: string;
-    document: DiffDocument;
-    theme: string;
-    fill?: boolean;
-    refresh?(): void;
-    refreshing?: boolean;
-    stale?: boolean;
-  },
-) {
+export function FileDiff(props: {
+  projectId?: string;
+  document: DiffDocument;
+  theme: string;
+  fill?: boolean;
+  refresh?(): void;
+  refreshing?: boolean;
+  stale?: boolean;
+}) {
   const [mode, setMode] = createSignal<"inline" | "split">("inline");
   const binary = () =>
-    props.document.original.includes("\0") ||
-    props.document.modified.includes("\0");
+    props.document.original.includes("\0") || props.document.modified.includes("\0");
   return (
     <div class={`flex min-h-0 flex-col ${props.fill ? "flex-1" : ""}`}>
       <div class="flex shrink-0 items-center justify-between gap-3 border-b border-line px-6 py-2 text-sm text-muted">
@@ -123,10 +118,7 @@ export function FileDiff(
           </Button>
         </Show>
       </div>
-      <Show
-        when={!binary()}
-        fallback={<DiffPreview patch={props.document.patch} />}
-      >
+      <Show when={!binary()} fallback={<DiffPreview patch={props.document.patch} />}>
         <Show when={props.document} keyed>
           {(document) => (
             <DiffViewport

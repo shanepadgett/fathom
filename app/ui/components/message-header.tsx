@@ -9,11 +9,7 @@ export function MessageHeader(props: {
 }) {
   return (
     <header class="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-      <h3
-        class={`min-w-0 break-words text-base font-semibold ${
-          props.agent ? "text-action" : ""
-        }`}
-      >
+      <h3 class={`min-w-0 break-words text-base font-semibold ${props.agent ? "text-action" : ""}`}>
         {props.author}
       </h3>
       <Show when={props.working}>

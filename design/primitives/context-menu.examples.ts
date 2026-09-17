@@ -7,11 +7,7 @@ export const contextMenuExamples = [
   {
     name: "Thread options",
     markup: html`
-      <ds-context-menu
-        preview
-        label="Thread options"
-        .sections=${threadMenu}
-      ></ds-context-menu>
+      <ds-context-menu preview label="Thread options" .sections=${threadMenu}></ds-context-menu>
     `,
   },
   {

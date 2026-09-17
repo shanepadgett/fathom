@@ -1,10 +1,9 @@
 import type { ImagesInputContent } from "@earendil-works/pi-ai";
-import type {
-  ImageGenerationService,
-  ImageSelection,
-} from "../../sdk/images.ts";
+
+import type { ImageGenerationService, ImageSelection } from "../../sdk/images.ts";
 
 import { Buffer } from "node:buffer";
+
 import { createImagesModels } from "@earendil-works/pi-ai";
 import { openrouterImagesProvider } from "@earendil-works/pi-ai/providers/openrouter-images";
 import { Type } from "typebox";
@@ -21,18 +20,16 @@ export function imagesPlugin(authPath: string) {
       requires: ["storage", "media", "tools", "rpc", "workspace"],
       provides: ["images"],
       activate(ctx) {
-        const storage = ctx.get("storage"), media = ctx.get("media");
+        const storage = ctx.get("storage"),
+          media = ctx.get("media");
         const models = createImagesModels({
           credentials: new Credentials(authPath),
         });
         models.setProvider(openrouterImagesProvider());
-        const selection = () =>
-          storage.setting<ImageSelection | null>("images.model", null);
+        const selection = () => storage.setting<ImageSelection | null>("images.model", null);
         const selected = () => {
           const value = selection();
-          return value
-            ? models.getModel(value.provider, value.model)
-            : undefined;
+          return value ? models.getModel(value.provider, value.model) : undefined;
         };
         const service: ImageGenerationService = {
           models,
@@ -52,22 +49,19 @@ export function imagesPlugin(authPath: string) {
               if (!input.destination.trim()) {
                 throw new Error("Destination path must not be blank");
               }
-              const destination = await ctx.get("workspace").resolve(
-                input.destination,
-                true,
-              );
+              const destination = await ctx.get("workspace").resolve(input.destination, true);
               await assertNewFile(destination);
             }
             signal?.throwIfAborted();
-            const content: ImagesInputContent[] = [{
-              type: "text",
-              text: input.prompt,
-            }];
+            const content: ImagesInputContent[] = [
+              {
+                type: "text",
+                text: input.prompt,
+              },
+            ];
             for (const id of input.images ?? []) {
               if (!model.input.includes("image")) {
-                throw new Error(
-                  "This image model does not accept reference images",
-                );
+                throw new Error("This image model does not accept reference images");
               }
               const { asset, data } = await media.read(sessionId, id);
               if (!asset.mime.startsWith("image/")) {
@@ -80,9 +74,13 @@ export function imagesPlugin(authPath: string) {
               });
             }
             const started = Date.now();
-            const result = await models.generateImages(model, {
-              input: content,
-            }, { signal });
+            const result = await models.generateImages(
+              model,
+              {
+                input: content,
+              },
+              { signal },
+            );
             if (result.usage) {
               storage.recordUsage({
                 id: crypto.randomUUID(),
@@ -97,13 +95,9 @@ export function imagesPlugin(authPath: string) {
               });
             }
             if (result.stopReason !== "stop") {
-              throw new Error(
-                result.errorMessage || "Image generation did not complete",
-              );
+              throw new Error(result.errorMessage || "Image generation did not complete");
             }
-            const outputs = result.output.filter((block) =>
-              block.type === "image"
-            );
+            const outputs = result.output.filter((block) => block.type === "image");
             if (!outputs.length) {
               throw new Error("The provider returned no images");
             }
@@ -112,13 +106,10 @@ export function imagesPlugin(authPath: string) {
               if (output.data.length > 90_000_000) {
                 throw new Error("Generated image exceeds the media limit");
               }
-              const extension =
-                output.mimeType.split("/")[1]?.replace("jpeg", "jpg") || "png";
+              const extension = output.mimeType.split("/")[1]?.replace("jpeg", "jpg") || "png";
               assets.push(
                 await media.save(sessionId, {
-                  name: `generated-${result.timestamp}-${
-                    index + 1
-                  }.${extension}`,
+                  name: `generated-${result.timestamp}-${index + 1}.${extension}`,
                   mime: output.mimeType,
                   data: new Uint8Array(Buffer.from(output.data, "base64")),
                 }),
@@ -131,17 +122,14 @@ export function imagesPlugin(authPath: string) {
                   "Multiple images were saved to the media cache; export each asset to its own path",
                 );
               }
-              path = (await media.materialize(
-                sessionId,
-                assets[0].id,
-                input.destination,
-              )).path;
+              path = (await media.materialize(sessionId, assets[0].id, input.destination)).path;
             }
             return {
               assets,
-              text: result.output.filter((block) => block.type === "text").map((
-                block,
-              ) => block.text).join("\n"),
+              text: result.output
+                .filter((block) => block.type === "text")
+                .map((block) => block.text)
+                .join("\n"),
               path,
             };
           },
@@ -179,9 +167,10 @@ export function imagesPlugin(authPath: string) {
             }
             return {
               selected: selection(),
-              models: models.getModels().filter((model) =>
-                connected.has(model.provider)
-              ).map(({ id, name, provider }) => ({ id, name, provider })),
+              models: models
+                .getModels()
+                .filter((model) => connected.has(model.provider))
+                .map(({ id, name, provider }) => ({ id, name, provider })),
             };
           }),
           ctx.get("rpc").register("images.select", async (params) => {
@@ -189,16 +178,9 @@ export function imagesPlugin(authPath: string) {
               storage.setSetting("images.model", null);
               return {};
             }
-            const model = models.getModel(
-              String(params.provider),
-              String(params.model),
-            );
-            if (
-              !model?.output.includes("image") || !await models.getAuth(model)
-            ) {
-              throw new Error(
-                "Connect a supported image provider and choose an available model",
-              );
+            const model = models.getModel(String(params.provider), String(params.model));
+            if (!model?.output.includes("image") || !(await models.getAuth(model))) {
+              throw new Error("Connect a supported image provider and choose an available model");
             }
             storage.setSetting("images.model", {
               provider: model.provider,

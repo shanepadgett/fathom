@@ -1,11 +1,12 @@
 import type { createWorkspace } from "../state/workspace.ts";
-import { Show } from "solid-js";
-import { Button, IconButton, Metric } from "./primitives.tsx";
-import { PluginSlot } from "./plugin-slot.tsx";
-import { InspectorSection } from "./inspector-section.tsx";
-import { SessionUsage } from "./session-usage.tsx";
 
+import { Show } from "solid-js";
+
+import { InspectorSection } from "./inspector-section.tsx";
 import { LanguageServerSection } from "./language-server-section.tsx";
+import { PluginSlot } from "./plugin-slot.tsx";
+import { Button, IconButton, Metric } from "./primitives.tsx";
+import { SessionUsage } from "./session-usage.tsx";
 
 export function Inspector(props: { app: ReturnType<typeof createWorkspace> }) {
   const {
@@ -32,10 +33,7 @@ export function Inspector(props: { app: ReturnType<typeof createWorkspace> }) {
       <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 text-sm">
         <PluginSlot host={uiHost} slot="inspector" />
         <SessionUsage records={currentUsage()} />
-        <LanguageServerSection
-          transport={transport}
-          projectId={project()?.id}
-        />
+        <LanguageServerSection transport={transport} projectId={project()?.id} />
         <InspectorSection title="Runtime">
           <Metric label="Status" value={state()?.session.status ?? "idle"} />
           <Show when={state()?.activity}>
@@ -45,17 +43,11 @@ export function Inspector(props: { app: ReturnType<typeof createWorkspace> }) {
           <Metric label="Model" value={state()?.session.model || "—"} />
           <Metric label="Thinking" value={state()?.session.thinking ?? "low"} />
           <Metric label="Model calls" value={currentUsage().length} />
-          <Metric
-            label="Tool executions"
-            value={state()?.executions.length ?? 0}
-          />
+          <Metric label="Tool executions" value={state()?.executions.length ?? 0} />
         </InspectorSection>
         <InspectorSection title="Workspace">
           <p class="mono path-label">{project()?.path}</p>
-          <Metric
-            label="Trust"
-            value={project()?.trusted ? "Trusted" : "Restricted"}
-          />
+          <Metric label="Trust" value={project()?.trusted ? "Trusted" : "Restricted"} />
           <Button onClick={() => setTrustDialog(true)}>Manage trust</Button>
         </InspectorSection>
         <InspectorSection title="Tool access">
@@ -69,7 +61,8 @@ export function Inspector(props: { app: ReturnType<typeof createWorkspace> }) {
                   changes: { toolPolicy: event.currentTarget.value },
                 });
                 await refresh();
-              })}
+              })
+            }
           >
             <option value="default">All available tools</option>
             <option value="read-only">Read-only</option>

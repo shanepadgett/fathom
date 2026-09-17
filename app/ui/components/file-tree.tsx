@@ -10,15 +10,13 @@ export interface FileItem {
   directory: boolean;
 }
 
-export function FileRow(
-  props: {
-    file: FileItem;
-    selected: boolean;
-    tree?: boolean;
-    trailing?: JSX.Element;
-    open(): void;
-  },
-) {
+export function FileRow(props: {
+  file: FileItem;
+  selected: boolean;
+  tree?: boolean;
+  trailing?: JSX.Element;
+  open(): void;
+}) {
   return (
     <button
       type="button"
@@ -28,16 +26,10 @@ export function FileRow(
       onClick={props.open}
       class={`flex h-6 w-full min-w-0 items-center gap-1.5 rounded-sm pr-2 ${
         props.tree === false ? "pl-2" : "pl-5"
-      } text-left ${
-        props.selected ? "bg-action/10 text-action" : "text-ink hover:bg-canvas"
-      }`}
+      } text-left ${props.selected ? "bg-action/10 text-action" : "text-ink hover:bg-canvas"}`}
     >
-      <span
-        class={`flex shrink-0 ${props.selected ? "text-action" : "text-muted"}`}
-      >
-        <Icon
-          name={/\.tsx?$/.test(props.file.name) ? "file-ts" : "file-text"}
-        />
+      <span class={`flex shrink-0 ${props.selected ? "text-action" : "text-muted"}`}>
+        <Icon name={/\.tsx?$/.test(props.file.name) ? "file-ts" : "file-text"} />
       </span>
       <span class="min-w-0 flex-1 truncate">{props.file.name}</span>
       {props.trailing}
@@ -45,9 +37,7 @@ export function FileRow(
   );
 }
 
-export function FolderRow(
-  props: { name: string; expanded: boolean; toggle(): void },
-) {
+export function FolderRow(props: { name: string; expanded: boolean; toggle(): void }) {
   return (
     <button
       type="button"
@@ -56,10 +46,7 @@ export function FolderRow(
       onClick={props.toggle}
     >
       <span class="flex items-center gap-1.5 text-muted">
-        <Icon
-          name={props.expanded ? "caret-down" : "caret-right"}
-          size="small"
-        />
+        <Icon name={props.expanded ? "caret-down" : "caret-right"} size="small" />
         <Icon name={props.expanded ? "folder-open" : "folder"} />
       </span>
       <span class="truncate">{props.name}</span>

@@ -26,8 +26,8 @@ export function DraftRecovery(props: {
       }}
     >
       <p>
-        Save each draft to a new file in this workspace, or copy its text.
-        Existing files will not be replaced.
+        Save each draft to a new file in this workspace, or copy its text. Existing files will not
+        be replaced.
       </p>
       <For each={props.drafts}>
         {(draft) => {
@@ -36,10 +36,7 @@ export function DraftRecovery(props: {
             setBusy(true);
             setError("");
             try {
-              props.restored(
-                draft,
-                await props.recover(draft.path ?? "", destination()),
-              );
+              props.restored(draft, await props.recover(draft.path ?? "", destination()));
             } catch (error) {
               setError(String(error));
             } finally {
@@ -56,7 +53,8 @@ export function DraftRecovery(props: {
                 value={draft.text}
               />
               <label class="mt-3 block">
-                Save to workspace path<input
+                Save to workspace path
+                <input
                   class="mt-2 w-full"
                   value={destination()}
                   disabled={busy()}
@@ -67,9 +65,10 @@ export function DraftRecovery(props: {
                 <Button
                   disabled={busy()}
                   onClick={() =>
-                    void navigator.clipboard.writeText(draft.text).catch(
-                      (error) => setError(String(error)),
-                    )}
+                    void navigator.clipboard
+                      .writeText(draft.text)
+                      .catch((error) => setError(String(error)))
+                  }
                 >
                   Copy draft
                 </Button>
@@ -86,7 +85,9 @@ export function DraftRecovery(props: {
         }}
       </For>
       <Show when={error()}>
-        <p role="alert" class="error">{error()}</p>
+        <p role="alert" class="error">
+          {error()}
+        </p>
       </Show>
     </Modal>
   );

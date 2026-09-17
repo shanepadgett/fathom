@@ -7,13 +7,11 @@ export const chatSearchExamples = [
   {
     name: "Chats",
     markup: html`
-      <chat-search .chats=${scenario.searchChats} .projects=${scenario
-        .projects}></chat-search>
+      <chat-search .chats=${scenario.searchChats} .projects=${scenario.projects}></chat-search>
     `,
   },
   {
     name: "Empty results",
-    markup:
-      html`<chat-search .chats=${[]} .projects=${scenario.projects}></chat-search>`,
+    markup: html`<chat-search .chats=${[]} .projects=${scenario.projects}></chat-search>`,
   },
 ];

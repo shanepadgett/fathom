@@ -2,8 +2,8 @@ import type { Transport } from "../transport.ts";
 
 import { createResource, createSignal, For, onCleanup, Show } from "solid-js";
 
-import { Button, Field } from "./primitives.tsx";
 import { ConnectionRow } from "./connection-row.tsx";
+import { Button, Field } from "./primitives.tsx";
 
 interface Server {
   id: string;
@@ -13,23 +13,24 @@ interface Server {
   url?: string;
 }
 
-export function McpSettings(
-  props: { transport: Transport; error(error: unknown): void },
-) {
+export function McpSettings(props: { transport: Transport; error(error: unknown): void }) {
   const [servers, { refetch }] = createResource(() =>
-    props.transport.request<Server[]>("mcp.list")
+    props.transport.request<Server[]>("mcp.list"),
   );
   const [kind, setKind] = createSignal("stdio");
   const [id, setId] = createSignal("");
   const [address, setAddress] = createSignal("");
   const [args, setArgs] = createSignal("");
   const [busy, setBusy] = createSignal(false);
-  onCleanup(props.transport.onEvent((event) => {
-    if (
-      event.type === "mcp" &&
-      (!event.projectId || event.projectId === props.transport.projectId)
-    ) void refetch();
-  }));
+  onCleanup(
+    props.transport.onEvent((event) => {
+      if (
+        event.type === "mcp" &&
+        (!event.projectId || event.projectId === props.transport.projectId)
+      )
+        void refetch();
+    }),
+  );
   const connect = async () => {
     setBusy(true);
     try {
@@ -37,9 +38,9 @@ export function McpSettings(
         id: id().trim(),
         ...(kind() === "stdio"
           ? {
-            command: address().trim(),
-            args: args().split("\n").filter(Boolean),
-          }
+              command: address().trim(),
+              args: args().split("\n").filter(Boolean),
+            }
           : { url: address().trim() }),
       });
       await refetch();
@@ -64,8 +65,8 @@ export function McpSettings(
     <section>
       <h3>MCP connections</h3>
       <p class="muted">
-        Connect local tools or a remote MCP endpoint. Tools become searchable by
-        the agent and available to scripts.
+        Connect local tools or a remote MCP endpoint. Tools become searchable by the agent and
+        available to scripts.
       </p>
       <Show when={servers.error}>
         <p class="error">Could not load connections.</p>
@@ -74,9 +75,11 @@ export function McpSettings(
         {(server) => (
           <ConnectionRow
             name={server.id}
-            status={server.status === "connected"
-              ? `${server.count} tools · ${server.url ?? server.command}`
-              : server.status}
+            status={
+              server.status === "connected"
+                ? `${server.count} tools · ${server.url ?? server.command}`
+                : server.status
+            }
           >
             <Button onClick={() => void remove(server.id)}>Remove</Button>
           </ConnectionRow>
@@ -116,9 +119,7 @@ export function McpSettings(
             type={kind() === "stdio" ? "text" : "url"}
             value={address()}
             onInput={(event) => setAddress(event.currentTarget.value)}
-            placeholder={kind() === "stdio"
-              ? "/path/to/executable"
-              : "https://example.com/mcp"}
+            placeholder={kind() === "stdio" ? "/path/to/executable" : "https://example.com/mcp"}
           />
         </Field>
         <Show when={kind() === "stdio"}>

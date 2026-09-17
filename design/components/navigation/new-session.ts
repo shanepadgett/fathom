@@ -25,14 +25,13 @@ export class NewSessionElement extends DesignElement {
           heading="New session · Choose a project"
           .field=${searchFieldPreview("Search projects…")}
           .results=${this.projects.map(
-            (project, index) =>
-              html`
-                <project-search-result
-                  .project=${project}
-                  .shortcut=${`⌘${index + 1}`}
-                  .selected=${index === 0}
-                ></project-search-result>
-              `,
+            (project, index) => html`
+              <project-search-result
+                .project=${project}
+                .shortcut=${`⌘${index + 1}`}
+                .selected=${index === 0}
+              ></project-search-result>
+            `,
           )}
           action="Start session"
         ></search-surface>

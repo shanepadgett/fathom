@@ -7,9 +7,7 @@ export interface PaletteCommand {
   run(): unknown;
 }
 
-export function CommandPalette(
-  props: { commands: PaletteCommand[]; close(): void },
-) {
+export function CommandPalette(props: { commands: PaletteCommand[]; close(): void }) {
   return (
     <SearchDialog label="Commands" close={props.close}>
       <SearchList

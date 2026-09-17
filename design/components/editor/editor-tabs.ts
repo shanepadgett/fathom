@@ -29,10 +29,7 @@ export class EditorTabsElement extends DesignElement {
         aria-label="Open files"
       >
         ${files.map(
-          (file) =>
-            html`<editor-tab .file=${file} .selected=${
-              file.id === selected
-            }></editor-tab>`,
+          (file) => html`<editor-tab .file=${file} .selected=${file.id === selected}></editor-tab>`,
         )}
       </div>
     `;

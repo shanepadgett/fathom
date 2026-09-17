@@ -1,34 +1,24 @@
 import type { FileActivity, FileRange } from "../../sdk/editor.ts";
-import { DiffDrawer } from "./diff-drawer.tsx";
-import { createFileReview } from "../state/file-review.ts";
-import { createLanguageServer } from "../state/language-server.ts";
 import type { GitState } from "../../sdk/git.ts";
-
-import { ChangedFiles } from "./changed-files.tsx";
-import { TabStrip } from "./tab-strip.tsx";
-import { type EditorPosition, EditorStatus } from "./editor-status.tsx";
 import type { Transport } from "../transport.ts";
 import type { EditorDocument } from "./editor-engine.ts";
 
-import {
-  createEffect,
-  createSignal,
-  on,
-  onCleanup,
-  onMount,
-  Show,
-} from "solid-js";
+import { createEffect, createSignal, on, onCleanup, onMount, Show } from "solid-js";
 
-import { type FileItem, FileTree } from "./file-tree.tsx";
-import { EditorWrites } from "./editor-writes.ts";
-import { EditorTabs, FileBreadcrumbs } from "./editor-navigation.tsx";
+import { createFileReview } from "../state/file-review.ts";
+import { createLanguageServer } from "../state/language-server.ts";
+import { ChangedFiles } from "./changed-files.tsx";
+import { DiffDrawer } from "./diff-drawer.tsx";
 import { DraftRecovery } from "./draft-recovery.tsx";
+import { EditorTabs, FileBreadcrumbs } from "./editor-navigation.tsx";
+import { type EditorPosition, EditorStatus } from "./editor-status.tsx";
+import { EditorWrites } from "./editor-writes.ts";
+import { type FileItem, FileTree } from "./file-tree.tsx";
 import { Button, IconButton, Modal } from "./primitives.tsx";
+import { TabStrip } from "./tab-strip.tsx";
 
 interface EditorState {
-  views?: ReturnType<
-    ReturnType<typeof import("./editor-engine.ts").mountEditor>["saveViews"]
-  >;
+  views?: ReturnType<ReturnType<typeof import("./editor-engine.ts").mountEditor>["saveViews"]>;
   expanded: string[];
   documents: EditorDocument[];
   activePath: string;
@@ -37,19 +27,17 @@ interface EditorState {
 
 const workspaceEditors = new Map<string, EditorState>();
 
-export function EditorWorkspace(
-  props: {
-    sidebarOpen: boolean;
-    drawerMount?: HTMLElement;
-    focus?: { path: string; request: number; range?: FileRange };
-    sessionId?: string;
-    focused?(request: number): void;
-    transport: Transport;
-    theme: string;
-    close(): void;
-    error(error: unknown): void;
-  },
-) {
+export function EditorWorkspace(props: {
+  sidebarOpen: boolean;
+  drawerMount?: HTMLElement;
+  focus?: { path: string; request: number; range?: FileRange };
+  sessionId?: string;
+  focused?(request: number): void;
+  transport: Transport;
+  theme: string;
+  close(): void;
+  error(error: unknown): void;
+}) {
   const projectId = props.transport.projectId;
   const previous = workspaceEditors.get(projectId);
   const request = <T,>(method: string, params: Record<string, unknown> = {}) =>
@@ -60,16 +48,12 @@ export function EditorWorkspace(
   const [expanded, setExpanded] = createSignal(previous?.expanded ?? []);
   const [treeRevision, setTreeRevision] = createSignal(0);
   const refetch = () => setTreeRevision((value) => value + 1);
-  const [documents, setDocuments] = createSignal<EditorDocument[]>(
-    previous?.documents ?? [],
-  );
+  const [documents, setDocuments] = createSignal<EditorDocument[]>(previous?.documents ?? []);
   const [activePath, setActivePath] = createSignal(previous?.activePath ?? "");
-  const [drafts, setDrafts] = createSignal<Record<string, string>>(
-    previous?.drafts ?? {},
+  const [drafts, setDrafts] = createSignal<Record<string, string>>(previous?.drafts ?? {});
+  const [recovery, setRecovery] = createSignal<{ path?: string; text: string; error?: string }[]>(
+    [],
   );
-  const [recovery, setRecovery] = createSignal<
-    { path?: string; text: string; error?: string }[]
-  >([]);
   const [showRecovery, setShowRecovery] = createSignal(false);
   const [closing, setClosing] = createSignal("");
   const [discarding, setDiscarding] = createSignal(false);
@@ -83,20 +67,14 @@ export function EditorWorkspace(
   const [followAgent, setFollowAgent] = createSignal(
     localStorage.getItem("fathom.followAgent") !== "false",
   );
-  const [reveal, setReveal] = createSignal<
-    { path: string; range: FileRange }
-  >();
+  const [reveal, setReveal] = createSignal<{ path: string; range: FileRange }>();
   const [loading, setLoading] = createSignal(true);
-  const current = () =>
-    documents().find((document) => document.path === activePath());
+  const current = () => documents().find((document) => document.path === activePath());
   const dirty = (path: string) =>
     drafts()[path] !== undefined &&
-    drafts()[path] !==
-      documents().find((document) => document.path === path)?.text;
+    drafts()[path] !== documents().find((document) => document.path === path)?.text;
   let element!: HTMLDivElement;
-  let editor:
-    | ReturnType<typeof import("./editor-engine.ts").mountEditor>
-    | undefined;
+  let editor: ReturnType<typeof import("./editor-engine.ts").mountEditor> | undefined;
   const writes = new EditorWrites(props.error);
   let disposed = false;
   let openVersion = 0;
@@ -117,22 +95,22 @@ export function EditorWorkspace(
       if (focus && range) setReveal({ path: document.path, range });
       return;
     }
-    setDocuments(
-      (items) => [
-        ...items.filter((item) => item.path !== document.path),
-        document,
-      ],
-    );
+    setDocuments((items) => [...items.filter((item) => item.path !== document.path), document]);
     if (focus) setActivePath(document.path);
     if (focus && range) setReveal({ path: document.path, range });
   }
 
-  createEffect(on(() => props.focus, (target) => {
-    if (target) {
-      void act(() => open(target.path, true, target.range));
-      props.focused?.(target.request);
-    }
-  }));
+  createEffect(
+    on(
+      () => props.focus,
+      (target) => {
+        if (target) {
+          void act(() => open(target.path, true, target.range));
+          props.focused?.(target.request);
+        }
+      },
+    ),
+  );
 
   async function save() {
     const document = current();
@@ -141,18 +119,14 @@ export function EditorWorkspace(
     const text = drafts()[document.path] ?? document.text;
     setSaving(true);
     try {
-      const saved = await writes.run(
-        document.path,
-        () =>
-          request<EditorDocument>("file.save", {
-            path: document.path,
-            version: document.version,
-            text,
-          }),
+      const saved = await writes.run(document.path, () =>
+        request<EditorDocument>("file.save", {
+          path: document.path,
+          version: document.version,
+          text,
+        }),
       );
-      setDocuments((items) =>
-        items.map((item) => item.path === saved.path ? saved : item)
-      );
+      setDocuments((items) => items.map((item) => (item.path === saved.path ? saved : item)));
       setDrafts((items) => {
         if (items[saved.path] !== text) return items;
         const next = { ...items };
@@ -180,13 +154,10 @@ export function EditorWorkspace(
   async function discard() {
     const path = closing() || activePath();
     writes.cancel(path);
-    const document = await writes.run(
-      path,
-      () => request<EditorDocument>("file.discard", { path }),
+    const document = await writes.run(path, () =>
+      request<EditorDocument>("file.discard", { path }),
     );
-    setDocuments((items) =>
-      items.map((item) => item.path === path ? document : item)
-    );
+    setDocuments((items) => items.map((item) => (item.path === path ? document : item)));
     setDrafts((items) => {
       const next = { ...items };
       delete next[path];
@@ -225,29 +196,31 @@ export function EditorWorkspace(
     for (const document of documents()) {
       if (!dirty(document.path)) void act(() => open(document.path, false));
     }
-    void import("./editor-engine.ts").then((module) => {
-      if (disposed) return;
-      editor = module.mountEditor(
-        element,
-        (text) => {
-          const path = activePath();
-          setDrafts((items) => ({ ...items, [path]: text }));
-          writes.schedule(path, () =>
-            request("file.change", {
-              path,
-              text,
-              version: documents().find((item) => item.path === path)?.version,
-            }));
-        },
-        props.theme,
-        setPosition,
-        (path, text, position) =>
-          request("lsp.completion", { path, text, position }),
-        previous?.views,
-        projectId,
-      );
-      setLoading(false);
-    }).catch(props.error);
+    void import("./editor-engine.ts")
+      .then((module) => {
+        if (disposed) return;
+        editor = module.mountEditor(
+          element,
+          (text) => {
+            const path = activePath();
+            setDrafts((items) => ({ ...items, [path]: text }));
+            writes.schedule(path, () =>
+              request("file.change", {
+                path,
+                text,
+                version: documents().find((item) => item.path === path)?.version,
+              }),
+            );
+          },
+          props.theme,
+          setPosition,
+          (path, text, position) => request("lsp.completion", { path, text, position }),
+          previous?.views,
+          projectId,
+        );
+        setLoading(false);
+      })
+      .catch(props.error);
     const unsubscribe = props.transport.onEvent((event) => {
       if (event.projectId && event.projectId !== projectId) return;
       if (event.type === "git") refetch();
@@ -255,10 +228,7 @@ export function EditorWorkspace(
         const data = event.data as FileActivity;
         if (!data || typeof data.path !== "string" || !data.path) return;
         void act(async () => {
-          if (
-            followAgent() && props.sessionId &&
-            event.sessionId === props.sessionId
-          ) {
+          if (followAgent() && props.sessionId && event.sessionId === props.sessionId) {
             await open(data.path, true, data.range);
           } else if (documents().some((item) => item.path === data.path)) {
             await open(data.path, false);
@@ -273,10 +243,8 @@ export function EditorWorkspace(
         };
         setDocuments((items) =>
           items.map((item) =>
-            item.uri === data.uri
-              ? { ...item, diagnostics: data.diagnostics }
-              : item
-          )
+            item.uri === data.uri ? { ...item, diagnostics: data.diagnostics } : item,
+          ),
         );
       }
     });
@@ -329,20 +297,19 @@ export function EditorWorkspace(
           aria-label="Workspace files"
         >
           <TabStrip
-            items={[{ id: "files", label: "Files" }, {
-              id: "changes",
-              label: "Changes",
-            }]}
+            items={[
+              { id: "files", label: "Files" },
+              {
+                id: "changes",
+                label: "Changes",
+              },
+            ]}
             selected={fileView()}
             select={setFileView}
             label="Files and changes"
           />
           <div class="flex justify-end px-2">
-            <IconButton
-              name="arrow-counter-clockwise"
-              label="Refresh files"
-              onClick={refetch}
-            />
+            <IconButton name="arrow-counter-clockwise" label="Refresh files" onClick={refetch} />
           </div>
           <Show when={recovery().length}>
             <Button onClick={() => setShowRecovery(true)}>
@@ -367,10 +334,9 @@ export function EditorWorkspace(
               expanded={expanded()}
               toggle={(path) =>
                 setExpanded((items) =>
-                  items.includes(path)
-                    ? items.filter((item) => item !== path)
-                    : [...items, path]
-                )}
+                  items.includes(path) ? items.filter((item) => item !== path) : [...items, path],
+                )
+              }
               open={(path) => void act(() => open(path))}
             />
           </Show>
@@ -394,10 +360,8 @@ export function EditorWorkspace(
         <EditorStatus
           server={languageServer()}
           position={position()}
-          errors={current()?.diagnostics.filter((item) => item.severity === 1)
-            .length ?? 0}
-          warnings={current()?.diagnostics.filter((item) => item.severity === 2)
-            .length ?? 0}
+          errors={current()?.diagnostics.filter((item) => item.severity === 1).length ?? 0}
+          warnings={current()?.diagnostics.filter((item) => item.severity === 2).length ?? 0}
         >
           <Button
             aria-pressed={followAgent()}
@@ -412,15 +376,11 @@ export function EditorWorkspace(
           <Show when={current()}>
             <Button
               disabled={saving()}
-              onClick={() =>
-                dirty(activePath()) ? setDiscarding(true) : void act(discard)}
+              onClick={() => (dirty(activePath()) ? setDiscarding(true) : void act(discard))}
             >
               Reload
             </Button>
-            <Button
-              disabled={saving() || !dirty(activePath())}
-              onClick={() => void act(save)}
-            >
+            <Button disabled={saving() || !dirty(activePath())} onClick={() => void act(save)}>
               Save ⌘S
             </Button>
           </Show>
@@ -443,7 +403,8 @@ export function EditorWorkspace(
                   void act(async () => {
                     await open(file().path);
                     review.close();
-                  })}
+                  })
+                }
               >
                 Open in editor
               </Button>
@@ -459,10 +420,7 @@ export function EditorWorkspace(
             setClosing("");
           }}
         >
-          <p>
-            Your edits to {closing() || activePath()}{" "}
-            will be replaced with the file on disk.
-          </p>
+          <p>Your edits to {closing() || activePath()} will be replaced with the file on disk.</p>
           <div class="actions">
             <Button
               onClick={() => {
@@ -483,15 +441,14 @@ export function EditorWorkspace(
           drafts={recovery()}
           close={() => setShowRecovery(false)}
           recover={(path, destination) =>
-            request<EditorDocument>("file.recover", { path, destination })}
+            request<EditorDocument>("file.recover", { path, destination })
+          }
           restored={(draft, document) => {
             setRecovery((items) => items.filter((item) => item !== draft));
-            setDocuments(
-              (items) => [
-                ...items.filter((item) => item.path !== document.path),
-                document,
-              ],
-            );
+            setDocuments((items) => [
+              ...items.filter((item) => item.path !== document.path),
+              document,
+            ]);
             setActivePath(document.path);
             void refetch();
             if (!recovery().length) setShowRecovery(false);

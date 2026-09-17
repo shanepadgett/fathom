@@ -33,9 +33,7 @@ export function installPicker(channel: string, hostOrigin: string) {
       height: Math.abs(end.y - drag!.y),
     };
   };
-  const show = (
-    rect: { x: number; y: number; width: number; height: number },
-  ) => {
+  const show = (rect: { x: number; y: number; width: number; height: number }) => {
     if (!overlay) {
       overlay = document.createElement("div");
       overlay.style.cssText =
@@ -62,96 +60,125 @@ export function installPicker(channel: string, hostOrigin: string) {
       hierarchy.unshift(
         node.tagName.toLowerCase() +
           (node.id ? `#${CSS.escape(node.id)}` : "") +
-          [...node.classList].slice(0, 4).map((name) => `.${CSS.escape(name)}`)
+          [...node.classList]
+            .slice(0, 4)
+            .map((name) => `.${CSS.escape(name)}`)
             .join(""),
       );
       node = node.parentElement;
     }
-    parent.postMessage({
-      channel,
-      kind,
-      selector: hierarchy.join(" > ").slice(0, 1200),
-      text: (element.textContent ?? "").trim().slice(0, 2000),
-      bounds: {
-        x: Math.round(rect.x + scrollX),
-        y: Math.round(rect.y + scrollY),
-        width: Math.round(rect.width),
-        height: Math.round(rect.height),
+    parent.postMessage(
+      {
+        channel,
+        kind,
+        selector: hierarchy.join(" > ").slice(0, 1200),
+        text: (element.textContent ?? "").trim().slice(0, 2000),
+        bounds: {
+          x: Math.round(rect.x + scrollX),
+          y: Math.round(rect.y + scrollY),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+        },
       },
-    }, hostOrigin);
+      hostOrigin,
+    );
     mode = undefined;
     resetDrag();
   };
   window.addEventListener("message", (event) => {
-    if (
-      event.source !== parent || event.origin !== hostOrigin ||
-      event.data?.channel !== channel
-    ) return;
-    mode = event.data.mode === "element" || event.data.mode === "area"
-      ? event.data.mode
-      : undefined;
+    if (event.source !== parent || event.origin !== hostOrigin || event.data?.channel !== channel)
+      return;
+    mode =
+      event.data.mode === "element" || event.data.mode === "area" ? event.data.mode : undefined;
     resetDrag();
     if (typeof event.data.color === "string") color = event.data.color;
   });
-  window.addEventListener("pointermove", (event) => {
-    if (!mode || !(event.target instanceof Element)) return;
-    if (mode === "element") show(event.target.getBoundingClientRect());
-    else if (drag) show(area(event));
-  }, true);
-  window.addEventListener("pointerdown", (event) => {
-    if (!mode) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (mode === "area" && event.button === 0 && !drag) {
-      drag = { ...point(event), pointer: event.pointerId };
-      document.documentElement.setPointerCapture(event.pointerId);
-    }
-  }, true);
-  window.addEventListener("pointerup", (event) => {
-    if (!mode) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (mode !== "area" || !drag || drag.pointer !== event.pointerId) return;
-    const rect = area(event);
-    suppressClick = true;
-    setTimeout(() => {
-      suppressClick = false;
-    }, 0);
-    if (rect.width < 2 || rect.height < 2) {
-      resetDrag();
-      return;
-    }
-    const element = document.elementFromPoint(
-      rect.x + rect.width / 2,
-      rect.y + rect.height / 2,
-    ) ?? document.body;
-    send("area", element, rect);
-  }, true);
-  for (const name of ["mousedown", "mouseup"]) {
-    window.addEventListener(name, (event) => {
-      if (mode || suppressClick) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    }, true);
-  }
-  window.addEventListener("click", (event) => {
-    if (!mode && !suppressClick) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (mode === "element" && event.target instanceof Element) {
-      send("element", event.target, event.target.getBoundingClientRect());
-    }
-  }, true);
-  window.addEventListener("keydown", (event) => {
-    if (mode && event.key === "Escape") {
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      if (!mode || !(event.target instanceof Element)) return;
+      if (mode === "element") show(event.target.getBoundingClientRect());
+      else if (drag) show(area(event));
+    },
+    true,
+  );
+  window.addEventListener(
+    "pointerdown",
+    (event) => {
+      if (!mode) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      cancel();
-    }
-  }, true);
-  window.addEventListener("pointercancel", () => {
-    if (drag) cancel();
-  }, true);
+      if (mode === "area" && event.button === 0 && !drag) {
+        drag = { ...point(event), pointer: event.pointerId };
+        document.documentElement.setPointerCapture(event.pointerId);
+      }
+    },
+    true,
+  );
+  window.addEventListener(
+    "pointerup",
+    (event) => {
+      if (!mode) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (mode !== "area" || !drag || drag.pointer !== event.pointerId) return;
+      const rect = area(event);
+      suppressClick = true;
+      setTimeout(() => {
+        suppressClick = false;
+      }, 0);
+      if (rect.width < 2 || rect.height < 2) {
+        resetDrag();
+        return;
+      }
+      const element =
+        document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2) ??
+        document.body;
+      send("area", element, rect);
+    },
+    true,
+  );
+  for (const name of ["mousedown", "mouseup"]) {
+    window.addEventListener(
+      name,
+      (event) => {
+        if (mode || suppressClick) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
+  }
+  window.addEventListener(
+    "click",
+    (event) => {
+      if (!mode && !suppressClick) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (mode === "element" && event.target instanceof Element) {
+        send("element", event.target, event.target.getBoundingClientRect());
+      }
+    },
+    true,
+  );
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (mode && event.key === "Escape") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        cancel();
+      }
+    },
+    true,
+  );
+  window.addEventListener(
+    "pointercancel",
+    () => {
+      if (drag) cancel();
+    },
+    true,
+  );
   window.addEventListener("scroll", resetDrag, true);
 }

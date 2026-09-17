@@ -1,4 +1,5 @@
 import type { JSX } from "solid-js";
+
 import type { FileDiff as DiffDocument } from "../../sdk/git.ts";
 
 import { createMemo, Show } from "solid-js";
@@ -22,8 +23,7 @@ export function DiffDrawer(props: {
   footer?: JSX.Element;
 }) {
   const lines = createMemo(() => diffLines(props.document?.patch ?? ""));
-  const count = (kind: "added" | "removed") =>
-    lines().filter((line) => line.kind === kind).length;
+  const count = (kind: "added" | "removed") => lines().filter((line) => line.kind === kind).length;
   return (
     <WorkspaceDrawer kind="diff" close={props.close} mount={props.mount}>
       <header class="flex h-12 shrink-0 items-center justify-between border-b border-line pl-6 font-medium">

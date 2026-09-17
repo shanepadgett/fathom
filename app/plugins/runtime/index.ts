@@ -1,12 +1,7 @@
 import type { AssistantMessage, ToolCall } from "@earendil-works/pi-ai";
 
-import type {
-  Entry,
-  EntryAttachment,
-  RuntimeService,
-  ToolExecution,
-} from "../../sdk/mod.ts";
 import type { RunInput, ToolInput } from "../../sdk/hooks.ts";
+import type { Entry, EntryAttachment, RuntimeService, ToolExecution } from "../../sdk/mod.ts";
 
 import { calculateCost, clampThinkingLevel } from "@earendil-works/pi-ai";
 import { Value } from "typebox/value";
@@ -30,15 +25,7 @@ export default definePlugin({
   id: "fathom:runtime",
   apiVersion: 1,
   backend: {
-    requires: [
-      "storage",
-      "model",
-      "context",
-      "compaction",
-      "tools",
-      "approvals",
-      "events",
-    ],
+    requires: ["storage", "model", "context", "compaction", "tools", "approvals", "events"],
     provides: ["runtime"],
     activate(ctx) {
       const storage = ctx.get("storage"),
@@ -51,10 +38,8 @@ export default definePlugin({
       const active = new Map<string, ActiveRun>();
       const admitting = new Map<string, Promise<void>>();
       let disposing = false;
-      const queue = (id: string) =>
-        storage.setting<Queued[]>(`queue:${id}`, []);
-      const publish = (id: string) =>
-        events.publish({ type: "session", sessionId: id });
+      const queue = (id: string) => storage.setting<Queued[]>(`queue:${id}`, []);
+      const publish = (id: string) => events.publish({ type: "session", sessionId: id });
       const appendUser = (
         id: string,
         text: string,
@@ -87,9 +72,7 @@ export default definePlugin({
         const entries = storage.entries(sessionId);
         const results = new Set(
           entries.flatMap((entry) =>
-            entry.message?.role === "toolResult"
-              ? [entry.message.toolCallId]
-              : []
+            entry.message?.role === "toolResult" ? [entry.message.toolCallId] : [],
           ),
         );
         storage.transaction(() => {
@@ -98,11 +81,7 @@ export default definePlugin({
               storage.updateEntry(entry.id, { status: "interrupted" });
             }
             if (entry.message?.role !== "assistant") continue;
-            for (
-              const call of entry.message.content.filter((block) =>
-                block.type === "toolCall"
-              )
-            ) {
+            for (const call of entry.message.content.filter((block) => block.type === "toolCall")) {
               if (!results.has(call.id)) {
                 storage.append(sessionId, {
                   kind: "message",
@@ -111,11 +90,12 @@ export default definePlugin({
                     role: "toolResult",
                     toolCallId: call.id,
                     toolName: call.name,
-                    content: [{
-                      type: "text",
-                      text:
-                        "Interrupted before a result was recorded. This action was not re-executed.",
-                    }],
+                    content: [
+                      {
+                        type: "text",
+                        text: "Interrupted before a result was recorded. This action was not re-executed.",
+                      },
+                    ],
                     isError: true,
                     timestamp: Date.now(),
                   },
@@ -133,10 +113,9 @@ export default definePlugin({
             }
           }
           if (
-            ["running", "retry_waiting", "approval"].includes(
-              storage.getSession(sessionId).status,
-            )
-          ) storage.updateSession(sessionId, { status: "interrupted" });
+            ["running", "retry_waiting", "approval"].includes(storage.getSession(sessionId).status)
+          )
+            storage.updateSession(sessionId, { status: "interrupted" });
         });
       }
 
@@ -170,12 +149,11 @@ export default definePlugin({
               data: { callId: call.id, text },
             }),
         };
-        let result = "", isError = false;
+        let result = "",
+          isError = false;
         try {
           signal.throwIfAborted();
-          const tool = tools.list(sessionId).find((tool) =>
-            tool.name === call.name
-          );
+          const tool = tools.list(sessionId).find((tool) => tool.name === call.name);
           if (!tool) {
             throw new Error(`Tool is unavailable or disallowed: ${call.name}`);
           }
@@ -188,9 +166,7 @@ export default definePlugin({
           else {
             await approvals.request(
               input,
-              decision?.action === "prompt_user"
-                ? decision.explanation
-                : undefined,
+              decision?.action === "prompt_user" ? decision.explanation : undefined,
             );
             signal.throwIfAborted();
             await ctx.cordis.parallel("tool:execute", input);
@@ -204,13 +180,13 @@ export default definePlugin({
           result = signal.aborted
             ? "Tool execution cancelled by user."
             : error instanceof Error
-            ? error.message
-            : String(error);
+              ? error.message
+              : String(error);
         }
-        const bounded = result.length > 100_000
-          ? result.slice(0, 50_000) + "\n[Output truncated]\n" +
-            result.slice(-50_000)
-          : result;
+        const bounded =
+          result.length > 100_000
+            ? result.slice(0, 50_000) + "\n[Output truncated]\n" + result.slice(-50_000)
+            : result;
         storage.transaction(() => {
           storage.append(sessionId, {
             kind: "message",
@@ -226,11 +202,7 @@ export default definePlugin({
           });
           storage.saveExecution({
             ...execution,
-            status: signal.aborted
-              ? "aborted"
-              : isError
-              ? "error"
-              : "completed",
+            status: signal.aborted ? "aborted" : isError ? "error" : "completed",
             result: bounded,
             durationMs: Date.now() - execution.startedAt,
           });
@@ -253,16 +225,13 @@ export default definePlugin({
           while (!signal.aborted) {
             activity("Preparing context");
             if (++steps > storage.setting("maxSteps", 200)) {
-              throw new Error(
-                "Step limit reached. Continue to resume this task.",
-              );
+              throw new Error("Step limit reached. Continue to resume this task.");
             }
             flushSteering(sessionId);
             const model = await modelService.select(sessionId);
             const session = storage.getSession(sessionId);
-            if (
-              session.provider && session.provider !== model.provider
-            ) throw new Error("Fork this branch before switching provider");
+            if (session.provider && session.provider !== model.provider)
+              throw new Error("Fork this branch before switching provider");
             storage.updateSession(sessionId, {
               provider: model.provider,
               model: model.id,
@@ -281,8 +250,8 @@ export default definePlugin({
               };
               const outputLimit = Math.min(16384, model.maxTokens);
               const exceedsBudget = () =>
-                Math.ceil(JSON.stringify(input.context).length / 3) +
-                    outputLimit > model.contextWindow * 0.9;
+                Math.ceil(JSON.stringify(input.context).length / 3) + outputLimit >
+                model.contextWindow * 0.9;
               if (exceedsBudget()) {
                 if (compacted) {
                   throw new Error(
@@ -306,16 +275,12 @@ export default definePlugin({
               activity("Waiting for provider");
               const startedAt = Date.now();
               const reasoning = clampThinkingLevel(model, session.thinking);
-              const stream = modelService.models.streamSimple(
-                model,
-                input.context,
-                {
-                  signal,
-                  reasoning: reasoning === "off" ? undefined : reasoning,
-                  maxTokens: outputLimit,
-                  transport: "sse",
-                },
-              );
+              const stream = modelService.models.streamSimple(model, input.context, {
+                signal,
+                reasoning: reasoning === "off" ? undefined : reasoning,
+                maxTokens: outputLimit,
+                transport: "sse",
+              });
               let checkpoint = Date.now();
               for await (const event of stream) {
                 if (event.type.endsWith("_delta")) {
@@ -343,21 +308,24 @@ export default definePlugin({
                 }
               }
               reply = await stream.result();
-              const status = signal.aborted || reply.stopReason === "aborted"
-                ? "interrupted"
-                : reply.stopReason === "error"
-                ? "error"
-                : "completed";
+              const status =
+                signal.aborted || reply.stopReason === "aborted"
+                  ? "interrupted"
+                  : reply.stopReason === "error"
+                    ? "error"
+                    : "completed";
               if (entryId) {
                 storage.updateEntry(entryId, {
                   message: reply,
                   status,
                 });
-              } else {entryId = storage.append(sessionId, {
+              } else {
+                entryId = storage.append(sessionId, {
                   kind: "message",
                   status,
                   message: reply,
-                }).id;}
+                }).id;
+              }
               calculateCost(model, reply.usage);
               storage.recordUsage({
                 id: crypto.randomUUID(),
@@ -373,11 +341,7 @@ export default definePlugin({
               if (reply.stopReason === "aborted") run.controller.abort();
               signal.throwIfAborted();
               if (reply.stopReason !== "error") break;
-              for (
-                const call of reply.content.filter((block) =>
-                  block.type === "toolCall"
-                )
-              ) {
+              for (const call of reply.content.filter((block) => block.type === "toolCall")) {
                 storage.append(sessionId, {
                   kind: "message",
                   status: "error",
@@ -385,19 +349,21 @@ export default definePlugin({
                     role: "toolResult",
                     toolCallId: call.id,
                     toolName: call.name,
-                    content: [{
-                      type: "text",
-                      text:
-                        "Provider generation failed. This tool was not executed.",
-                    }],
+                    content: [
+                      {
+                        type: "text",
+                        text: "Provider generation failed. This tool was not executed.",
+                      },
+                    ],
                     isError: true,
                     timestamp: Date.now(),
                   },
                 });
               }
               if (
-                /context_length_exceeded|maximum context length|context window|prompt is too long|input.{0,30}exceed.{0,30}token/i
-                  .test(reply.errorMessage ?? "")
+                /context_length_exceeded|maximum context length|context window|prompt is too long|input.{0,30}exceed.{0,30}token/i.test(
+                  reply.errorMessage ?? "",
+                )
               ) {
                 if (compacted) {
                   throw new Error(
@@ -412,15 +378,14 @@ export default definePlugin({
                 continue;
               }
               if (
-                !/429|503|rate.limit|overloaded|capacity|network|fetch failed/i
-                  .test(reply.errorMessage ?? "") || attempt === 4
+                !/429|503|rate.limit|overloaded|capacity|network|fetch failed/i.test(
+                  reply.errorMessage ?? "",
+                ) ||
+                attempt === 4
               ) {
-                throw new Error(
-                  reply.errorMessage ?? "Provider request failed",
-                );
+                throw new Error(reply.errorMessage ?? "Provider request failed");
               }
-              const delay = Math.min(30_000, 1000 * 2 ** attempt) +
-                Math.random() * 500;
+              const delay = Math.min(30_000, 1000 * 2 ** attempt) + Math.random() * 500;
               storage.updateSession(sessionId, { status: "retry_waiting" });
               activity("Waiting to retry");
               events.publish({
@@ -443,21 +408,15 @@ export default definePlugin({
               entryId = undefined;
             }
             if (!reply || !entryId) {
-              throw new Error(
-                "Provider returned no response",
-              );
+              throw new Error("Provider returned no response");
             }
-            const calls = reply.content.filter((block) =>
-              block.type === "toolCall"
-            );
+            const calls = reply.content.filter((block) => block.type === "toolCall");
             const mode = storage.setting<string>("toolExecution", "adaptive");
             if (calls.length) activity("Executing tools");
             let batch: Promise<void>[] = [];
             for (const call of calls) {
-              if (
-                mode === "parallel" ||
-                (mode === "adaptive" && tools.get(call.name)?.readOnly)
-              ) batch.push(execute(sessionId, entryId, call, signal));
+              if (mode === "parallel" || (mode === "adaptive" && tools.get(call.name)?.readOnly))
+                batch.push(execute(sessionId, entryId, call, signal));
               else {
                 await Promise.all(batch);
                 batch = [];
@@ -484,14 +443,9 @@ export default definePlugin({
               );
               continue;
             }
-            if (
-              !calls.length &&
-              !queue(sessionId).some((item) => item.mode === "steer")
-            ) {
+            if (!calls.length && !queue(sessionId).some((item) => item.mode === "steer")) {
               if (reply.stopReason === "length") {
-                throw new Error(
-                  "Response reached its output limit. Continue to resume.",
-                );
+                throw new Error("Response reached its output limit. Continue to resume.");
               }
               break;
             }
@@ -526,18 +480,13 @@ export default definePlugin({
           reconcile(sessionId);
           publish(sessionId);
           const settled = storage.getSession(sessionId);
-          if (
-            !disposing &&
-            ["idle", "error", "interrupted"].includes(settled.status)
-          ) {
+          if (!disposing && ["idle", "error", "interrupted"].includes(settled.status)) {
             events.publish({
               type: "attention",
               sessionId,
               data: {
                 kind: settled.status === "idle" ? "success" : "error",
-                title: settled.status === "idle"
-                  ? "Fathom finished"
-                  : "Fathom needs attention",
+                title: settled.status === "idle" ? "Fathom finished" : "Fathom needs attention",
                 body: settled.title,
               },
             });
@@ -551,19 +500,10 @@ export default definePlugin({
               data: { message: `Idle hook failed: ${error}` },
             });
           }
-          if (
-            !disposing && !signal.aborted &&
-            storage.getSession(sessionId).status === "idle"
-          ) {
+          if (!disposing && !signal.aborted && storage.getSession(sessionId).status === "idle") {
             const next = queue(sessionId)[0];
             if (next) {
-              await submit(
-                sessionId,
-                next.text,
-                undefined,
-                next.attachments,
-                next.id,
-              );
+              await submit(sessionId, next.text, undefined, next.attachments, next.id);
             }
           }
         }
@@ -592,19 +532,20 @@ export default definePlugin({
         queuedId?: string,
       ) {
         if (!text.trim() || text.length > 200_000) {
-          throw new Error(
-            "Enter a prompt of at most 200,000 characters",
-          );
+          throw new Error("Enter a prompt of at most 200,000 characters");
         }
         storage.getSession(sessionId);
         if (active.has(sessionId) || admitting.has(sessionId)) {
           if (queuedId) return;
-          storage.setSetting(`queue:${sessionId}`, [...queue(sessionId), {
-            id: crypto.randomUUID(),
-            text,
-            mode,
-            attachments,
-          }]);
+          storage.setSetting(`queue:${sessionId}`, [
+            ...queue(sessionId),
+            {
+              id: crypto.randomUUID(),
+              text,
+              mode,
+              attachments,
+            },
+          ]);
           if (mode === "steer") active.get(sessionId)?.wake?.();
           publish(sessionId);
           return;
@@ -620,9 +561,7 @@ export default definePlugin({
           await ctx.cordis.serial("run:admit", input);
           storage.transaction(() => {
             if (queuedId) {
-              const current = queue(sessionId).find((item) =>
-                item.id === queuedId
-              );
+              const current = queue(sessionId).find((item) => item.id === queuedId);
               if (!current || current.text !== text) {
                 throw new Error(
                   "Queued message changed during admission. Review the queue before continuing.",
@@ -633,19 +572,13 @@ export default definePlugin({
                 queue(sessionId).filter((item) => item.id !== queuedId),
               );
             }
-            const entry = appendUser(
-              sessionId,
-              input.text,
-              input.attachments,
-            );
+            const entry = appendUser(sessionId, input.text, input.attachments);
             if (input.snapshotTreeId) {
               storage.updateEntry(entry.id, {
                 snapshotTreeId: input.snapshotTreeId,
               });
             }
-            if (
-              storage.getSession(sessionId).title === "New session"
-            ) {
+            if (storage.getSession(sessionId).title === "New session") {
               storage.updateSession(sessionId, {
                 title: input.text.slice(0, 70),
               });
@@ -678,38 +611,26 @@ export default definePlugin({
             `queue:${sessionId}`,
             text === null
               ? pending.filter((item) => item.id !== id)
-              : pending.map((item) =>
-                item.id === id ? { ...item, text } : item
-              ),
+              : pending.map((item) => (item.id === id ? { ...item, text } : item)),
           );
           publish(sessionId);
         },
         submit,
         async sendQueued(sessionId, id) {
           if (active.has(sessionId) || admitting.has(sessionId)) {
-            throw new Error(
-              "Wait for the current run to finish before sending queued work.",
-            );
+            throw new Error("Wait for the current run to finish before sending queued work.");
           }
           const item = queue(sessionId).find((item) => item.id === id);
           if (!item) {
             throw new Error("This message has already left the queue.");
           }
-          await submit(
-            sessionId,
-            item.text,
-            item.mode,
-            item.attachments,
-            item.id,
-          );
+          await submit(sessionId, item.text, item.mode, item.attachments, item.id);
         },
         async resume(sessionId) {
           if (active.has(sessionId) || admitting.has(sessionId)) return;
           reconcile(sessionId);
           if (!storage.entries(sessionId).length) {
-            throw new Error(
-              "Send a prompt to start this session",
-            );
+            throw new Error("Send a prompt to start this session");
           }
           start(sessionId);
         },
@@ -724,9 +645,10 @@ export default definePlugin({
           reconcile(sessionId);
           const session = storage.getSession(sessionId);
           return {
-            session: admitting.has(sessionId) && !active.has(sessionId)
-              ? { ...session, status: "running" as const }
-              : session,
+            session:
+              admitting.has(sessionId) && !active.has(sessionId)
+                ? { ...session, status: "running" as const }
+                : session,
             entries: storage.entries(sessionId),
             executions: storage.executions(sessionId),
             queued: queue(sessionId),

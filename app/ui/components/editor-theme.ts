@@ -60,7 +60,7 @@ export function editorTheme(element: HTMLElement, mode: string) {
         "symbolIcon.stringForeground": tokens.success,
         "symbolIcon.numberForeground": tokens.warning,
         "symbolIcon.keywordForeground": tokens.action,
-        "focusBorder": tokens.action,
+        focusBorder: tokens.action,
         "diffEditor.insertedTextBackground": tokens.success + "26",
         "diffEditor.removedTextBackground": tokens.danger + "26",
         "diffEditor.insertedLineBackground": tokens.success + "1a",

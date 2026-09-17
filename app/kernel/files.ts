@@ -65,11 +65,7 @@ export function atomicWrite(
 }
 
 /** Publish a fully written file without replacing any existing destination. */
-export function atomicCreate(
-  path: string,
-  content: string | Uint8Array,
-  mode = 0o644,
-) {
+export function atomicCreate(path: string, content: string | Uint8Array, mode = 0o644) {
   return writeAtomically(path, content, mode, false);
 }
 

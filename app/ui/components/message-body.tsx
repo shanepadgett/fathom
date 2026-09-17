@@ -1,18 +1,18 @@
-import { AnnotationSummary } from "./annotation-summary.tsx";
-import { MessagePreview } from "./message-preview.tsx";
-import type { Entry } from "../../sdk/session.ts";
+import type { Artifact } from "../../sdk/artifacts.ts";
 import type { MediaAsset } from "../../sdk/media.ts";
+import type { Entry } from "../../sdk/session.ts";
 import type { UIHost } from "../host.ts";
 
 import { For, Index, Match, Show, Switch } from "solid-js";
 
-import { Disclosure } from "./disclosure.tsx";
-import { Markdown } from "./markdown.tsx";
-import { ResponseStatus } from "./response-status.tsx";
-import { MediaPreview } from "./media-preview.tsx";
+import { AnnotationSummary } from "./annotation-summary.tsx";
 import { ArtifactCard } from "./artifact-card.tsx";
 import { CompactionNotice } from "./compaction-notice.tsx";
-import type { Artifact } from "../../sdk/artifacts.ts";
+import { Disclosure } from "./disclosure.tsx";
+import { Markdown } from "./markdown.tsx";
+import { MediaPreview } from "./media-preview.tsx";
+import { MessagePreview } from "./message-preview.tsx";
+import { ResponseStatus } from "./response-status.tsx";
 
 function ThinkingBlock(props: { text: string; open: boolean }) {
   return (
@@ -24,28 +24,26 @@ function ThinkingBlock(props: { text: string; open: boolean }) {
   );
 }
 
-export function MessageBody(
-  props: {
-    entry: Entry;
-    artifact?: Artifact;
-    detailed: boolean;
-    projectId: string;
-    host: UIHost;
-    openArtifact(id: string): void;
-  },
-) {
+export function MessageBody(props: {
+  entry: Entry;
+  artifact?: Artifact;
+  detailed: boolean;
+  projectId: string;
+  host: UIHost;
+  openArtifact(id: string): void;
+}) {
   const blocks = () => {
     const content = props.entry.message?.content;
     return typeof content === "string"
       ? [{ type: "text" as const, text: content }]
-      : content ?? [];
+      : (content ?? []);
   };
   const media = (asset: MediaAsset) => (
     <MediaPreview
       asset={asset}
-      url={`/media/${encodeURIComponent(props.projectId)}/${
-        encodeURIComponent(props.entry.sessionId)
-      }/${encodeURIComponent(asset.id)}`}
+      url={`/media/${encodeURIComponent(props.projectId)}/${encodeURIComponent(
+        props.entry.sessionId,
+      )}/${encodeURIComponent(asset.id)}`}
       save={async (path) => {
         await props.host.request("media.materialize", {
           projectId: props.projectId,
@@ -61,24 +59,19 @@ export function MessageBody(
   const annotationCount = () =>
     props.entry.attachments?.reduce((count, item) => {
       const ids =
-        (item.type === "artifact-feedback" || item.type === "browser-feedback")
+        item.type === "artifact-feedback" || item.type === "browser-feedback"
           ? (item.data as { ids?: unknown })?.ids
           : undefined;
-      return count +
-        (Array.isArray(ids)
-          ? new Set(ids.filter((id) => typeof id === "string")).size
-          : 0);
+      return (
+        count + (Array.isArray(ids) ? new Set(ids.filter((id) => typeof id === "string")).size : 0)
+      );
     }, 0) ?? 0;
   const artifact = () => props.artifact;
   return (
     <div class="space-y-4">
       <Show when={attachedMedia().length}>
         <div class="mb-3 flex flex-wrap gap-3">
-          <For
-            each={attachedMedia()}
-          >
-            {(item) => media(item.data as MediaAsset)}
-          </For>
+          <For each={attachedMedia()}>{(item) => media(item.data as MediaAsset)}</For>
         </div>
       </Show>
       <AnnotationSummary count={annotationCount()} />
@@ -103,16 +96,9 @@ export function MessageBody(
       </MessagePreview>
       <ResponseStatus entry={props.entry} />
       <Show when={props.entry.custom}>
-        <Switch
-          fallback={
-            <pre>{JSON.stringify(props.entry.custom?.data, null, 2)}</pre>
-          }
-        >
+        <Switch fallback={<pre>{JSON.stringify(props.entry.custom?.data, null, 2)}</pre>}>
           <Match when={props.entry.custom?.type === "compaction"}>
-            <CompactionNotice
-              data={props.entry.custom?.data}
-              detailed={props.detailed}
-            />
+            <CompactionNotice data={props.entry.custom?.data} detailed={props.detailed} />
           </Match>
           <Match when={props.entry.custom?.type === "media"}>
             {media(props.entry.custom!.data as MediaAsset)}
@@ -126,7 +112,8 @@ export function MessageBody(
                       projectId: props.projectId,
                       sessionId: props.host.session()?.session.id,
                       id: value().id,
-                    })}
+                    })
+                  }
                   artifact={value()}
                   open={() => props.openArtifact(value().id)}
                 />

@@ -9,15 +9,13 @@ import { DiffDrawer } from "./diff-drawer.tsx";
 import { Button } from "./primitives.tsx";
 
 /** Workspace review stays separate from commit planning and repository management. */
-export function WorkspaceChanges(
-  props: {
-    transport: Transport;
-    theme: string;
-    initialPath?: string;
-    close(): void;
-    commits(): void;
-  },
-) {
+export function WorkspaceChanges(props: {
+  transport: Transport;
+  theme: string;
+  initialPath?: string;
+  close(): void;
+  commits(): void;
+}) {
   const projectId = props.transport.projectId;
   const [status, setStatus] = createSignal<GitState>();
   const [loading, setLoading] = createSignal(false);
@@ -66,10 +64,7 @@ export function WorkspaceChanges(
           <Show
             when={review.document()}
             fallback={
-              <Button
-                disabled={loading()}
-                onClick={() => void refresh()}
-              >
+              <Button disabled={loading()} onClick={() => void refresh()}>
                 Refresh files
               </Button>
             }

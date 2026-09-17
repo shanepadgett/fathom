@@ -12,11 +12,7 @@ export function MessageCard(props: {
   children: JSX.Element;
 }) {
   return (
-    <article
-      ref={props.ref}
-      tabIndex={-1}
-      class="group min-w-0 break-words scroll-mt-6"
-    >
+    <article ref={props.ref} tabIndex={-1} class="group min-w-0 break-words scroll-mt-6">
       <MessageHeader
         author={props.author}
         agent={props.agent}

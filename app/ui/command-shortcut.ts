@@ -7,12 +7,13 @@ export interface CommandShortcut {
 }
 
 export function commandShortcut(value: string): CommandShortcut {
-  const parts = value.toLowerCase().split("+").map((part) => part.trim());
+  const parts = value
+    .toLowerCase()
+    .split("+")
+    .map((part) => part.trim());
   const key = parts.pop() ?? "";
   if (!/^[a-z0-9,./;=-]$/.test(key)) {
-    throw new Error(
-      "Command shortcuts require a letter, digit or punctuation key",
-    );
+    throw new Error("Command shortcuts require a letter, digit or punctuation key");
   }
   const mac = /mac/i.test(navigator.platform);
   const binding: CommandShortcut = {
@@ -23,11 +24,14 @@ export function commandShortcut(value: string): CommandShortcut {
     shift: false,
   };
   for (const part of parts) {
-    const modifier = part === "mod" || part === "cmdorctrl"
-      ? mac ? "meta" : "ctrl"
-      : part === "cmd"
-      ? "meta"
-      : part;
+    const modifier =
+      part === "mod" || part === "cmdorctrl"
+        ? mac
+          ? "meta"
+          : "ctrl"
+        : part === "cmd"
+          ? "meta"
+          : part;
     if (!["ctrl", "meta", "alt", "shift"].includes(modifier)) {
       throw new Error(`Unknown shortcut modifier: ${part}`);
     }
@@ -41,21 +45,20 @@ export function commandShortcut(value: string): CommandShortcut {
   return binding;
 }
 
-export function shortcutMatches(
-  binding: CommandShortcut,
-  event: KeyboardEvent,
-) {
+export function shortcutMatches(binding: CommandShortcut, event: KeyboardEvent) {
   // Physical letter/digit codes keep Alt and Shift from changing the key on macOS.
   const code = /^[a-z]$/.test(binding.key)
     ? `Key${binding.key.toUpperCase()}`
     : /^[0-9]$/.test(binding.key)
-    ? `Digit${binding.key}`
-    : undefined;
-  return (code
-    ? event.code === code
-    : event.key.toLowerCase() === binding.key) &&
-    event.ctrlKey === binding.ctrl && event.metaKey === binding.meta &&
-    event.altKey === binding.alt && event.shiftKey === binding.shift;
+      ? `Digit${binding.key}`
+      : undefined;
+  return (
+    (code ? event.code === code : event.key.toLowerCase() === binding.key) &&
+    event.ctrlKey === binding.ctrl &&
+    event.metaKey === binding.meta &&
+    event.altKey === binding.alt &&
+    event.shiftKey === binding.shift
+  );
 }
 
 export function shortcutIdentity(binding: CommandShortcut) {
@@ -63,7 +66,9 @@ export function shortcutIdentity(binding: CommandShortcut) {
 }
 
 export function reservedShortcut(binding: CommandShortcut) {
-  return !binding.alt && !binding.shift &&
-    ["a", "c", "f", "i", "j", "k", "n", "o", "q", "s", "v", "x", "z", ","]
-      .includes(binding.key);
+  return (
+    !binding.alt &&
+    !binding.shift &&
+    ["a", "c", "f", "i", "j", "k", "n", "o", "q", "s", "v", "x", "z", ","].includes(binding.key)
+  );
 }

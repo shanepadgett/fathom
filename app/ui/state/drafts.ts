@@ -16,18 +16,21 @@ export function createDraftStore(transport: Transport) {
     if (!id) return;
     projects.set(id, projectId);
     if (Object.hasOwn(drafts(), id) || loading.has(id)) return;
-    const pending = transport.request<string>("session.draft.get", {
-      sessionId: id,
-      projectId,
-    }).then((value) => {
-      setDrafts((values) =>
-        Object.hasOwn(values, id) ? values : { ...values, [id]: value }
-      );
-      error(id, "");
-    }).catch(() => error(id, "Saved draft could not be loaded.")).finally(() =>
-      loading.delete(id)
+    const pending = transport
+      .request<string>("session.draft.get", {
+        sessionId: id,
+        projectId,
+      })
+      .then((value) => {
+        setDrafts((values) => (Object.hasOwn(values, id) ? values : { ...values, [id]: value }));
+        error(id, "");
+      })
+      .catch(() => error(id, "Saved draft could not be loaded."))
+      .finally(() => loading.delete(id));
+    loading.set(
+      id,
+      pending.then(() => {}),
     );
-    loading.set(id, pending.then(() => {}));
   }
 
   function update(id: string, change: (previous: string) => string) {
@@ -35,25 +38,26 @@ export function createDraftStore(transport: Transport) {
     if (!id || !projectId) return;
     const value = change(drafts()[id] ?? "");
     setDrafts((values) => ({ ...values, [id]: value }));
-    const pending = (writes.get(id) ?? Promise.resolve()).catch(() => {}).then(
-      async () => {
+    const pending = (writes.get(id) ?? Promise.resolve())
+      .catch(() => {})
+      .then(async () => {
         await transport.request("session.draft.set", {
           sessionId: id,
           projectId,
           text: value,
         });
-      },
-    );
+      });
     writes.set(id, pending);
-    void pending.then(
-      () => {
-        if (writes.get(id) === pending) error(id, "");
-      },
-      () =>
-        error(id, "Draft could not be saved. Copy your text before closing."),
-    ).finally(() => {
-      if (writes.get(id) === pending) writes.delete(id);
-    });
+    void pending
+      .then(
+        () => {
+          if (writes.get(id) === pending) error(id, "");
+        },
+        () => error(id, "Draft could not be saved. Copy your text before closing."),
+      )
+      .finally(() => {
+        if (writes.get(id) === pending) writes.delete(id);
+      });
   }
 
   return {

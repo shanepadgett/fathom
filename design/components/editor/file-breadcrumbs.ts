@@ -19,12 +19,12 @@ export class BreadcrumbsElement extends DesignElement {
         class="flex h-9 shrink-0 items-center gap-1 overflow-hidden border-b border-line px-4 text-sm text-muted"
       >
         ${path.map(
-          (part, index) =>
-            html`
-              ${index ? html`<span aria-hidden="true">/</span>` : ""}<span
-                class="truncate ${index === path.length - 1 ? "text-ink" : ""}"
-              >${part}</span>
-            `,
+          (part, index) => html`
+            ${index ? html`<span aria-hidden="true">/</span>` : ""}<span
+              class="truncate ${index === path.length - 1 ? "text-ink" : ""}"
+              >${part}</span
+            >
+          `,
         )}
       </p>
     `;

@@ -3,13 +3,7 @@ import MarkdownIt from "markdown-it";
 const markdown = new MarkdownIt({ html: false, linkify: true, breaks: false });
 markdown.disable("image");
 const renderLink = markdown.renderer.rules.link_open;
-markdown.renderer.rules.link_open = (
-  tokens,
-  index,
-  options,
-  environment,
-  self,
-) => {
+markdown.renderer.rules.link_open = (tokens, index, options, environment, self) => {
   tokens[index].attrSet("rel", "noopener noreferrer");
   tokens[index].attrSet("target", "_blank");
   return renderLink

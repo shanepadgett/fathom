@@ -4,10 +4,7 @@ import { spawn } from "node:child_process";
 import process from "node:process";
 
 /** Children must be spawned detached on Unix to own their process group. */
-export function signalProcessGroup(
-  child: ChildProcess,
-  signal: NodeJS.Signals,
-): void {
+export function signalProcessGroup(child: ChildProcess, signal: NodeJS.Signals): void {
   try {
     if (!child.pid) return;
     if (process.platform === "win32") child.kill(signal);
@@ -17,14 +14,18 @@ export function signalProcessGroup(
   }
 }
 
-export async function captureProcess(command: string, args: string[], options: {
-  cwd: string;
-  env?: Record<string, string>;
-  input?: string;
-  signal: AbortSignal;
-  timeoutMs?: number;
-  maxBytes?: number;
-}): Promise<{ code: number; stdout: string; stderr: string }> {
+export async function captureProcess(
+  command: string,
+  args: string[],
+  options: {
+    cwd: string;
+    env?: Record<string, string>;
+    input?: string;
+    signal: AbortSignal;
+    timeoutMs?: number;
+    maxBytes?: number;
+  },
+): Promise<{ code: number; stdout: string; stderr: string }> {
   options.signal.throwIfAborted();
   const child = spawn(command, args, {
     cwd: options.cwd,
@@ -37,7 +38,8 @@ export async function captureProcess(command: string, args: string[], options: {
   let bytes = 0;
   let failure: Error | undefined;
   let escalation: ReturnType<typeof setTimeout> | undefined;
-  const stdout: Buffer[] = [], stderr: Buffer[] = [];
+  const stdout: Buffer[] = [],
+    stderr: Buffer[] = [];
   const stop = (error: Error) => {
     if (failure) return;
     failure = error;
@@ -61,10 +63,7 @@ export async function captureProcess(command: string, args: string[], options: {
   options.signal.addEventListener("abort", abort, { once: true });
   if (options.signal.aborted) abort();
   const timer = setTimeout(
-    () =>
-      stop(
-        new Error(`${command} timed out after ${timeoutMs / 1000} seconds.`),
-      ),
+    () => stop(new Error(`${command} timed out after ${timeoutMs / 1000} seconds.`)),
     timeoutMs,
   );
   try {

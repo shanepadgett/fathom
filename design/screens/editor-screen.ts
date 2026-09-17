@@ -1,14 +1,14 @@
 import { html, nothing } from "lit";
 
-import { DesignElement } from "../foundation/design-element.ts";
 import { codeLines } from "../fixtures/code.ts";
+import { systemStatus } from "../fixtures/system-status.ts";
 import "../components/messages/conversation-pane.ts";
 import "../components/editor/editor-pane.ts";
 import "../components/navigation/files-sidebar.ts";
 import "../components/workspace/workspace-header.ts";
 import "../components/workspace/workspace-status-bar.ts";
-import { systemStatus } from "../fixtures/system-status.ts";
 import { scenario } from "../fixtures/workspace-scenario.ts";
+import { DesignElement } from "../foundation/design-element.ts";
 import "../layouts/workspace-drawer.ts";
 import "../layouts/workspace-layout.ts";
 import "../layouts/workspace-sidebar.ts";
@@ -56,23 +56,24 @@ export class EditorScreen extends DesignElement {
             .context=${scenario.context}
           ></workspace-status-bar>
 
-          ${this.state === "agent"
-            ? html`
-              <div class="workspace-scrim">
-                <workspace-drawer kind="conversation" role="region"
-                  aria-label="Agent overlay">
-                  <conversation-pane
-                    .title=${scenario.selectedChat.title}
-                    .messages=${scenario.messages}
-                    .changes=${scenario.changes}
-                    .model=${scenario.model}
-                    .reasoning=${scenario.reasoning}
-                    presentation="drawer"
-                  ></conversation-pane>
-                </workspace-drawer>
-              </div>
-            `
-            : nothing}
+          ${
+            this.state === "agent"
+              ? html`
+                  <div class="workspace-scrim">
+                    <workspace-drawer kind="conversation" role="region" aria-label="Agent overlay">
+                      <conversation-pane
+                        .title=${scenario.selectedChat.title}
+                        .messages=${scenario.messages}
+                        .changes=${scenario.changes}
+                        .model=${scenario.model}
+                        .reasoning=${scenario.reasoning}
+                        presentation="drawer"
+                      ></conversation-pane>
+                    </workspace-drawer>
+                  </div>
+                `
+              : nothing
+          }
         </workspace-layout>
       </div>
     `;

@@ -2,9 +2,11 @@ import { createSignal, Show } from "solid-js";
 
 import { Button } from "./primitives.tsx";
 
-export function ArtifactApproval(
-  props: { disabled?: boolean; approve(): Promise<unknown>; approved?(): void },
-) {
+export function ArtifactApproval(props: {
+  disabled?: boolean;
+  approve(): Promise<unknown>;
+  approved?(): void;
+}) {
   const [busy, setBusy] = createSignal(false);
   const [complete, setComplete] = createSignal(false);
   const [error, setError] = createSignal("");
@@ -32,7 +34,9 @@ export function ArtifactApproval(
         {busy() ? "Approving…" : complete() ? "Approved" : "Approve & proceed"}
       </Button>
       <Show when={error()}>
-        <p role="alert" class="text-sm text-danger">{error()}</p>
+        <p role="alert" class="text-sm text-danger">
+          {error()}
+        </p>
       </Show>
     </div>
   );

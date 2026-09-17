@@ -1,18 +1,10 @@
 import type { JSX } from "solid-js";
 
-import {
-  createSignal,
-  createUniqueId,
-  onCleanup,
-  onMount,
-  Show,
-} from "solid-js";
+import { createSignal, createUniqueId, onCleanup, onMount, Show } from "solid-js";
 
 import { Button } from "./primitives.tsx";
 
-export function MessagePreview(
-  props: { collapsible: boolean; children: JSX.Element },
-) {
+export function MessagePreview(props: { collapsible: boolean; children: JSX.Element }) {
   const id = createUniqueId();
   const [expanded, setExpanded] = createSignal(false);
   const [overflows, setOverflows] = createSignal(false);
@@ -20,8 +12,7 @@ export function MessagePreview(
   onMount(() => {
     const measure = () => {
       const style = getComputedStyle(content);
-      const lineHeight = parseFloat(style.lineHeight) ||
-        parseFloat(style.fontSize) * 1.5;
+      const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.5;
       setOverflows(content.scrollHeight > lineHeight * 5 + 1);
     };
     const observer = new ResizeObserver(measure);

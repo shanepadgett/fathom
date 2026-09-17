@@ -17,9 +17,9 @@ export function orderPlugins(plugins: FathomPlugin[]) {
     for (const key of plugin.backend?.provides ?? []) {
       if (providers.has(key)) {
         throw new Error(
-          `Service ${key} supplied by both ${
-            providers.get(key)
-          } and ${plugin.id}; disable one provider`,
+          `Service ${key} supplied by both ${providers.get(
+            key,
+          )} and ${plugin.id}; disable one provider`,
         );
       }
       providers.set(key, plugin.id);
@@ -30,20 +30,18 @@ export function orderPlugins(plugins: FathomPlugin[]) {
   const ordered: FathomPlugin[] = [];
   while (pending.length) {
     const index = pending.findIndex((p) =>
-      (p.backend?.requires ?? []).every((key) => available.has(key))
+      (p.backend?.requires ?? []).every((key) => available.has(key)),
     );
     if (index === -1) {
       throw new Error(
-        `Missing or cyclic dependencies: ${
-          pending.map((p) =>
-            `${p.id} requires ${
-              (p.backend?.requires ?? []).filter((k) => !available.has(k))
-                .join(
-                  ", ",
-                )
-            }`
-          ).join("; ")
-        }`,
+        `Missing or cyclic dependencies: ${pending
+          .map(
+            (p) =>
+              `${p.id} requires ${(p.backend?.requires ?? [])
+                .filter((k) => !available.has(k))
+                .join(", ")}`,
+          )
+          .join("; ")}`,
       );
     }
     const [plugin] = pending.splice(index, 1);
@@ -72,9 +70,7 @@ export class PluginHost {
               cordis,
               get(key) {
                 if (!backend.requires?.includes(key)) {
-                  throw new Error(
-                    `${plugin.id} must declare dependency ${key}`,
-                  );
+                  throw new Error(`${plugin.id} must declare dependency ${key}`);
                 }
                 return cordis.get(`fathom:${key}`, true);
               },

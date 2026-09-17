@@ -1,48 +1,37 @@
-import { createFileReview } from "../state/file-review.ts";
-import type {
-  CommitGroup as Commit,
-  CommitPlan,
-  GitState,
-} from "../../sdk/git.ts";
-
+import type { CommitGroup as Commit, CommitPlan, GitState } from "../../sdk/git.ts";
 import type { Transport } from "../transport.ts";
 
 import { createResource, createSignal, For, Show } from "solid-js";
 
+import { createFileReview } from "../state/file-review.ts";
 import { ChangedFileList } from "./changed-file-list.tsx";
 import { CommitPlanEditor } from "./commit-plan-editor.tsx";
 import { FileDiff } from "./file-diff.tsx";
 import { Button, Field, Modal } from "./primitives.tsx";
 
-export function GitStudio(
-  props: {
-    transport: Transport;
-    sessionId: string;
-    theme: string;
-    close(): void;
-    openProject(path: string): Promise<void>;
-  },
-) {
+export function GitStudio(props: {
+  transport: Transport;
+  sessionId: string;
+  theme: string;
+  close(): void;
+  openProject(path: string): Promise<void>;
+}) {
   const [status, { refetch }] = createResource(() =>
-    props.transport.request<GitState>("git.status")
+    props.transport.request<GitState>("git.status"),
   );
   const [branches, { refetch: refreshBranches }] = createResource(() =>
-    props.transport.request<string[]>("git.branches")
+    props.transport.request<string[]>("git.branches"),
   );
   const [worktrees, { refetch: refreshWorktrees }] = createResource(() =>
-    props.transport.request<{ worktree: string; branch?: string }[]>(
-      "git.worktrees",
-    )
+    props.transport.request<{ worktree: string; branch?: string }[]>("git.worktrees"),
   );
   const [commits, setCommits] = createSignal<Commit[]>([]),
     [version, setVersion] = createSignal("");
   const [busy, setBusy] = createSignal(false),
     [name, setName] = createSignal("");
   const [failure, setFailure] = createSignal("");
-  const review = createFileReview(
-    props.transport,
-    (error) =>
-      setFailure(error instanceof Error ? error.message : String(error)),
+  const review = createFileReview(props.transport, (error) =>
+    setFailure(error instanceof Error ? error.message : String(error)),
   );
   const diff = review.document;
   const refresh = async () => {
@@ -97,9 +86,9 @@ export function GitStudio(
               <For
                 each={[
                   ...new Set(
-                    [status()?.branch, ...(branches() ?? [])].filter((
-                      branch,
-                    ): branch is string => !!branch),
+                    [status()?.branch, ...(branches() ?? [])].filter(
+                      (branch): branch is string => !!branch,
+                    ),
                   ),
                 ]}
               >
@@ -122,7 +111,8 @@ export function GitStudio(
                   branch: name(),
                 });
                 await refresh();
-              })}
+              })
+            }
           >
             New branch
           </Button>
@@ -134,7 +124,8 @@ export function GitStudio(
                   name: name(),
                 });
                 await refresh();
-              })}
+              })
+            }
           >
             New worktree
           </Button>
@@ -150,7 +141,8 @@ export function GitStudio(
                     void act(async () => {
                       await props.openProject(tree.worktree);
                       props.close();
-                    })}
+                    })
+                  }
                 >
                   Open
                 </Button>
@@ -158,10 +150,7 @@ export function GitStudio(
             )}
           </For>
         </details>
-        <div
-          class="max-h-64 overflow-auto"
-          aria-label="Files available for commit review"
-        >
+        <div class="max-h-64 overflow-auto" aria-label="Files available for commit review">
           <ChangedFileList
             files={status()?.files ?? []}
             selected={diff()?.path ?? ""}
@@ -188,43 +177,32 @@ export function GitStudio(
             disabled={busy() || !status()?.files.length}
             onClick={() =>
               void act(async () => {
-                const plan = await props.transport.request<CommitPlan>(
-                  "git.planCommits",
-                  { sessionId: props.sessionId },
-                );
+                const plan = await props.transport.request<CommitPlan>("git.planCommits", {
+                  sessionId: props.sessionId,
+                });
                 setVersion(plan.version);
                 setCommits(plan.commits);
-              })}
+              })
+            }
           >
             {busy() ? "Working…" : "Plan atomic commits"}
           </Button>
         </div>
-        <CommitPlanEditor
-          commits={commits()}
-          disabled={busy()}
-          onChange={setCommits}
-        />
+        <CommitPlanEditor commits={commits()} disabled={busy()} onChange={setCommits} />
         <Show when={commits().length}>
           <p class="muted">
-            Commits include the complete working copy of each listed file.
-            Review the file allocation and messages before executing.
+            Commits include the complete working copy of each listed file. Review the file
+            allocation and messages before executing.
           </p>
           <div class="actions">
-            <Button
-              variant="primary"
-              disabled={busy()}
-              onClick={() => void act(() => execute())}
-            >
+            <Button variant="primary" disabled={busy()} onClick={() => void act(() => execute())}>
               Execute commits
             </Button>
             <Button
               disabled={busy()}
               onClick={() => {
-                if (
-                  confirm(
-                    "Create these commits and push them to the tracking remote?",
-                  )
-                ) void act(() => execute(true));
+                if (confirm("Create these commits and push them to the tracking remote?"))
+                  void act(() => execute(true));
               }}
             >
               Commit & push

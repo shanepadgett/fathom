@@ -1,25 +1,21 @@
-import { SearchDialog } from "./search-dialog.tsx";
 import type { createWorkspace } from "../state/workspace.ts";
+
 import { createSignal } from "solid-js";
+
+import { SearchDialog } from "./search-dialog.tsx";
 import { SearchList } from "./search-list.tsx";
 
-export function ArchivedSessions(
-  props: { app: ReturnType<typeof createWorkspace> },
-) {
+export function ArchivedSessions(props: { app: ReturnType<typeof createWorkspace> }) {
   const app = props.app;
   const projectId = app.project()?.id;
   const [restoring, setRestoring] = createSignal<string>();
   const sessions = () =>
-    app.project()?.id === projectId
-      ? app.sessions().filter((session) => session.archived)
-      : [];
+    app.project()?.id === projectId ? app.sessions().filter((session) => session.archived) : [];
 
   async function restore(id: string) {
     if (restoring()) return;
     if (!projectId || app.project()?.id !== projectId) {
-      throw new Error(
-        "The project changed. Reopen archived sessions for the current project.",
-      );
+      throw new Error("The project changed. Reopen archived sessions for the current project.");
     }
     setRestoring(id);
     try {
@@ -64,9 +60,7 @@ export function ArchivedSessions(
                 {new Date(session.updatedAt).toLocaleDateString()}
               </span>
             </span>
-            <span class="shrink-0">
-              {restoring() === session.id ? "Restoring…" : "Restore"}
-            </span>
+            <span class="shrink-0">{restoring() === session.id ? "Restoring…" : "Restore"}</span>
           </>
         )}
       </SearchList>

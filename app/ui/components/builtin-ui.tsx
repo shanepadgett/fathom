@@ -1,20 +1,18 @@
 import type { Accessor, JSX } from "solid-js";
+
 import type { FrontendHost } from "../../sdk/frontend.ts";
-import type {
-  BuiltinComponentProps,
-  UIComponent,
-} from "../../sdk/ui-components.ts";
+import type { BuiltinComponentProps, UIComponent } from "../../sdk/ui-components.ts";
 
 import { createSignal } from "solid-js";
 import { render } from "solid-js/web";
 
-import { Button, Field, IconButton } from "./primitives.tsx";
 import { ConnectionRow } from "./connection-row.tsx";
-import { MessageCard } from "./message-card.tsx";
-import { Markdown } from "./markdown.tsx";
 import { DiffPreview } from "./diff-preview.tsx";
-import { TerminalPanel } from "./terminal.tsx";
+import { Markdown } from "./markdown.tsx";
+import { MessageCard } from "./message-card.tsx";
+import { Button, Field, IconButton } from "./primitives.tsx";
 import { SplitPane } from "./split-pane.tsx";
+import { TerminalPanel } from "./terminal.tsx";
 
 function component<Props>(
   view: (props: Accessor<Props>, host: FrontendHost) => JSX.Element,
@@ -37,9 +35,7 @@ function component<Props>(
 }
 
 export const builtinComponents = {
-  "fathom.icon-button": component<BuiltinComponentProps["fathom.icon-button"]>((
-    props,
-  ) => (
+  "fathom.icon-button": component<BuiltinComponentProps["fathom.icon-button"]>((props) => (
     <IconButton
       name={props().name}
       label={props().label}
@@ -50,20 +46,12 @@ export const builtinComponents = {
       onClick={() => props().onClick()}
     />
   )),
-  "fathom.connection-row": component<
-    BuiltinComponentProps["fathom.connection-row"]
-  >((props) => (
-    <ConnectionRow
-      name={props().name}
-      status={props().status}
-      avatar={props().avatar}
-    >
+  "fathom.connection-row": component<BuiltinComponentProps["fathom.connection-row"]>((props) => (
+    <ConnectionRow name={props().name} status={props().status} avatar={props().avatar}>
       {props().actions}
     </ConnectionRow>
   )),
-  "fathom.split-pane": component<BuiltinComponentProps["fathom.split-pane"]>((
-    props,
-  ) => (
+  "fathom.split-pane": component<BuiltinComponentProps["fathom.split-pane"]>((props) => (
     <SplitPane
       first={props().first}
       second={props().second}
@@ -76,10 +64,7 @@ export const builtinComponents = {
       onResize={(width) => props().onResize?.(width)}
     />
   )),
-  "fathom.terminal": component<BuiltinComponentProps["fathom.terminal"]>((
-    props,
-    host,
-  ) => (
+  "fathom.terminal": component<BuiltinComponentProps["fathom.terminal"]>((props, host) => (
     <TerminalPanel
       transport={host}
       sessionId={props().sessionId}
@@ -92,9 +77,7 @@ export const builtinComponents = {
   "fathom.diff": component<BuiltinComponentProps["fathom.diff"]>((props) => (
     <DiffPreview patch={props().patch} />
   )),
-  "fathom.message-card": component<
-    BuiltinComponentProps["fathom.message-card"]
-  >((props) => (
+  "fathom.message-card": component<BuiltinComponentProps["fathom.message-card"]>((props) => (
     <MessageCard
       author={props().author}
       createdAt={props().createdAt}
@@ -105,9 +88,7 @@ export const builtinComponents = {
       <Markdown text={props().text} />
     </MessageCard>
   )),
-  "fathom.button": component<BuiltinComponentProps["fathom.button"]>((
-    props,
-  ) => (
+  "fathom.button": component<BuiltinComponentProps["fathom.button"]>((props) => (
     <Button
       variant={props().variant}
       size={props().size}
@@ -117,9 +98,7 @@ export const builtinComponents = {
       {props().label}
     </Button>
   )),
-  "fathom.text-field": component<BuiltinComponentProps["fathom.text-field"]>((
-    props,
-  ) => (
+  "fathom.text-field": component<BuiltinComponentProps["fathom.text-field"]>((props) => (
     <Field label={props().label} hint={props().hint}>
       <input
         value={props().value}

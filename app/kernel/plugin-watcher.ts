@@ -2,8 +2,7 @@ import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 
 function contains(directory: string, path: string) {
   const child = relative(directory, path);
-  return child === "" ||
-    (child !== ".." && !child.startsWith(`..${sep}`) && !isAbsolute(child));
+  return child === "" || (child !== ".." && !child.startsWith(`..${sep}`) && !isAbsolute(child));
 }
 
 export async function watchPlugins(
@@ -13,10 +12,7 @@ export async function watchPlugins(
 ) {
   const watchers: Deno.FsWatcher[] = [];
   let disposed = false;
-  async function listen(
-    watcher: Deno.FsWatcher,
-    relevant: (path: string) => boolean,
-  ) {
+  async function listen(watcher: Deno.FsWatcher, relevant: (path: string) => boolean) {
     try {
       for await (const event of watcher) {
         if (event.kind !== "access" && event.paths.some(relevant)) changed();
@@ -28,10 +24,7 @@ export async function watchPlugins(
   try {
     for (const root of new Set(paths.roots)) {
       const canonical = await Deno.realPath(root);
-      const configs = new Set([
-        resolve(canonical, "deno.json"),
-        resolve(canonical, "deno.jsonc"),
-      ]);
+      const configs = new Set([resolve(canonical, "deno.json"), resolve(canonical, "deno.jsonc")]);
       const watcher = Deno.watchFs(canonical, { recursive: false });
       watchers.push(watcher);
       void listen(watcher, (path) => configs.has(resolve(path)));
@@ -43,10 +36,7 @@ export async function watchPlugins(
           await Deno.stat(parent);
           break;
         } catch (error) {
-          if (
-            !(error instanceof Deno.errors.NotFound) ||
-            dirname(parent) === parent
-          ) throw error;
+          if (!(error instanceof Deno.errors.NotFound) || dirname(parent) === parent) throw error;
           parent = dirname(parent);
         }
       }
@@ -56,8 +46,7 @@ export async function watchPlugins(
       watchers.push(watcher);
       void listen(
         watcher,
-        (path) =>
-          contains(target, resolve(path)) || contains(resolve(path), target),
+        (path) => contains(target, resolve(path)) || contains(resolve(path), target),
       );
     }
   } catch (error) {

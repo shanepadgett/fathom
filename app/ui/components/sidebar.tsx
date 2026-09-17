@@ -4,23 +4,24 @@ import type { createWorkspace } from "../state/workspace.ts";
 import { For, Show } from "solid-js";
 
 import { Icon } from "./icon.tsx";
-import { IconButton } from "./primitives.tsx";
 import { PluginSlot } from "./plugin-slot.tsx";
+import { IconButton } from "./primitives.tsx";
 
 export function Sidebar(props: { app: ReturnType<typeof createWorkspace> }) {
   const app = props.app;
   const visible = () =>
-    app.sessions().filter((session) =>
-      !session.archived &&
-      session.title.toLowerCase().includes(app.search().toLowerCase())
-    );
+    app
+      .sessions()
+      .filter(
+        (session) =>
+          !session.archived && session.title.toLowerCase().includes(app.search().toLowerCase()),
+      );
   const list = (items: Session[]) => (
     <div class="flex flex-col gap-1 px-2">
       <For each={items}>
         {(session) => {
           const selected = () => session.id === app.sessionId();
-          const running = () =>
-            ["running", "retry_waiting"].includes(session.status);
+          const running = () => ["running", "retry_waiting"].includes(session.status);
           return (
             <button
               type="button"
@@ -45,9 +46,7 @@ export function Sidebar(props: { app: ReturnType<typeof createWorkspace> }) {
                 </div>
               </Show>
               <p
-                class={`mt-1 truncate text-dense ${
-                  selected() ? "text-action" : "text-ink"
-                }`}
+                class={`mt-1 truncate text-dense ${selected() ? "text-action" : "text-ink"}`}
                 title={session.title}
               >
                 {session.title}
@@ -63,27 +62,29 @@ export function Sidebar(props: { app: ReturnType<typeof createWorkspace> }) {
                 </Show>
                 <span
                   class={`ml-auto inline-flex shrink-0 ${
-                    running() ? "text-action" : session.status === "error" ||
-                        session.status === "approval"
-                      ? "text-warning"
-                      : "text-muted"
+                    running()
+                      ? "text-action"
+                      : session.status === "error" || session.status === "approval"
+                        ? "text-warning"
+                        : "text-muted"
                   }`}
                   role="img"
                   aria-label={session.status}
                   title={session.status}
                 >
                   <span
-                    class={running()
-                      ? "inline-flex motion-safe:animate-session-spin"
-                      : "inline-flex"}
+                    class={
+                      running() ? "inline-flex motion-safe:animate-session-spin" : "inline-flex"
+                    }
                   >
                     <Icon
-                      name={running()
-                        ? "spinner-gap"
-                        : session.status === "error" ||
-                            session.status === "approval"
-                        ? "chat-circle-text"
-                        : "moon"}
+                      name={
+                        running()
+                          ? "spinner-gap"
+                          : session.status === "error" || session.status === "approval"
+                            ? "chat-circle-text"
+                            : "moon"
+                      }
                       size="small"
                     />
                   </span>
@@ -100,10 +101,7 @@ export function Sidebar(props: { app: ReturnType<typeof createWorkspace> }) {
       class="relative flex min-h-0 w-sidebar shrink-0 flex-col border-r border-line bg-surface"
       aria-label="Project sessions"
     >
-      <div
-        class="min-h-0 flex-1 overflow-y-auto"
-        data-component="session-sidebar"
-      >
+      <div class="min-h-0 flex-1 overflow-y-auto" data-component="session-sidebar">
         <div class="sticky top-0 z-10 flow-root bg-surface">
           <div class="flex h-10 items-center gap-2 px-3">
             <div class="flex min-w-0 flex-1 items-center gap-2 text-muted">

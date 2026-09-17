@@ -1,8 +1,4 @@
-import type {
-  AuthOperationOptions,
-  Credential,
-  CredentialStore,
-} from "@earendil-works/pi-ai";
+import type { AuthOperationOptions, Credential, CredentialStore } from "@earendil-works/pi-ai";
 
 import { dirname } from "node:path";
 
@@ -30,9 +26,10 @@ export class Credentials implements CredentialStore {
 
   async list(options?: AuthOperationOptions) {
     options?.signal?.throwIfAborted();
-    return Object.entries(await this.load()).map((
-      [providerId, credential],
-    ) => ({ providerId, type: credential.type }));
+    return Object.entries(await this.load()).map(([providerId, credential]) => ({
+      providerId,
+      type: credential.type,
+    }));
   }
 
   private async locked<T>(

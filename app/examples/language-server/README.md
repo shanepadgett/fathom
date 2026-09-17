@@ -51,7 +51,7 @@ ctx.effect(() =>
     languages: { ".rs": "rust" }, // lowercase suffix -> LSP language id
     initializationOptions: { checkOnSave: false }, // JSON data, copied on register
     priority: 0,
-  })
+  }),
 );
 ```
 
@@ -76,7 +76,7 @@ at priority zero using the existing native runtime executable resolution.
   are resynchronized when registrations or availability change.
 - `update(path, text)` synchronizes the latest buffer;
   `completion(path, text,
-  position)` returns the existing
+position)` returns the existing
   `{ isIncomplete, items }` shape. Positions are zero-based UTF-16. Per-document
   operations are serialized.
 - `getDiagnostics(paths)` returns `{ path, uri, serverId?, diagnostics }[]` for

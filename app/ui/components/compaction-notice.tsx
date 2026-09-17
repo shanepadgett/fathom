@@ -3,21 +3,13 @@ import { Show } from "solid-js";
 import { Disclosure } from "./disclosure.tsx";
 import { Markdown } from "./markdown.tsx";
 
-export function CompactionNotice(props: {
-  data?: unknown;
-  detailed?: boolean;
-  pending?: boolean;
-}) {
+export function CompactionNotice(props: { data?: unknown; detailed?: boolean; pending?: boolean }) {
   const data = () =>
-    props.data && typeof props.data === "object"
-      ? props.data as Record<string, unknown>
-      : {};
-  const summary = () =>
-    typeof data().summary === "string" ? String(data().summary) : "";
+    props.data && typeof props.data === "object" ? (props.data as Record<string, unknown>) : {};
+  const summary = () => (typeof data().summary === "string" ? String(data().summary) : "");
   const count = () => {
     const value = data().messagesCompacted;
-    return typeof value === "number" && Number.isSafeInteger(value) &&
-        value >= 0
+    return typeof value === "number" && Number.isSafeInteger(value) && value >= 0
       ? value
       : undefined;
   };
@@ -30,10 +22,7 @@ export function CompactionNotice(props: {
   return (
     <Disclosure
       label={
-        <span
-          role="status"
-          classList={{ "tool-execution-working": !!props.pending }}
-        >
+        <span role="status" classList={{ "tool-execution-working": !!props.pending }}>
           {props.pending ? "Compacting context…" : "Context compacted"}
           <Show when={!props.pending && saved()}>
             <span class="ml-2 text-xs">~{saved()} tokens freed</span>
@@ -59,9 +48,8 @@ export function CompactionNotice(props: {
         }
       >
         <p class="text-sm text-muted">
-          Summarizing earlier messages to make room for the next steps. Your
-          original conversation is preserved. The agent will resume
-          automatically.
+          Summarizing earlier messages to make room for the next steps. Your original conversation
+          is preserved. The agent will resume automatically.
         </p>
       </Show>
     </Disclosure>

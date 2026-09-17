@@ -14,8 +14,7 @@ export class LanguageServerItemElement extends DesignElement {
   override render() {
     const { name } = this;
     return html`
-      <p
-        class="flex justify-between gap-3">${name}<span class="text-success">Connected</span></p>
+      <p class="flex justify-between gap-3">${name}<span class="text-success">Connected</span></p>
     `;
   }
 }

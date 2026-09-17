@@ -1,10 +1,10 @@
-import { SearchDialog } from "./search-dialog.tsx";
 import type { Project } from "../../sdk/session.ts";
 
 import { createSignal, Show } from "solid-js";
 
 import { Icon } from "./icon.tsx";
 import { Button, Field } from "./primitives.tsx";
+import { SearchDialog } from "./search-dialog.tsx";
 import { SearchList } from "./search-list.tsx";
 
 export function ProjectDialog(props: {
@@ -52,11 +52,10 @@ export function ProjectDialog(props: {
               <Icon name="folder" />
             </span>
             <span class="min-w-0 flex-1">
-              <p class="truncate" title={project.name}>{project.name}</p>
-              <p
-                class="mt-0.5 truncate text-micro text-muted"
-                title={project.path}
-              >
+              <p class="truncate" title={project.name}>
+                {project.name}
+              </p>
+              <p class="mt-0.5 truncate text-micro text-muted" title={project.path}>
                 {project.path}
               </p>
             </span>
@@ -80,14 +79,11 @@ export function ProjectDialog(props: {
           />
         </Field>
         <Show when={error()}>
-          <p role="alert" class="my-3 text-sm text-danger">{error()}</p>
+          <p role="alert" class="my-3 text-sm text-danger">
+            {error()}
+          </p>
         </Show>
-        <Button
-          class="mt-3"
-          variant="primary"
-          type="submit"
-          disabled={busy() || !path().trim()}
-        >
+        <Button class="mt-3" variant="primary" type="submit" disabled={busy() || !path().trim()}>
           {busy() ? "Opening…" : "Open folder"}
         </Button>
       </form>

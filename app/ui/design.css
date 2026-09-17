@@ -64,8 +64,7 @@
 
 @layer components {
   .workspace-drawer-panel {
-    animation: workspace-drawer-enter var(--duration-motion-slow, 240ms)
-      ease-out;
+    animation: workspace-drawer-enter var(--duration-motion-slow, 240ms) ease-out;
   }
   .contents > edge-resizer {
     display: none;

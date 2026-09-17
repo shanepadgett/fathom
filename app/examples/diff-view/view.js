@@ -30,11 +30,7 @@ export default {
             button.update(props());
           },
         });
-        const button = host.ui.getComponent("fathom.button")(
-          actionElement,
-          host,
-          props(),
-        );
+        const button = host.ui.getComponent("fathom.button")(actionElement, host, props());
         return async () => {
           await button.dispose();
           await diff.dispose();

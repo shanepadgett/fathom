@@ -1,31 +1,18 @@
-import type { FileRange } from "../../sdk/editor.ts";
 import type { AssistantMessage } from "@earendil-works/pi-ai";
-import type {
-  Entry,
-  Project,
-  Session,
-  SessionState,
-  UsageRecord,
-} from "../../sdk/session.ts";
+
+import type { FileRange } from "../../sdk/editor.ts";
 import type { ModelChoice } from "../../sdk/models.ts";
-import {
-  batch,
-  createEffect,
-  createMemo,
-  createSignal,
-  onCleanup,
-  onMount,
-} from "solid-js";
-import { UIHost } from "../host.ts";
-import { Transport } from "../transport.ts";
-import {
-  notify,
-  type Preferences as NotificationPreferences,
-} from "../notifications.ts";
+import type { Entry, Project, Session, SessionState, UsageRecord } from "../../sdk/session.ts";
 import type { AudioCue } from "../audio-cues.ts";
 import type { Approval } from "./project-data.ts";
-import { prepareProject, projectOverview } from "./project-data.ts";
+
+import { batch, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+
 import { parseMessageLink } from "../../sdk/message-link.ts";
+import { UIHost } from "../host.ts";
+import { notify, type Preferences as NotificationPreferences } from "../notifications.ts";
+import { Transport } from "../transport.ts";
+import { prepareProject, projectOverview } from "./project-data.ts";
 import { workspaceLayout } from "./workspace-layout.ts";
 export function createWorkspace() {
   const transport = new Transport();
@@ -33,9 +20,7 @@ export function createWorkspace() {
   const [project, setProject] = createSignal<Project>();
   const [sessions, setSessions] = createSignal<Session[]>([]);
   const [state, setState] = createSignal<SessionState>();
-  const [live, setLive] = createSignal<
-    { entryId: string; message: AssistantMessage }
-  >();
+  const [live, setLive] = createSignal<{ entryId: string; message: AssistantMessage }>();
   const [models, setModels] = createSignal<ModelChoice[]>([]);
   const [usage, setUsage] = createSignal<UsageRecord[]>([]);
   const [approvals, setApprovals] = createSignal<Approval[]>([]);
@@ -50,9 +35,11 @@ export function createWorkspace() {
   const [search, setSearch] = createSignal("");
   const [palette, setPalette] = createSignal(false);
   const [messageLinkOpen, setMessageLinkOpen] = createSignal(false);
-  const [messageFocus, setMessageFocus] = createSignal<
-    { entryId: string; sessionId: string; request: number }
-  >();
+  const [messageFocus, setMessageFocus] = createSignal<{
+    entryId: string;
+    sessionId: string;
+    request: number;
+  }>();
   const [inspector, setInspector] = createSignal(true);
   const [mode, setMode] = createSignal("agent");
   const layout = workspaceLayout(
@@ -62,8 +49,7 @@ export function createWorkspace() {
   );
   const browserVisible = () =>
     !!sessionId() &&
-    (mode() === "browser" ||
-      (mode() === "editor" && layout.value().browserBeside));
+    (mode() === "browser" || (mode() === "editor" && layout.value().browserBeside));
   const showBrowser = (surface: "split" | "active") =>
     batch(() => {
       if (!sessionId()) {
@@ -81,18 +67,18 @@ export function createWorkspace() {
       if (mode() === "browser") setMode("agent");
     });
   const toggleBrowser = () =>
-    browserVisible()
-      ? hideBrowser()
-      : showBrowser(mode() === "editor" ? "split" : "active");
-  const switchBrowserSurface = () =>
-    showBrowser(mode() === "editor" ? "active" : "split");
+    browserVisible() ? hideBrowser() : showBrowser(mode() === "editor" ? "split" : "active");
+  const switchBrowserSurface = () => showBrowser(mode() === "editor" ? "active" : "split");
   const [sidebarOpen, setSidebarOpen] = createSignal(true);
   const [agentDrawer, setAgentDrawer] = createSignal(false);
   const [terminalOpen, setTerminalOpen] = createSignal(false);
   const [artifactsOpen, setArtifactsOpen] = createSignal(false);
-  const [fileFocus, setFileFocus] = createSignal<
-    { projectId: string; path: string; request: number; range?: FileRange }
-  >();
+  const [fileFocus, setFileFocus] = createSignal<{
+    projectId: string;
+    path: string;
+    request: number;
+    range?: FileRange;
+  }>();
   const [diffPath, setDiffPath] = createSignal<string>();
   const [diffOpen, setDiffOpen] = createSignal(false);
   const [gitOpen, setGitOpen] = createSignal(false);
@@ -108,11 +94,8 @@ export function createWorkspace() {
   const [pluginCommands, setPluginCommands] = createSignal<
     { title: string; run(): void | Promise<void> }[]
   >([]);
-  onCleanup(
-    uiHost.subscribe(() => setPluginCommands([...uiHost.commands.values()])),
-  );
-  const fail = (error: unknown) =>
-    setError(error instanceof Error ? error.message : String(error));
+  onCleanup(uiHost.subscribe(() => setPluginCommands([...uiHost.commands.values()])));
+  const fail = (error: unknown) => setError(error instanceof Error ? error.message : String(error));
   const act = async (action: () => Promise<unknown>) => {
     try {
       return await action();
@@ -122,12 +105,10 @@ export function createWorkspace() {
   };
   const sessionId = createMemo(() => state()?.session.id);
   const currentUsage = createMemo(() =>
-    usage().filter((record) => record.sessionId === sessionId())
+    usage().filter((record) => record.sessionId === sessionId()),
   );
-  const totalTokens = () =>
-    currentUsage().reduce((n, record) => n + record.usage.totalTokens, 0);
-  const totalCost = () =>
-    currentUsage().reduce((n, record) => n + record.usage.cost.total, 0);
+  const totalTokens = () => currentUsage().reduce((n, record) => n + record.usage.totalTokens, 0);
+  const totalCost = () => currentUsage().reduce((n, record) => n + record.usage.cost.total, 0);
 
   let selectionVersion = 0;
   let refreshVersion = 0;
@@ -142,15 +123,13 @@ export function createWorkspace() {
       projectOverview(transport, projectId),
       selectedId
         ? transport.request<SessionState>("session.get", {
-          projectId,
-          sessionId: selectedId,
-        })
+            projectId,
+            sessionId: selectedId,
+          })
         : undefined,
     ]);
-    if (
-      version !== refreshVersion || project()?.id !== projectId ||
-      sessionId() !== selectedId
-    ) return;
+    if (version !== refreshVersion || project()?.id !== projectId || sessionId() !== selectedId)
+      return;
     batch(() => {
       setSessions(overview.sessions);
       setModels(overview.models);
@@ -158,15 +137,10 @@ export function createWorkspace() {
       setApprovals(overview.approvals);
       if (snapshot) {
         setState(snapshot);
-        if (
-          snapshot.session.status !== "retry_waiting" &&
-          retrySession() === snapshot.session.id
-        ) setRetrySession(undefined);
-        if (
-          !["running", "retry_waiting", "approval"].includes(
-            snapshot.session.status,
-          )
-        ) setLive(undefined);
+        if (snapshot.session.status !== "retry_waiting" && retrySession() === snapshot.session.id)
+          setRetrySession(undefined);
+        if (!["running", "retry_waiting", "approval"].includes(snapshot.session.status))
+          setLive(undefined);
       }
     });
   }
@@ -247,29 +221,20 @@ export function createWorkspace() {
     const available = await transport.request<Project[]>("projects.list");
     const destination = available.find((item) => item.id === target.projectId);
     if (!destination) {
-      throw new Error(
-        "This message's project is not available on this machine.",
-      );
+      throw new Error("This message's project is not available on this machine.");
     }
     if (project()?.id !== target.projectId) await openProject(destination.path);
     await chooseSession(target.sessionId);
     const snapshot = state();
-    if (
-      project()?.id !== target.projectId ||
-      snapshot?.session.id !== target.sessionId
-    ) {
-      throw new Error(
-        "The selection changed while opening this message. Try again.",
-      );
+    if (project()?.id !== target.projectId || snapshot?.session.id !== target.sessionId) {
+      throw new Error("The selection changed while opening this message. Try again.");
     }
     if (
-      !snapshot.entries.some((entry) =>
-        entry.id === target.entryId && entry.message?.role !== "toolResult"
+      !snapshot.entries.some(
+        (entry) => entry.id === target.entryId && entry.message?.role !== "toolResult",
       )
     ) {
-      throw new Error(
-        "This message is no longer available in the linked conversation.",
-      );
+      throw new Error("This message is no longer available in the linked conversation.");
     }
     setMode("agent");
     setSettings(false);
@@ -317,9 +282,10 @@ export function createWorkspace() {
             body: string;
             kind?: AudioCue;
           };
-          const preferences = await transport.request<
-            NotificationPreferences
-          >("settings.runtime.get", { projectId: event.projectId });
+          const preferences = await transport.request<NotificationPreferences>(
+            "settings.runtime.get",
+            { projectId: event.projectId },
+          );
           await notify(
             data.title,
             data.body,
@@ -337,11 +303,8 @@ export function createWorkspace() {
         if (retrySession() === event.sessionId) setRetrySession(undefined);
       }
       if (event.type === "environment") void act(() => uiHost.load());
-      if (
-        ["session", "approvals", "environment", "providers", "usage"].includes(
-          event.type,
-        )
-      ) void act(refresh);
+      if (["session", "approvals", "environment", "providers", "usage"].includes(event.type))
+        void act(refresh);
       if (event.type === "error") {
         fail((event.data as { message: string }).message);
       }
@@ -352,22 +315,15 @@ export function createWorkspace() {
       }
     });
     const notificationClick = (event: Event) => {
-      const target =
-        (event as CustomEvent<{ projectId: string; sessionId: string }>).detail;
-      if (
-        !target || typeof target.projectId !== "string" ||
-        typeof target.sessionId !== "string"
-      ) return;
+      const target = (event as CustomEvent<{ projectId: string; sessionId: string }>).detail;
+      if (!target || typeof target.projectId !== "string" || typeof target.sessionId !== "string")
+        return;
       void act(async () => {
         if (project()?.id !== target.projectId) {
           const available = await transport.request<Project[]>("projects.list");
-          const destination = available.find((item) =>
-            item.id === target.projectId
-          );
+          const destination = available.find((item) => item.id === target.projectId);
           if (!destination) {
-            throw new Error(
-              "The notification's project is no longer available.",
-            );
+            throw new Error("The notification's project is no longer available.");
           }
           await openProject(destination.path);
         }
@@ -378,9 +334,7 @@ export function createWorkspace() {
       });
     };
     window.addEventListener("fathom:notification", notificationClick);
-    onCleanup(() =>
-      window.removeEventListener("fathom:notification", notificationClick)
-    );
+    onCleanup(() => window.removeEventListener("fathom:notification", notificationClick));
     const keydown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "k") {
         event.preventDefault();
@@ -404,13 +358,9 @@ export function createWorkspace() {
       await transport.connect();
       const revision = themeRevision;
       try {
-        const appearance = await transport.request<{ theme: string }>(
-          "appearance.get",
-        );
-        if (
-          revision === themeRevision &&
-          ["dark", "light"].includes(appearance.theme)
-        ) setTheme(appearance.theme);
+        const appearance = await transport.request<{ theme: string }>("appearance.get");
+        if (revision === themeRevision && ["dark", "light"].includes(appearance.theme))
+          setTheme(appearance.theme);
       } catch (error) {
         fail(error);
       }
@@ -522,9 +472,7 @@ export function createWorkspace() {
     setError,
     notice: () =>
       notice() ||
-      (retrySession() === sessionId()
-        ? "Provider temporarily unavailable. Retrying…"
-        : ""),
+      (retrySession() === sessionId() ? "Provider temporarily unavailable. Retrying…" : ""),
     setNotice: (value: string) => {
       setNotice(value);
       if (!value) setRetrySession(undefined);

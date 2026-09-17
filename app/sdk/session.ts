@@ -1,12 +1,6 @@
 import type { Message, ModelThinkingLevel, Usage } from "@earendil-works/pi-ai";
 
-export type RunStatus =
-  | "idle"
-  | "running"
-  | "retry_waiting"
-  | "approval"
-  | "interrupted"
-  | "error";
+export type RunStatus = "idle" | "running" | "retry_waiting" | "approval" | "interrupted" | "error";
 export type ToolPolicy = "default" | "read-only" | "no-terminal";
 
 export interface Session {

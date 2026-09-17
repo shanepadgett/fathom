@@ -1,4 +1,5 @@
 import type { AppEvent } from "../sdk/session.ts";
+
 import { MAX_RPC_REQUEST_BYTES } from "../sdk/transport.ts";
 
 export class Transport {
@@ -24,12 +25,14 @@ export class Transport {
     if (this.socket?.readyState === WebSocket.OPEN) return Promise.resolve();
     if (this.opening) return this.opening;
     clearTimeout(this.reconnect);
-    this.opening = this.establish().catch((error) => {
-      this.scheduleReconnect();
-      throw error;
-    }).finally(() => {
-      this.opening = undefined;
-    });
+    this.opening = this.establish()
+      .catch((error) => {
+        this.scheduleReconnect();
+        throw error;
+      })
+      .finally(() => {
+        this.opening = undefined;
+      });
     return this.opening;
   }
 
@@ -46,10 +49,7 @@ export class Transport {
     this.bootstrap = new AbortController();
     const response = await fetch("/bootstrap", {
       method: "POST",
-      signal: AbortSignal.any([
-        this.bootstrap.signal,
-        AbortSignal.timeout(15_000),
-      ]),
+      signal: AbortSignal.any([this.bootstrap.signal, AbortSignal.timeout(15_000)]),
     });
     if (!response.ok) {
       throw new Error(`Cannot initialize connection (${response.status})`);
@@ -138,9 +138,7 @@ export class Transport {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pending.delete(id);
-        reject(
-          new Error("Request timed out; inspect current state before retrying"),
-        );
+        reject(new Error("Request timed out; inspect current state before retrying"));
       }, timeoutMs);
       this.pending.set(id, {
         resolve: (value) => resolve(value as T),
@@ -153,9 +151,7 @@ export class Transport {
           method,
           params: { projectId: this.projectId, ...params },
         });
-        if (
-          new TextEncoder().encode(message).byteLength > MAX_RPC_REQUEST_BYTES
-        ) {
+        if (new TextEncoder().encode(message).byteLength > MAX_RPC_REQUEST_BYTES) {
           throw new Error("Request exceeds the 25 MB transport limit");
         }
         socket.send(message);

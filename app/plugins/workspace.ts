@@ -33,19 +33,17 @@ export function workspacePlugin(project: Project, home: string) {
           async resolve(path, write = false) {
             const target = resolve(project.path, path);
             const roots = write ? [project.path] : readable;
-            const canonicalRoots = await Promise.all(roots.map(async (root) => {
-              try {
-                return await Deno.realPath(root);
-              } catch (error) {
-                if (!(error instanceof Deno.errors.NotFound)) throw error;
-                return root;
-              }
-            }));
-            if (
-              ![...roots, ...canonicalRoots].some((root) =>
-                contains(root, target)
-              )
-            ) {
+            const canonicalRoots = await Promise.all(
+              roots.map(async (root) => {
+                try {
+                  return await Deno.realPath(root);
+                } catch (error) {
+                  if (!(error instanceof Deno.errors.NotFound)) throw error;
+                  return root;
+                }
+              }),
+            );
+            if (![...roots, ...canonicalRoots].some((root) => contains(root, target))) {
               throw new Error("Path is outside the authorized workspace");
             }
             let existing = target;
@@ -53,15 +51,11 @@ export function workspacePlugin(project: Project, home: string) {
               try {
                 const real = await Deno.realPath(existing);
                 if (!canonicalRoots.some((root) => contains(root, real))) {
-                  throw new Error(
-                    "Symlink points outside the authorized workspace",
-                  );
+                  throw new Error("Symlink points outside the authorized workspace");
                 }
                 break;
               } catch (error) {
-                if (
-                  !(error instanceof Deno.errors.NotFound) || !write
-                ) throw error;
+                if (!(error instanceof Deno.errors.NotFound) || !write) throw error;
                 const parent = dirname(existing);
                 if (parent === existing) throw error;
                 existing = parent;

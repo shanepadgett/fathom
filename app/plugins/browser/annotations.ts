@@ -1,7 +1,4 @@
-import type {
-  BrowserAnnotation,
-  BrowserAnnotationBounds,
-} from "../../sdk/browser.ts";
+import type { BrowserAnnotation, BrowserAnnotationBounds } from "../../sdk/browser.ts";
 import type { PluginContext } from "../../sdk/mod.ts";
 
 import { submittedFeedbackIds } from "../submitted-feedback.ts";
@@ -11,15 +8,13 @@ type Capture = (
   y: number,
   url?: string,
   bounds?: BrowserAnnotationBounds,
-) => Promise<
-  {
-    url: string;
-    element?: unknown;
-    image: string;
-    scroll: { x: number; y: number };
-    viewport: { width: number; height: number };
-  }
->;
+) => Promise<{
+  url: string;
+  element?: unknown;
+  image: string;
+  scroll: { x: number; y: number };
+  viewport: { width: number; height: number };
+}>;
 
 function annotationBounds(value: unknown): BrowserAnnotationBounds | undefined {
   if (value === undefined) return undefined;
@@ -28,12 +23,20 @@ function annotationBounds(value: unknown): BrowserAnnotationBounds | undefined {
   }
   const { x, y, width, height } = value as Record<string, unknown>;
   if (
-    typeof x !== "number" || !Number.isFinite(x) ||
-    typeof y !== "number" || !Number.isFinite(y) ||
-    typeof width !== "number" || !Number.isFinite(width) ||
-    typeof height !== "number" || !Number.isFinite(height) ||
-    x < 0 || y < 0 || width <= 0 || height <= 0
-  ) throw new Error("Invalid annotation bounds");
+    typeof x !== "number" ||
+    !Number.isFinite(x) ||
+    typeof y !== "number" ||
+    !Number.isFinite(y) ||
+    typeof width !== "number" ||
+    !Number.isFinite(width) ||
+    typeof height !== "number" ||
+    !Number.isFinite(height) ||
+    x < 0 ||
+    y < 0 ||
+    width <= 0 ||
+    height <= 0
+  )
+    throw new Error("Invalid annotation bounds");
   return { x, y, width, height };
 }
 
@@ -51,8 +54,7 @@ export function registerBrowserAnnotations(
   const key = (id: string) => `annotations:${id}`;
   const stored = (id: string) =>
     storage.setting<(BrowserAnnotation & { image?: string })[]>(key(id), []);
-  const emit = (id: string) =>
-    ctx.get("events").publish({ type: "session", sessionId: id });
+  const emit = (id: string) => ctx.get("events").publish({ type: "session", sessionId: id });
   async function cache(id: string, image: string, name: string) {
     if (image.length > 12_000_000) {
       throw new Error("Annotation screenshot exceeds the image limit");
@@ -64,10 +66,7 @@ export function registerBrowserAnnotations(
     });
   }
   function reconcile(id: string) {
-    const accepted = submittedFeedbackIds(
-      runtime.state(id),
-      "browser-feedback",
-    );
+    const accepted = submittedFeedbackIds(runtime.state(id), "browser-feedback");
     const draft = stored(id),
       remaining = draft.filter((item) => !accepted.has(item.id));
     if (remaining.length !== draft.length) {
@@ -83,18 +82,12 @@ export function registerBrowserAnnotations(
       migration = (async () => {
         for (const item of stored(id)) {
           if (typeof item.image !== "string") continue;
-          const screenshot = await cache(
-            id,
-            item.image,
-            `annotation-${item.id}.png`,
-          );
+          const screenshot = await cache(id, item.image, `annotation-${item.id}.png`);
           storage.transaction(() => {
             storage.setSetting(
               key(id),
               stored(id).map((current) => {
-                if (
-                  current.id !== item.id || current.image !== item.image
-                ) return current;
+                if (current.id !== item.id || current.image !== item.image) return current;
                 const { image: _image, ...metadata } = current;
                 return { ...metadata, screenshot };
               }),
@@ -108,10 +101,7 @@ export function registerBrowserAnnotations(
     return reconcile(id);
   }
   const disposers = [
-    rpc.register(
-      "annotations.list",
-      (params) => list(String(params.sessionId)),
-    ),
+    rpc.register("annotations.list", (params) => list(String(params.sessionId))),
     rpc.register("browser.annotate", async (params) => {
       const bounds = annotationBounds(params.bounds);
       const id = String(params.sessionId),
@@ -119,19 +109,18 @@ export function registerBrowserAnnotations(
         y = bounds ? bounds.y + bounds.height / 2 : Number(params.y);
       storage.getSession(id);
       const assertOwner = captureOwner(params.viewId, id);
+      if (![x, y].every(Number.isFinite) || x < 0 || y < 0)
+        throw new Error("Invalid annotation position");
       if (
-        ![x, y].every(Number.isFinite) || x < 0 || y < 0
-      ) throw new Error("Invalid annotation position");
-      if (
-        typeof params.comment !== "string" || !params.comment.trim() ||
+        typeof params.comment !== "string" ||
+        !params.comment.trim() ||
         params.comment.length > 4000
-      ) throw new Error("Add a comment of at most 4,000 characters");
+      )
+        throw new Error("Add a comment of at most 4,000 characters");
       await list(id);
       assertOwner();
       if (stored(id).length >= 20) {
-        throw new Error(
-          "Send or clear feedback before staging more than 20 comments",
-        );
+        throw new Error("Send or clear feedback before staging more than 20 comments");
       }
       const result = await capture(
         x,
@@ -151,19 +140,13 @@ export function registerBrowserAnnotations(
         viewport: result.viewport,
         comment: params.comment.trim(),
         element: result.element,
-        screenshot: await cache(
-          id,
-          result.image,
-          `annotation-${annotationId}.png`,
-        ),
+        screenshot: await cache(id, result.image, `annotation-${annotationId}.png`),
       };
       storage.transaction(() => {
         assertOwner();
         const draft = reconcile(id);
         if (draft.length >= 20) {
-          throw new Error(
-            "Send or clear feedback before staging more than 20 comments",
-          );
+          throw new Error("Send or clear feedback before staging more than 20 comments");
         }
         storage.setSetting(key(id), [...draft, annotation]);
       });
@@ -177,7 +160,8 @@ export function registerBrowserAnnotations(
         throw new Error("Wait for feedback submission to finish");
       }
       if (
-        typeof params.comment !== "string" || !params.comment.trim() ||
+        typeof params.comment !== "string" ||
+        !params.comment.trim() ||
         params.comment.length > 4000
       ) {
         throw new Error("Add a comment of at most 4,000 characters");
@@ -192,7 +176,7 @@ export function registerBrowserAnnotations(
         };
         storage.setSetting(
           key(id),
-          draft.map((item) => item.id === previous.id ? updated : item),
+          draft.map((item) => (item.id === previous.id ? updated : item)),
         );
         emit(id);
         return updated;
@@ -208,7 +192,7 @@ export function registerBrowserAnnotations(
         storage.setSetting(
           key(id),
           reconcile(id).filter((item) => item.id !== params.id),
-        )
+        ),
       );
       emit(id);
     }),
@@ -222,9 +206,8 @@ export function registerBrowserAnnotations(
       emit(id);
       return {};
     }),
-    rpc.register(
-      "annotations.submit",
-      (params) => feedback.send(String(params.sessionId), ["browser"]),
+    rpc.register("annotations.submit", (params) =>
+      feedback.send(String(params.sessionId), ["browser"]),
     ),
     feedback.register({
       id: "browser",
@@ -232,16 +215,14 @@ export function registerBrowserAnnotations(
         const draft = await list(id);
         return {
           count: draft.length,
-          text: `Please address this batched visual feedback:\n${
-            JSON.stringify(draft, null, 2)
-          }`,
+          text: `Please address this batched visual feedback:\n${JSON.stringify(draft, null, 2)}`,
           attachments: [
             {
               type: "browser-feedback",
               data: { ids: draft.map((item) => item.id) },
             },
             ...draft.flatMap((item) =>
-              item.screenshot ? [{ type: "media", data: item.screenshot }] : []
+              item.screenshot ? [{ type: "media", data: item.screenshot }] : [],
             ),
           ],
         };

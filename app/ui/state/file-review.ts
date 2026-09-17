@@ -4,10 +4,7 @@ import type { Transport } from "../transport.ts";
 import { createSignal, onCleanup } from "solid-js";
 
 /** Owns review requests independently of editor and commit-screen presentation. */
-export function createFileReview(
-  transport: Transport,
-  failed: (error: unknown) => void,
-) {
+export function createFileReview(transport: Transport, failed: (error: unknown) => void) {
   const projectId = transport.projectId;
   const [document, setDocument] = createSignal<FileDiff>();
   const [busy, setBusy] = createSignal(false);
@@ -18,7 +15,8 @@ export function createFileReview(
   let disposed = false;
 
   async function open(path: string) {
-    const requestVersion = ++version, changeVersion = changes;
+    const requestVersion = ++version,
+      changeVersion = changes;
     if (selected !== path) setDocument(undefined);
     selected = path;
     setBusy(true);
@@ -27,17 +25,12 @@ export function createFileReview(
         projectId,
         path,
       });
-      if (
-        disposed || requestVersion !== version ||
-        transport.projectId !== projectId
-      ) return;
+      if (disposed || requestVersion !== version || transport.projectId !== projectId) return;
       setDocument(next);
       setStale(changes !== changeVersion);
     } catch (error) {
-      if (
-        !disposed && requestVersion === version &&
-        transport.projectId === projectId
-      ) failed(error);
+      if (!disposed && requestVersion === version && transport.projectId === projectId)
+        failed(error);
     } finally {
       if (!disposed && requestVersion === version) setBusy(false);
     }
@@ -73,6 +66,6 @@ export function createFileReview(
     stale,
     open,
     close,
-    refresh: () => selected ? open(selected) : Promise.resolve(),
+    refresh: () => (selected ? open(selected) : Promise.resolve()),
   };
 }

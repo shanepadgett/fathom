@@ -18,19 +18,13 @@ export default {
         const status = document.createElement("p");
         first.className = "p-4";
         first.append(cardElement, status);
-        const card = host.ui.getComponent("fathom.message-card")(
-          cardElement,
-          host,
-          {
-            author: "Split panes",
-            createdAt: Date.now(),
-            text:
-              "Drag the divider, or focus it and use **Left/Right**, **Home/End**, or **Enter** to reset.",
-          },
-        );
+        const card = host.ui.getComponent("fathom.message-card")(cardElement, host, {
+          author: "Split panes",
+          createdAt: Date.now(),
+          text: "Drag the divider, or focus it and use **Left/Right**, **Home/End**, or **Enter** to reset.",
+        });
         const diff = host.ui.getComponent("fathom.diff")(second, host, {
-          patch:
-            "--- a/example.txt\n+++ b/example.txt\n@@ -1 +1 @@\n-Before\n+After",
+          patch: "--- a/example.txt\n+++ b/example.txt\n@@ -1 +1 @@\n-Before\n+After",
         });
         const splitProps = () => ({
           first,
@@ -46,17 +40,9 @@ export default {
             status.textContent = `First pane: ${value}px`;
           },
         });
-        const split = host.ui.getComponent("fathom.split-pane")(
-          splitElement,
-          host,
-          splitProps(),
-        );
+        const split = host.ui.getComponent("fathom.split-pane")(splitElement, host, splitProps());
         const buttonProps = () => ({
-          label: [
-            "Show first pane only",
-            "Show second pane only",
-            "Show both panes",
-          ][mode],
+          label: ["Show first pane only", "Show second pane only", "Show both panes"][mode],
           variant: "secondary",
           onClick() {
             mode = (mode + 1) % 3;
@@ -64,11 +50,7 @@ export default {
             button.update(buttonProps());
           },
         });
-        const button = host.ui.getComponent("fathom.button")(
-          controls,
-          host,
-          buttonProps(),
-        );
+        const button = host.ui.getComponent("fathom.button")(controls, host, buttonProps());
         return async () => {
           await button.dispose();
           await card.dispose();

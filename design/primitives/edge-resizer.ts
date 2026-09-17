@@ -32,17 +32,12 @@ export class EdgeResizer extends HTMLElement {
       const value = Math.round(Math.max(min, Math.min(max, width)));
       panel.style.width = `${value}px`;
       sync();
-      this.dispatchEvent(
-        new CustomEvent("edge-resize", { detail: value, bubbles: true }),
-      );
+      this.dispatchEvent(new CustomEvent("edge-resize", { detail: value, bubbles: true }));
     };
     this.tabIndex = 0;
     this.setAttribute("role", "separator");
     this.setAttribute("aria-orientation", "vertical");
-    this.setAttribute(
-      "aria-label",
-      `Resize ${panel.getAttribute("aria-label") ?? "drawer"}`,
-    );
+    this.setAttribute("aria-label", `Resize ${panel.getAttribute("aria-label") ?? "drawer"}`);
     this.title = "Drag to resize; use arrow keys; double-click to reset";
     this.addEventListener(
       "pointerdown",
@@ -84,9 +79,7 @@ export class EdgeResizer extends HTMLElement {
           },
           { signal: drag.signal },
         );
-        for (
-          const type of ["pointerup", "pointercancel", "lostpointercapture"]
-        ) {
+        for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) {
           this.addEventListener(type, () => this.finish?.(), {
             signal: drag.signal,
           });

@@ -9,13 +9,7 @@ import { join, relative, resolve, sep } from "node:path";
 
 import { definePlugin } from "../sdk/mod.ts";
 
-const kinds: ResourceKind[] = [
-  "snapshots",
-  "artifacts",
-  "media",
-  "databases",
-  "other",
-];
+const kinds: ResourceKind[] = ["snapshots", "artifacts", "media", "databases", "other"];
 
 function classify(path: string): ResourceKind {
   const parts = path.split(sep);
@@ -23,18 +17,13 @@ function classify(path: string): ResourceKind {
   if (parts[0] === "projects" && parts.length >= 3) {
     if (parts[2] === "shadow.git") return "snapshots";
     if (parts[2] === "media") return "media";
-    if (
-      parts.length === 3 &&
-      /^sessions\.db(?:-wal|-shm|-journal)?$/.test(parts[2])
-    ) return "databases";
+    if (parts.length === 3 && /^sessions\.db(?:-wal|-shm|-journal)?$/.test(parts[2]))
+      return "databases";
   }
   return "other";
 }
 
-async function scan(
-  root: string,
-  signal: AbortSignal,
-): Promise<ResourceReport> {
+async function scan(root: string, signal: AbortSignal): Promise<ResourceReport> {
   const resources = kinds.map((kind): ResourceUsage => ({
     kind,
     bytes: 0,
@@ -68,9 +57,7 @@ async function scan(
           stack.push(join(path, child.name));
         }
       } else if (info.isFile) {
-        const resource = resources.find((item) =>
-          item.kind === classify(relative(root, path))
-        )!;
+        const resource = resources.find((item) => item.kind === classify(relative(root, path)))!;
         resource.bytes += info.size;
         resource.files++;
       }
@@ -103,54 +90,53 @@ export function resourcesPlugin(home: string) {
         let scanning: Promise<ResourceReport> | undefined;
         const service: ResourceService = {
           scan() {
-            return scanning ??= scan(root, controller.signal).finally(() => {
+            return (scanning ??= scan(root, controller.signal).finally(() => {
               scanning = undefined;
-            });
+            }));
           },
           async open(kind) {
             if (!kinds.includes(kind)) {
               throw new Error("Unknown storage resource");
             }
-            const path = kind === "artifacts"
-              ? join(root, "artifacts")
-              : kind === "other"
-              ? root
-              : join(root, "projects");
+            const path =
+              kind === "artifacts"
+                ? join(root, "artifacts")
+                : kind === "other"
+                  ? root
+                  : join(root, "projects");
             const info = await Deno.lstat(path).catch((error) => {
               if (error instanceof Deno.errors.NotFound) {
-                throw new Error(
-                  "Nothing is stored in this resource folder yet.",
-                );
+                throw new Error("Nothing is stored in this resource folder yet.");
               }
               throw error;
             });
             if (!info.isDirectory || info.isSymlink) {
               throw new Error("The resource folder is not available.");
             }
-            const command = Deno.build.os === "darwin"
-              ? "open"
-              : Deno.build.os === "windows"
-              ? "explorer.exe"
-              : "xdg-open";
+            const command =
+              Deno.build.os === "darwin"
+                ? "open"
+                : Deno.build.os === "windows"
+                  ? "explorer.exe"
+                  : "xdg-open";
             const result = await new Deno.Command(command, {
               args: [path],
               stdout: "null",
               stderr: "piped",
             }).output();
             if (!result.success) {
-              throw new Error(
-                "Could not open the resource folder in the file manager.",
-              );
+              throw new Error("Could not open the resource folder in the file manager.");
             }
           },
         };
         ctx.provide("resources", service);
         const disposers = [
           ctx.get("rpc").register("resources.scan", () => service.scan()),
-          ctx.get("rpc").register(
-            "resources.open",
-            (params) => service.open(String(params.kind) as ResourceKind),
-          ),
+          ctx
+            .get("rpc")
+            .register("resources.open", (params) =>
+              service.open(String(params.kind) as ResourceKind),
+            ),
         ];
         ctx.effect(() => () => {
           controller.abort();

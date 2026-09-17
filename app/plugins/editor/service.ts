@@ -30,44 +30,42 @@ interface Document {
   owner?: Registration;
 }
 
-function definition(
-  value: LanguageServerRegistration,
-): LanguageServerRegistration {
+function definition(value: LanguageServerRegistration): LanguageServerRegistration {
   if (
-    !value || typeof value !== "object" ||
+    !value ||
+    typeof value !== "object" ||
     typeof value.id !== "string" ||
     !/^[a-zA-Z0-9][a-zA-Z0-9:._-]*$/.test(value.id) ||
-    typeof value.name !== "string" || !value.name.trim() ||
+    typeof value.name !== "string" ||
+    !value.name.trim() ||
     value.name.includes("\0") ||
-    typeof value.command !== "string" || !value.command.trim() ||
+    typeof value.command !== "string" ||
+    !value.command.trim() ||
     value.command.includes("\0")
   ) {
     throw new Error("Invalid language server id, name, or command");
   }
   if (
-    value.args !== undefined && (!Array.isArray(value.args) ||
+    value.args !== undefined &&
+    (!Array.isArray(value.args) ||
       value.args.some((arg) => typeof arg !== "string" || arg.includes("\0")))
   ) {
-    throw new Error(
-      "Language server arguments must be strings without NUL bytes",
-    );
+    throw new Error("Language server arguments must be strings without NUL bytes");
   }
   if (value.priority !== undefined && !Number.isSafeInteger(value.priority)) {
     throw new Error("Language server priority must be a safe integer");
   }
-  if (
-    !value.languages || typeof value.languages !== "object" ||
-    Array.isArray(value.languages)
-  ) {
+  if (!value.languages || typeof value.languages !== "object" || Array.isArray(value.languages)) {
     throw new Error("Language server extensions must map to language ids");
   }
   const languages = Object.entries(value.languages);
   if (
     !languages.length ||
-    languages.some(([extension, language]) =>
-      !/^\.[a-z0-9][a-z0-9._+-]*$/.test(extension) ||
-      typeof language !== "string" ||
-      !/^[a-zA-Z0-9][a-zA-Z0-9._+-]*$/.test(language)
+    languages.some(
+      ([extension, language]) =>
+        !/^\.[a-z0-9][a-z0-9._+-]*$/.test(extension) ||
+        typeof language !== "string" ||
+        !/^[a-zA-Z0-9][a-zA-Z0-9._+-]*$/.test(language),
     )
   ) {
     throw new Error("Invalid language server extension or language id");
@@ -78,8 +76,10 @@ function definition(
       initializationOptions = JSON.parse(
         JSON.stringify(value.initializationOptions, (_key, item) => {
           if (
-            typeof item === "function" || typeof item === "symbol" ||
-            typeof item === "bigint" || item === undefined ||
+            typeof item === "function" ||
+            typeof item === "symbol" ||
+            typeof item === "bigint" ||
+            item === undefined ||
             (typeof item === "number" && !Number.isFinite(item))
           ) {
             throw new Error("Not JSON");
@@ -88,9 +88,7 @@ function definition(
         }),
       );
     } catch {
-      throw new Error(
-        "Language server initialization options must be JSON data",
-      );
+      throw new Error("Language server initialization options must be JSON data");
     }
   }
   return {
@@ -104,10 +102,7 @@ function definition(
   };
 }
 
-function language(
-  registration: Registration,
-  path: string,
-): string | undefined {
+function language(registration: Registration, path: string): string | undefined {
   const suffix = Object.keys(registration.definition.languages)
     .sort((a, b) => b.length - a.length)
     .find((extension) => path.toLowerCase().endsWith(extension));
@@ -115,12 +110,10 @@ function language(
 }
 
 function compare(a: Registration, b: Registration): number {
-  return (b.definition.priority ?? 0) - (a.definition.priority ?? 0) ||
-    (a.definition.id < b.definition.id
-      ? -1
-      : a.definition.id > b.definition.id
-      ? 1
-      : 0);
+  return (
+    (b.definition.priority ?? 0) - (a.definition.priority ?? 0) ||
+    (a.definition.id < b.definition.id ? -1 : a.definition.id > b.definition.id ? 1 : 0)
+  );
 }
 
 /** Cordis-provided gateway. Registrations are plugin effects, not RPC commands. */
@@ -156,15 +149,18 @@ export class EditorLspService implements LspService {
   }
 
   private enqueue<T>(path: string, work: () => Promise<T>): Promise<T> {
-    const next = (this.queues.get(path) ?? Promise.resolve()).catch(() => {})
+    const next = (this.queues.get(path) ?? Promise.resolve())
+      .catch(() => {})
       .then(() => {
         this.assertActive();
         return work();
       });
     this.queues.set(path, next);
-    void next.finally(() => {
-      if (this.queues.get(path) === next) this.queues.delete(path);
-    }).catch(() => {});
+    void next
+      .finally(() => {
+        if (this.queues.get(path) === next) this.queues.delete(path);
+      })
+      .catch(() => {});
     return next;
   }
 
@@ -173,13 +169,12 @@ export class EditorLspService implements LspService {
     const document = this.documents.get(path);
     const uri = pathToFileURL(path).href;
     const owner = document?.owner;
-    const current = owner &&
-      this.registrations.get(owner.definition.id) === owner;
+    const current = owner && this.registrations.get(owner.definition.id) === owner;
     this.events.publish({
       type: "diagnostics",
       data: {
         uri,
-        diagnostics: current ? owner.client?.diagnostics.get(uri) ?? [] : [],
+        diagnostics: current ? (owner.client?.diagnostics.get(uri) ?? []) : [],
         serverId: current ? owner.definition.id : undefined,
       },
     });
@@ -209,7 +204,8 @@ export class EditorLspService implements LspService {
     this.assertActive();
     const config = definition(value);
     if (
-      !options || typeof options !== "object" ||
+      !options ||
+      typeof options !== "object" ||
       (options.replace !== undefined && typeof options.replace !== "boolean")
     ) {
       throw new Error("Invalid language server registration options");
@@ -231,7 +227,7 @@ export class EditorLspService implements LspService {
     this.refresh();
     let disposal: Promise<void> | undefined;
     return () =>
-      disposal ??= (async () => {
+      (disposal ??= (async () => {
         // An old plugin's disposer must never unregister its replacement.
         const current = this.registrations.get(config.id);
         if (current?.ownership === registration.ownership) {
@@ -245,7 +241,7 @@ export class EditorLspService implements LspService {
           await this.retire(current);
           await current.restarting?.catch(() => {});
         }
-      })();
+      })());
   }
 
   private start(registration: Registration) {
@@ -260,16 +256,12 @@ export class EditorLspService implements LspService {
           // Only the current owner may publish markers. URI values never bypass
           // the gateway's authorized-document map.
           for (const [path, document] of this.documents) {
-            if (
-              document.owner === registration &&
-              pathToFileURL(path).href === uri
-            ) this.publish(path);
+            if (document.owner === registration && pathToFileURL(path).href === uri)
+              this.publish(path);
           }
         },
         () => {
-          if (
-            this.disposed || this.registrations.get(config.id) !== registration
-          ) return;
+          if (this.disposed || this.registrations.get(config.id) !== registration) return;
           this.events.publish({ type: "language-server" });
           // Diagnostics also change status counts; reroute only failed owners.
           if (registration.client?.status().state === "unavailable") {
@@ -277,16 +269,13 @@ export class EditorLspService implements LspService {
           }
         },
       );
-      registration.started = registration.client.initialize(this.workspace.root)
-        .then(() => {
-          if (this.registrations.get(config.id) === registration) {
-            this.refresh();
-          }
-        });
+      registration.started = registration.client.initialize(this.workspace.root).then(() => {
+        if (this.registrations.get(config.id) === registration) {
+          this.refresh();
+        }
+      });
     } catch (error) {
-      registration.error = error instanceof Error
-        ? error.message
-        : String(error);
+      registration.error = error instanceof Error ? error.message : String(error);
     }
   }
 
@@ -327,48 +316,44 @@ export class EditorLspService implements LspService {
             active();
             const document = this.documents.get(path);
             if (document) await this.route(path, document.text);
-          })
+          }),
         ),
       );
       active();
       const status = registration.client?.status();
       if (!status?.running) {
-        throw new Error(
-          status?.error ?? registration.error ??
-            "Language server restart failed",
-        );
+        throw new Error(status?.error ?? registration.error ?? "Language server restart failed");
       }
       return status;
     });
     registration.restarting = pending;
-    void pending.finally(() => {
-      registration.restarting = undefined;
-      if (!this.disposed && this.registrations.get(id) === registration) {
-        this.events.publish({ type: "language-server" });
-      }
-    }).catch(() => {});
+    void pending
+      .finally(() => {
+        registration.restarting = undefined;
+        if (!this.disposed && this.registrations.get(id) === registration) {
+          this.events.publish({ type: "language-server" });
+        }
+      })
+      .catch(() => {});
     for (const path of this.documents.keys()) this.publish(path);
     this.events.publish({ type: "language-server" });
     return pending;
   }
 
   private async select(path: string): Promise<Registration | undefined> {
-    const candidates = [...this.registrations.values()].filter((entry) =>
-      language(entry, path)
-    ).sort(compare);
+    const candidates = [...this.registrations.values()]
+      .filter((entry) => language(entry, path))
+      .sort(compare);
     // Startup runs concurrently, so fallback never multiplies the 8s deadline.
     await Promise.all(candidates.map((entry) => entry.started));
     if (this.disposed) return;
-    return candidates.find((entry) =>
-      this.registrations.get(entry.definition.id) === entry &&
-      entry.client?.status().running
+    return candidates.find(
+      (entry) =>
+        this.registrations.get(entry.definition.id) === entry && entry.client?.status().running,
     );
   }
 
-  private async route(
-    path: string,
-    text: string,
-  ): Promise<Registration | undefined> {
+  private async route(path: string, text: string): Promise<Registration | undefined> {
     let document = this.documents.get(path);
     if (!document) {
       document = { text };
@@ -422,12 +407,8 @@ export class EditorLspService implements LspService {
           if (expired) return empty;
           const owner = await this.route(path, text);
           if (expired || !owner) return empty;
-          const result = await owner.client?.completion(path, position) ??
-            empty;
-          return !expired &&
-              this.registrations.get(owner.definition.id) === owner
-            ? result
-            : empty;
+          const result = (await owner.client?.completion(path, position)) ?? empty;
+          return !expired && this.registrations.get(owner.definition.id) === owner ? result : empty;
         }),
         // Includes queueing, startup, synchronization and the 3s RPC request.
         new Promise<CompletionResult>((resolve) => {
@@ -442,9 +423,7 @@ export class EditorLspService implements LspService {
     }
   }
 
-  async getDiagnostics(
-    values: readonly string[],
-  ): Promise<DocumentDiagnostics[]> {
+  async getDiagnostics(values: readonly string[]): Promise<DocumentDiagnostics[]> {
     this.assertActive();
     if (!Array.isArray(values) || values.length > 3000) {
       throw new Error("Expected at most 3000 diagnostic paths");
@@ -463,11 +442,10 @@ export class EditorLspService implements LspService {
         return true;
       });
       results.push(
-        ...await Promise.all(
+        ...(await Promise.all(
           unique.map((path) =>
             this.enqueue(path, async () => {
-              const text = this.documents.get(path)?.text ??
-                await readEditorText(path);
+              const text = this.documents.get(path)?.text ?? (await readEditorText(path));
               await this.route(path, text);
               const owner = this.documents.get(path)?.owner;
               const uri = pathToFileURL(path).href;
@@ -475,13 +453,11 @@ export class EditorLspService implements LspService {
                 path: relative(this.workspace.root, path),
                 uri,
                 serverId: owner?.definition.id,
-                diagnostics: structuredClone(
-                  owner?.client?.diagnostics.get(uri) ?? [],
-                ),
+                diagnostics: structuredClone(owner?.client?.diagnostics.get(uri) ?? []),
               };
-            })
+            }),
           ),
-        ),
+        )),
       );
     }
     return results;
@@ -489,58 +465,58 @@ export class EditorLspService implements LspService {
 
   servers(): RegisteredLanguageServerStatus[] {
     this.assertActive();
-    return [...this.registrations.values()].sort(compare).map((entry) =>
-      entry.client?.status() ?? {
-        id: entry.definition.id,
-        name: entry.definition.name,
-        priority: entry.definition.priority ?? 0,
-        languages: { ...entry.definition.languages },
-        running: false,
-        state: entry.restarting ? "starting" : "unavailable",
-        error: entry.error,
-        errors: 0,
-        warnings: 0,
-      }
+    return [...this.registrations.values()].sort(compare).map(
+      (entry) =>
+        entry.client?.status() ?? {
+          id: entry.definition.id,
+          name: entry.definition.name,
+          priority: entry.definition.priority ?? 0,
+          languages: { ...entry.definition.languages },
+          running: false,
+          state: entry.restarting ? "starting" : "unavailable",
+          error: entry.error,
+          errors: 0,
+          warnings: 0,
+        },
     );
   }
 
   async status(value?: string): Promise<LanguageServerStatus> {
     this.assertActive();
     if (value === undefined) {
-      return this.servers().find((entry) => entry.id === "deno") ?? {
-        name: "Deno",
-        running: false,
-        errors: 0,
-        warnings: 0,
-      };
+      return (
+        this.servers().find((entry) => entry.id === "deno") ?? {
+          name: "Deno",
+          running: false,
+          errors: 0,
+          warnings: 0,
+        }
+      );
     }
     const path = await this.path(value);
     const selected = await this.select(path);
-    const candidate = selected ??
-      [...this.registrations.values()].filter((entry) => language(entry, path))
-        .sort(compare)[0];
+    const candidate =
+      selected ??
+      [...this.registrations.values()].filter((entry) => language(entry, path)).sort(compare)[0];
     return candidate
       ? this.servers().find((entry) => entry.id === candidate.definition.id)!
       : {
-        name: "No language server",
-        running: false,
-        errors: 0,
-        warnings: 0,
-      };
+          name: "No language server",
+          running: false,
+          errors: 0,
+          warnings: 0,
+        };
   }
 
   dispose(): Promise<void> {
-    return this.disposal ??= (async () => {
+    return (this.disposal ??= (async () => {
       this.disposed = true;
       const entries = [...this.registrations.values()];
       this.registrations.clear();
-      await Promise.all([
-        ...entries.map((entry) => this.retire(entry)),
-        ...this.retiring,
-      ]);
+      await Promise.all([...entries.map((entry) => this.retire(entry)), ...this.retiring]);
       await Promise.allSettled(entries.map((entry) => entry.restarting));
-      await Promise.allSettled([...this.queues.values()]);
+      await Promise.allSettled(this.queues.values());
       this.documents.clear();
-    })();
+    })());
   }
 }

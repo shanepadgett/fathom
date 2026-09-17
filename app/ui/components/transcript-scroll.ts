@@ -1,4 +1,5 @@
 import type { Accessor } from "solid-js";
+
 import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
 
 export function createTranscriptScroll(options: {

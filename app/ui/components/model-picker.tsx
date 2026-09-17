@@ -1,31 +1,34 @@
-import { SearchDialog } from "./search-dialog.tsx";
 import type { ModelChoice } from "../../sdk/models.ts";
 
 import { createEffect, createSignal, For, on, Show } from "solid-js";
 
-import { SearchList } from "./search-list.tsx";
 import { Field } from "./primitives.tsx";
+import { SearchDialog } from "./search-dialog.tsx";
+import { SearchList } from "./search-list.tsx";
 import { SelectorButton } from "./selector-button.tsx";
 
-export function ModelPicker(
-  props: {
-    models: ModelChoice[];
-    provider: string;
-    model: string;
-    contextKey?: string;
-    thinking?: string;
-    thinkingLevels?: string[];
-    selectThinking?(value: string): void | Promise<void>;
-    select(value: string): void | Promise<void>;
-  },
-) {
+export function ModelPicker(props: {
+  models: ModelChoice[];
+  provider: string;
+  model: string;
+  contextKey?: string;
+  thinking?: string;
+  thinkingLevels?: string[];
+  selectThinking?(value: string): void | Promise<void>;
+  select(value: string): void | Promise<void>;
+}) {
   const [open, setOpen] = createSignal(false);
   const [saving, setSaving] = createSignal(false);
   const [failure, setFailure] = createSignal("");
-  createEffect(on(() => props.contextKey, () => {
-    setOpen(false);
-    setFailure("");
-  }));
+  createEffect(
+    on(
+      () => props.contextKey,
+      () => {
+        setOpen(false);
+        setFailure("");
+      },
+    ),
+  );
   async function thinking(value: string) {
     if (saving()) return;
     const context = props.contextKey;
@@ -42,9 +45,7 @@ export function ModelPicker(
     }
   }
   const selected = () =>
-    props.models.find((model) =>
-      model.id === props.model && model.provider === props.provider
-    );
+    props.models.find((model) => model.id === props.model && model.provider === props.provider);
   return (
     <>
       <SelectorButton
@@ -61,11 +62,12 @@ export function ModelPicker(
             disabled={saving()}
             label="Search models"
             placeholder="Search by model or provider…"
-            empty={props.models.length
-              ? "No matching models. Try a different search."
-              : "No models available. Connect a provider in Settings."}
-            searchText={(model) =>
-              `${model.name} ${model.id} ${model.provider}`}
+            empty={
+              props.models.length
+                ? "No matching models. Try a different search."
+                : "No models available. Connect a provider in Settings."
+            }
+            searchText={(model) => `${model.name} ${model.id} ${model.provider}`}
             select={async (model) => {
               if (saving()) return;
               setSaving(true);
@@ -83,22 +85,16 @@ export function ModelPicker(
                   <span class="font-medium">{model.name}</span>
                   <span class="text-xs text-muted">
                     {model.provider}
-                    {model.id === props.model &&
-                        model.provider === props.provider
+                    {model.id === props.model && model.provider === props.provider
                       ? " · Current"
                       : ""}
                   </span>
                 </span>
-                <span class="shrink-0 text-muted">
-                  {Math.round(model.contextWindow / 1000)}k
-                </span>
+                <span class="shrink-0 text-muted">{Math.round(model.contextWindow / 1000)}k</span>
               </span>
             )}
           </SearchList>
-          <Show
-            when={(props.thinkingLevels?.length ?? 0) > 1 &&
-              props.selectThinking}
-          >
+          <Show when={(props.thinkingLevels?.length ?? 0) > 1 && props.selectThinking}>
             <div class="border-t border-line p-4">
               <Field label="Thinking effort">
                 <select
@@ -119,7 +115,9 @@ export function ModelPicker(
                 </select>
               </Field>
               <Show when={failure()}>
-                <p role="alert" class="mt-2 text-sm text-danger">{failure()}</p>
+                <p role="alert" class="mt-2 text-sm text-danger">
+                  {failure()}
+                </p>
               </Show>
             </div>
           </Show>

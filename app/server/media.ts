@@ -13,12 +13,12 @@ export async function mediaResponse(
       headers: { Allow: "GET, HEAD" },
     });
   }
-  const { asset, data } = new URL(request.url).searchParams.get("draft") === "1"
-    ? await service.readDraft(sessionId, id)
-    : await service.read(sessionId, id);
+  const { asset, data } =
+    new URL(request.url).searchParams.get("draft") === "1"
+      ? await service.readDraft(sessionId, id)
+      : await service.read(sessionId, id);
   if (
-    !/^(image\/(png|jpeg|webp|gif)|audio\/(mpeg|wav|ogg|mp4)|video\/(mp4|webm))$/
-      .test(asset.mime)
+    !/^(image\/(png|jpeg|webp|gif)|audio\/(mpeg|wav|ogg|mp4)|video\/(mp4|webm))$/.test(asset.mime)
   ) {
     return new Response("Unsupported media type", { status: 415 });
   }
@@ -32,10 +32,10 @@ export async function mediaResponse(
     "Content-Security-Policy": "default-src 'none'; sandbox",
     "Content-Disposition": `${
       download ? "attachment" : "inline"
-    }; filename*=UTF-8''${
-      encodeURIComponent(asset.name).replace(/['()*]/g, (value) =>
-        `%${value.charCodeAt(0).toString(16).toUpperCase()}`)
-    }`,
+    }; filename*=UTF-8''${encodeURIComponent(asset.name).replace(
+      /['()*]/g,
+      (value) => `%${value.charCodeAt(0).toString(16).toUpperCase()}`,
+    )}`,
   });
   if (request.method === "HEAD") return new Response(null, { headers });
   // Unsupported/multiple ranges and conditional ranges fall back to the full asset.
@@ -43,15 +43,14 @@ export async function mediaResponse(
     ? null
     : request.headers.get("range")?.match(/^bytes=(\d*)-(\d*)$/);
   if (range && (range[1] || range[2])) {
-    const start = range[1]
-      ? Number(range[1])
-      : Math.max(0, data.byteLength - Number(range[2]));
-    const end = range[1] && range[2]
-      ? Math.min(Number(range[2]), data.byteLength - 1)
-      : data.byteLength - 1;
+    const start = range[1] ? Number(range[1]) : Math.max(0, data.byteLength - Number(range[2]));
+    const end =
+      range[1] && range[2] ? Math.min(Number(range[2]), data.byteLength - 1) : data.byteLength - 1;
     if (
-      !Number.isSafeInteger(start) || !Number.isSafeInteger(end) ||
-      start > end || start >= data.byteLength
+      !Number.isSafeInteger(start) ||
+      !Number.isSafeInteger(end) ||
+      start > end ||
+      start >= data.byteLength
     ) {
       headers.set("Content-Range", `bytes */${data.byteLength}`);
       headers.set("Content-Length", "0");
@@ -67,11 +66,7 @@ export async function mediaResponse(
   return new Response(new Uint8Array(data), { headers });
 }
 
-export async function mediaUpload(
-  request: Request,
-  service: MediaService,
-  sessionId: string,
-) {
+export async function mediaUpload(request: Request, service: MediaService, sessionId: string) {
   const limit = 64 * 1024 * 1024;
   if (Number(request.headers.get("content-length")) > limit) {
     return new Response("Media exceeds 64 MiB", { status: 413 });
@@ -93,17 +88,13 @@ export async function mediaUpload(
     offset += chunk.byteLength;
   }
   try {
-    const name = decodeURIComponent(
-      request.headers.get("x-fathom-filename") ?? "",
-    );
-    const mime = (request.headers.get("content-type") ?? "").split(";")[0]
+    const name = decodeURIComponent(request.headers.get("x-fathom-filename") ?? "");
+    const mime = (request.headers.get("content-type") ?? "")
+      .split(";")[0]
       .replace("audio/x-wav", "audio/wav");
     const asset = await service.stage(sessionId, { name, mime, data });
     return Response.json(asset, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    return new Response(
-      error instanceof Error ? error.message : "Upload failed",
-      { status: 400 },
-    );
+    return new Response(error instanceof Error ? error.message : "Upload failed", { status: 400 });
   }
 }

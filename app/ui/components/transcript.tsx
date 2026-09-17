@@ -1,69 +1,56 @@
-import type { FileRange } from "../../sdk/editor.ts";
-import { artifactsOnBranch } from "../../sdk/artifacts.ts";
-import { createTranscriptScroll } from "./transcript-scroll.ts";
-import { messageLink } from "../../sdk/message-link.ts";
 import type { AssistantMessage } from "@earendil-works/pi-ai";
 
+import type { FileRange } from "../../sdk/editor.ts";
 import type { Entry, SessionState } from "../../sdk/session.ts";
-
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  onCleanup,
-  Show,
-} from "solid-js";
-
 import type { UIHost } from "../host.ts";
-import { EntryContent, matchingEntryRenderer } from "./plugin-slot.tsx";
-import { ToolGroup } from "./tool-group.tsx";
-import {
-  activityOnly,
-  TranscriptActivity,
-  transcriptSegments,
-} from "./transcript-activity.tsx";
-import { EditMessage } from "./edit-message.tsx";
-import { MessageActions } from "./message-actions.tsx";
-import { MessageCard } from "./message-card.tsx";
-import { MessageBody } from "./message-body.tsx";
+
+import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
+
+import { artifactsOnBranch } from "../../sdk/artifacts.ts";
+import { messageLink } from "../../sdk/message-link.ts";
 import { CompactionNotice } from "./compaction-notice.tsx";
+import { EditMessage } from "./edit-message.tsx";
 import { Icon } from "./icon.tsx";
+import { MessageActions } from "./message-actions.tsx";
+import { MessageBody } from "./message-body.tsx";
+import { MessageCard } from "./message-card.tsx";
+import { EntryContent, matchingEntryRenderer } from "./plugin-slot.tsx";
 import { Button, EmptyState } from "./primitives.tsx";
+import { ToolGroup } from "./tool-group.tsx";
+import { activityOnly, TranscriptActivity, transcriptSegments } from "./transcript-activity.tsx";
+import { createTranscriptScroll } from "./transcript-scroll.ts";
 
 function textOf(entry: Entry) {
   const content = entry.message?.content;
   return typeof content === "string"
     ? content
-    : content?.filter((block) => block.type === "text").map((block) =>
-      block.text
-    ).join("\n") ?? "";
+    : (content
+        ?.filter((block) => block.type === "text")
+        .map((block) => block.text)
+        .join("\n") ?? "");
 }
 
-export function Transcript(
-  props: {
-    host: UIHost;
-    bottomPadding: number;
-    projectId: string;
-    state?: SessionState;
-    live?: { entryId: string; message: AssistantMessage };
-    detailed: boolean;
-    openArtifact(id: string): void;
-    openFile(path: string, range?: FileRange): void;
-    openDiff(path: string): void;
-    active: boolean;
-    focus?: { entryId: string; sessionId: string; request: number };
-    rewind(entry: Entry): void;
-    retry(entry: Entry): Promise<void>;
-    resend(entry: Entry, text: string): Promise<void>;
-  },
-) {
-  const artifactMap = createMemo(() =>
-    new Map(
-      artifactsOnBranch(props.state?.entries ?? []).map((
-        artifact,
-      ) => [artifact.id, artifact]),
-    )
+export function Transcript(props: {
+  host: UIHost;
+  bottomPadding: number;
+  projectId: string;
+  state?: SessionState;
+  live?: { entryId: string; message: AssistantMessage };
+  detailed: boolean;
+  openArtifact(id: string): void;
+  openFile(path: string, range?: FileRange): void;
+  openDiff(path: string): void;
+  active: boolean;
+  focus?: { entryId: string; sessionId: string; request: number };
+  rewind(entry: Entry): void;
+  retry(entry: Entry): Promise<void>;
+  resend(entry: Entry, text: string): Promise<void>;
+}) {
+  const artifactMap = createMemo(
+    () =>
+      new Map(
+        artifactsOnBranch(props.state?.entries ?? []).map((artifact) => [artifact.id, artifact]),
+      ),
   );
   const [editing, setEditing] = createSignal<Entry>();
   let viewport!: HTMLDivElement;
@@ -82,20 +69,20 @@ export function Transcript(
     const found = stored.some((entry) => entry.id === live.entryId);
     return found
       ? stored.map((entry) =>
-        entry.id === live.entryId ? { ...entry, message: live.message } : entry
-      )
+          entry.id === live.entryId ? { ...entry, message: live.message } : entry,
+        )
       : [
-        ...stored,
-        {
-          id: live.entryId,
-          kind: "message",
-          message: live.message,
-          status: "pending",
-          sessionId: props.state?.session.id ?? "",
-          parentId: null,
-          createdAt: Date.now(),
-        } as Entry,
-      ];
+          ...stored,
+          {
+            id: live.entryId,
+            kind: "message",
+            message: live.message,
+            status: "pending",
+            sessionId: props.state?.session.id ?? "",
+            parentId: null,
+            createdAt: Date.now(),
+          } as Entry,
+        ];
   };
   const groups = createMemo(() => {
     const result: Entry[][] = [];
@@ -111,7 +98,8 @@ export function Transcript(
         !["length", "error", "aborted"].includes(last.message.stopReason) &&
         last.message.model === entry.message.model &&
         last.message.provider === entry.message.provider
-      ) previous.push(entry);
+      )
+        previous.push(entry);
       else result.push([entry]);
     }
     return result;
@@ -121,17 +109,16 @@ export function Transcript(
   createEffect(() => {
     const target = props.focus;
     if (
-      !target || !props.active || target.request === focusedRequest ||
+      !target ||
+      !props.active ||
+      target.request === focusedRequest ||
       target.sessionId !== props.state?.session.id
-    ) return;
+    )
+      return;
     const frame = requestAnimationFrame(() => {
-      if (
-        props.focus !== target || !props.active ||
-        target.sessionId !== props.state?.session.id
-      ) return;
-      const group = groups().find((items) =>
-        items.some((entry) => entry.id === target.entryId)
-      );
+      if (props.focus !== target || !props.active || target.sessionId !== props.state?.session.id)
+        return;
+      const group = groups().find((items) => items.some((entry) => entry.id === target.entryId));
       const article = group && articles.get(group[0].id);
       if (article) {
         focusedRequest = target.request;
@@ -174,95 +161,80 @@ export function Transcript(
                 <For each={groups().map((group) => group[0].id)}>
                   {(id) => {
                     onCleanup(() => articles.delete(id));
-                    const group = () =>
-                      groups().find((group) => group[0].id === id)!;
-                    const [rendererRevision, setRendererRevision] =
-                      createSignal(0);
-                    onCleanup(props.host.subscribe(() =>
-                      setRendererRevision((value) =>
-                        value + 1
-                      )
-                    ));
+                    const group = () => groups().find((group) => group[0].id === id)!;
+                    const [rendererRevision, setRendererRevision] = createSignal(0);
+                    onCleanup(
+                      props.host.subscribe(() => setRendererRevision((value) => value + 1)),
+                    );
                     const segments = createMemo(() => {
                       rendererRevision();
-                      return transcriptSegments(group(), (entry) =>
-                        !!matchingEntryRenderer(props.host, entry));
-                    });
-                    const entry = () =>
-                      group()[0];
-                    const executions = () => {
-                      const ids = new Set(
-                        group().map((item) =>
-                          item.id
-                        ),
+                      return transcriptSegments(
+                        group(),
+                        (entry) => !!matchingEntryRenderer(props.host, entry),
                       );
-                      return props.state?.executions.filter((run) =>
-                        ids.has(run.entryId)
-                      ) ?? [];
+                    });
+                    const entry = () => group()[0];
+                    const executions = () => {
+                      const ids = new Set(group().map((item) => item.id));
+                      return props.state?.executions.filter((run) => ids.has(run.entryId)) ?? [];
                     };
                     const working = () =>
                       group().some((item) => item.status === "pending") ||
-                      executions().some((run) =>
-                        run.status === "running" || run.status === "pending"
+                      executions().some(
+                        (run) => run.status === "running" || run.status === "pending",
                       );
                     return (
                       <MessageCard
                         ref={(element) => articles.set(id, element)}
-                        author={entry().source?.label ??
+                        author={
+                          entry().source?.label ??
                           (entry().message?.role === "user"
                             ? "You"
                             : entry().message?.role === "assistant"
-                            ? "Fathom"
-                            : entry().custom?.type === "artifact"
-                            ? "Artifact"
-                            : entry().custom?.type === "artifact-approval"
-                            ? "Approval"
-                            : entry().custom?.type === "media"
-                            ? "Media"
-                            : entry().custom?.type ?? "Context")}
+                              ? "Fathom"
+                              : entry().custom?.type === "artifact"
+                                ? "Artifact"
+                                : entry().custom?.type === "artifact-approval"
+                                  ? "Approval"
+                                  : entry().custom?.type === "media"
+                                    ? "Media"
+                                    : (entry().custom?.type ?? "Context"))
+                        }
                         agent={entry().message?.role === "assistant"}
                         working={working()}
-                        model={entry().message?.role === "assistant"
-                          ? (entry().message as AssistantMessage).model
-                          : undefined}
+                        model={
+                          entry().message?.role === "assistant"
+                            ? (entry().message as AssistantMessage).model
+                            : undefined
+                        }
                         createdAt={entry().createdAt}
                       >
                         <div class="space-y-4">
-                          <For
-                            each={segments().map((items) => items[0].id)}
-                          >
+                          <For each={segments().map((items) => items[0].id)}>
                             {(segmentId) => {
                               const segment = () =>
-                                segments().find((items) =>
-                                  items[0].id === segmentId
-                                )!;
+                                segments().find((items) => items[0].id === segmentId)!;
                               return (
                                 <TranscriptActivity
                                   entries={segment()}
                                   executions={executions().filter((run) =>
-                                    segment().some((item) =>
-                                      item.id === run.entryId
-                                    )
+                                    segment().some((item) => item.id === run.entryId),
                                   )}
                                   detailed={props.detailed}
                                 >
                                   <For each={segment().map((item) => item.id)}>
                                     {(id) => {
-                                      const entry = () =>
-                                        segment().find((item) =>
-                                          item.id === id
-                                        )!;
+                                      const entry = () => segment().find((item) => item.id === id)!;
                                       return (
                                         <>
-                                          <EntryContent
-                                            host={props.host}
-                                            entry={entry()}
-                                          >
+                                          <EntryContent host={props.host} entry={entry()}>
                                             <MessageBody
                                               artifact={artifactMap().get(
-                                                (entry().custom?.data as {
-                                                  id?: string;
-                                                })?.id ?? "",
+                                                (
+                                                  entry().custom?.data as {
+                                                    id?: string;
+                                                  }
+                                                )?.id ?? "",
                                               )}
                                               host={props.host}
                                               projectId={props.projectId}
@@ -275,9 +247,9 @@ export function Transcript(
                                             grouped={activityOnly(segment()[0])}
                                             openFile={props.openFile}
                                             openDiff={props.openDiff}
-                                            executions={executions().filter((
-                                              run,
-                                            ) => run.entryId === id)}
+                                            executions={executions().filter(
+                                              (run) => run.entryId === id,
+                                            )}
                                             detailed={props.detailed}
                                           />
                                         </>
@@ -295,33 +267,34 @@ export function Transcript(
                             sessionId: props.state!.session.id,
                             entryId: entry().id,
                           })}
-                          text={group().map(textOf).filter(Boolean).join(
-                            "\n\n",
-                          )}
-                          disabled={working() ||
+                          text={group().map(textOf).filter(Boolean).join("\n\n")}
+                          disabled={
+                            working() ||
                             ["running", "approval", "retry_waiting"].includes(
                               props.state?.session.status ?? "",
-                            )}
-                          edit={entry().message?.role === "user" &&
-                              !entry().source
-                            ? () => setEditing(entry())
-                            : undefined}
-                          retry={entry().message?.role === "assistant"
-                            ? () => props.retry(entry())
-                            : undefined}
-                          branch={["user", "assistant"].includes(
-                              entry().message?.role ?? "",
                             )
-                            ? () => props.rewind(group().at(-1)!)
-                            : undefined}
+                          }
+                          edit={
+                            entry().message?.role === "user" && !entry().source
+                              ? () => setEditing(entry())
+                              : undefined
+                          }
+                          retry={
+                            entry().message?.role === "assistant"
+                              ? () => props.retry(entry())
+                              : undefined
+                          }
+                          branch={
+                            ["user", "assistant"].includes(entry().message?.role ?? "")
+                              ? () => props.rewind(group().at(-1)!)
+                              : undefined
+                          }
                         />
                       </MessageCard>
                     );
                   }}
                 </For>
-                <Show
-                  when={props.state?.activity?.label === "Compacting context"}
-                >
+                <Show when={props.state?.activity?.label === "Compacting context"}>
                   <CompactionNotice pending />
                 </Show>
               </div>

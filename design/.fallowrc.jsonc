@@ -5,6 +5,6 @@
   "ignorePatterns": ["dist/**", "node_modules/**", "vibe-lab.html"],
   "usedClassMembers": [
     // Lit reads this static declaration, rather than calling it in source code.
-    { "extends": "DesignElement", "members": ["properties"] }
-  ]
+    { "extends": "DesignElement", "members": ["properties"] },
+  ],
 }

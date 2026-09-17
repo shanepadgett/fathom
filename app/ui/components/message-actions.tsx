@@ -37,41 +37,24 @@ export function MessageActions(props: {
   }
   return (
     <>
-      <div
-        class="mt-4 flex flex-wrap gap-1"
-        role="group"
-        aria-label="Message actions"
-      >
+      <div class="mt-4 flex flex-wrap gap-1" role="group" aria-label="Message actions">
         <Show when={props.text.trim()}>
-          <Button
-            disabled={busy()}
-            title="Copy message"
-            onClick={() => void act(copy)}
-          >
+          <Button disabled={busy()} title="Copy message" onClick={() => void act(copy)}>
             {copied() ? "Copied" : "Copy"}
           </Button>
         </Show>
         <Show when={props.edit}>
-          <Button
-            disabled={busy() || props.disabled}
-            onClick={() => void act(props.edit!)}
-          >
+          <Button disabled={busy() || props.disabled} onClick={() => void act(props.edit!)}>
             Edit and resend
           </Button>
         </Show>
         <Show when={props.retry}>
-          <Button
-            disabled={busy() || props.disabled}
-            onClick={() => void act(props.retry!)}
-          >
+          <Button disabled={busy() || props.disabled} onClick={() => void act(props.retry!)}>
             Retry response
           </Button>
         </Show>
         <Show when={props.branch}>
-          <Button
-            disabled={busy() || props.disabled}
-            onClick={() => void act(props.branch!)}
-          >
+          <Button disabled={busy() || props.disabled} onClick={() => void act(props.branch!)}>
             Branch from here
           </Button>
         </Show>
@@ -84,13 +67,16 @@ export function MessageActions(props: {
               setCopied(false);
               clearTimeout(feedback);
               feedback = setTimeout(() => setLinkCopied(false), 2000);
-            })}
+            })
+          }
         >
           {linkCopied() ? "Copied link" : "Copy message link"}
         </Button>
       </div>
       <Show when={error()}>
-        <p role="alert" class="mt-2 text-sm text-danger">{error()}</p>
+        <p role="alert" class="mt-2 text-sm text-danger">
+          {error()}
+        </p>
       </Show>
     </>
   );

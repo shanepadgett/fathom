@@ -1,20 +1,11 @@
 import type { Application } from "./application.ts";
-import {
-  MAX_RPC_BUFFER_BYTES,
-  MAX_RPC_REQUEST_BYTES,
-} from "../sdk/transport.ts";
-import { artifactPreview } from "./artifact-preview.ts";
-import { mediaResponse, mediaUpload } from "./media.ts";
 
 import { timingSafeEqual } from "node:crypto";
-import {
-  dirname,
-  extname,
-  isAbsolute,
-  join,
-  relative,
-  resolve,
-} from "node:path";
+import { dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
+
+import { MAX_RPC_BUFFER_BYTES, MAX_RPC_REQUEST_BYTES } from "../sdk/transport.ts";
+import { artifactPreview } from "./artifact-preview.ts";
+import { mediaResponse, mediaUpload } from "./media.ts";
 
 const mime: Record<string, string> = {
   ".html": "text/html",
@@ -31,7 +22,8 @@ const mime: Record<string, string> = {
 };
 
 function equal(a: string, b: string) {
-  const x = new TextEncoder().encode(a), y = new TextEncoder().encode(b);
+  const x = new TextEncoder().encode(a),
+    y = new TextEncoder().encode(b);
   return x.length === y.length && timingSafeEqual(x, y);
 }
 
@@ -61,35 +53,35 @@ export function handler(
       return new Response("Cross-site request denied", { status: 403 });
     }
     if (url.pathname === "/bootstrap" && request.method === "POST") {
-      return Response.json({ projects: app.projects.list() }, {
-        headers: {
-          ...headers,
-          "Set-Cookie": `fathom=${token}; HttpOnly; SameSite=Strict; Path=/`,
-          "Cache-Control": "no-store",
+      return Response.json(
+        { projects: app.projects.list() },
+        {
+          headers: {
+            ...headers,
+            "Set-Cookie": `fathom=${token}; HttpOnly; SameSite=Strict; Path=/`,
+            "Cache-Control": "no-store",
+          },
         },
-      });
+      );
     }
     const cookie =
-      request.headers.get("cookie")?.split(";").map((value) => value.trim())
-        .find((value) => value.startsWith("fathom="))?.slice(7) ?? "";
-    const authorized = equal(cookie, token) ||
-      equal(
-        request.headers.get("authorization")?.replace(/^Bearer /, "") ?? "",
-        token,
-      );
+      request.headers
+        .get("cookie")
+        ?.split(";")
+        .map((value) => value.trim())
+        .find((value) => value.startsWith("fathom="))
+        ?.slice(7) ?? "";
+    const authorized =
+      equal(cookie, token) ||
+      equal(request.headers.get("authorization")?.replace(/^Bearer /, "") ?? "", token);
     if (url.pathname === "/ws") {
-      if (
-        !authorized ||
-        request.headers.get("upgrade")?.toLowerCase() !== "websocket"
-      ) return new Response("Unauthorized", { status: 401 });
+      if (!authorized || request.headers.get("upgrade")?.toLowerCase() !== "websocket")
+        return new Response("Unauthorized", { status: 401 });
       const { socket, response } = Deno.upgradeWebSocket(request);
       const send = (value: unknown) => {
         if (socket.readyState !== WebSocket.OPEN) return;
         if (socket.bufferedAmount >= MAX_RPC_BUFFER_BYTES) {
-          socket.close(
-            1013,
-            "Connection is too slow; reconnect to refresh state",
-          );
+          socket.close(1013, "Connection is too slow; reconnect to refresh state");
           return;
         }
         socket.send(JSON.stringify(value));
@@ -102,8 +94,7 @@ export function handler(
         if (
           typeof event.data !== "string" ||
           event.data.length > MAX_RPC_REQUEST_BYTES ||
-          new TextEncoder().encode(event.data).byteLength >
-            MAX_RPC_REQUEST_BYTES
+          new TextEncoder().encode(event.data).byteLength > MAX_RPC_REQUEST_BYTES
         ) {
           socket.close(1009, "Message too large");
           return;
@@ -113,14 +104,16 @@ export function handler(
           const message = JSON.parse(event.data);
           id = message.id;
           if (
-            typeof id !== "string" || typeof message.method !== "string" ||
+            typeof id !== "string" ||
+            typeof message.method !== "string" ||
             (message.params &&
-              (typeof message.params !== "object" ||
-                Array.isArray(message.params)))
-          ) throw new Error("Invalid request");
-          const result = message.method === "ping"
-            ? { time: Date.now() }
-            : await app.request(message.method, message.params);
+              (typeof message.params !== "object" || Array.isArray(message.params)))
+          )
+            throw new Error("Invalid request");
+          const result =
+            message.method === "ping"
+              ? { time: Date.now() }
+              : await app.request(message.method, message.params);
           send({ id, result });
         } catch (error) {
           send({
@@ -153,18 +146,9 @@ export function handler(
         }
         await environment.whenReady();
         if (id === "upload" && request.method === "POST") {
-          return await mediaUpload(
-            request,
-            environment.host.get("media"),
-            sessionId,
-          );
+          return await mediaUpload(request, environment.host.get("media"), sessionId);
         }
-        return await mediaResponse(
-          request,
-          environment.host.get("media"),
-          sessionId,
-          id,
-        );
+        return await mediaResponse(request, environment.host.get("media"), sessionId, id);
       } catch {
         return new Response("Media unavailable", { status: 404 });
       }
@@ -172,16 +156,14 @@ export function handler(
     if (url.pathname.startsWith("/extensions/")) {
       if (!authorized) return new Response("Unauthorized", { status: 401 });
       const [, , projectId, encodedId, ...parts] = url.pathname.split("/");
-      const entry = app.environments.get(projectId)?.assets.get(
-        decodeURIComponent(encodedId ?? ""),
-      );
+      const entry = app.environments
+        .get(projectId)
+        ?.assets.get(decodeURIComponent(encodedId ?? ""));
       if (!entry) return new Response("Extension not found", { status: 404 });
       const root = await Deno.realPath(dirname(entry));
       let file: string;
       try {
-        file = await Deno.realPath(
-          resolve(root, ...parts.map(decodeURIComponent)),
-        );
+        file = await Deno.realPath(resolve(root, ...parts.map(decodeURIComponent)));
       } catch {
         return new Response("Extension file not found", { status: 404 });
       }
@@ -204,10 +186,8 @@ export function handler(
       return new Response("Method not allowed", { status: 405 });
     }
     const path = decodeURIComponent(url.pathname);
-    if (
-      path.split("/").includes("..") || path.includes("\\") ||
-      path.includes("\0")
-    ) return new Response("Invalid path", { status: 400 });
+    if (path.split("/").includes("..") || path.includes("\\") || path.includes("\0"))
+      return new Response("Invalid path", { status: 400 });
     try {
       const file = join(publicDir, path === "/" ? "index.html" : path);
       return new Response(await Deno.readFile(file), {

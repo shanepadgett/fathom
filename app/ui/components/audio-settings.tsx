@@ -51,7 +51,8 @@ export function AudioSettings(props: {
                   props.setCues({
                     ...props.cues,
                     [cue.id]: event.currentTarget.checked,
-                  })}
+                  })
+                }
               />
               {cue.label}
             </label>
@@ -72,8 +73,7 @@ export function AudioSettings(props: {
           max="1"
           step="0.05"
           value={props.volume}
-          onInput={(event) =>
-            props.setVolume(event.currentTarget.valueAsNumber)}
+          onInput={(event) => props.setVolume(event.currentTarget.valueAsNumber)}
         />
       </Field>
     </div>

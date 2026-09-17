@@ -1,16 +1,13 @@
 import type { DesktopBindings, DesktopNotification } from "../sdk/desktop.ts";
 
-import { loadNativeBrowser } from "./native-browser.ts";
 import { NativeBrowserHost } from "./native-browser-host.ts";
+import { loadNativeBrowser } from "./native-browser.ts";
 
 interface DesktopWindow extends EventTarget {
   readonly windowId: number;
   focus(): void;
   close(): void;
-  bind<K extends keyof DesktopBindings>(
-    name: K,
-    handler: DesktopBindings[K],
-  ): void;
+  bind<K extends keyof DesktopBindings>(name: K, handler: DesktopBindings[K]): void;
   navigate(url: string): void;
   setTitle(title: string): void;
   setSize(width: number, height: number): void;
@@ -19,9 +16,7 @@ interface DesktopWindow extends EventTarget {
 }
 
 type DesktopRuntime = typeof Deno & {
-  BrowserWindow?: new (
-    options: { title: string; width: number; height: number },
-  ) => DesktopWindow;
+  BrowserWindow?: new (options: { title: string; width: number; height: number }) => DesktopWindow;
 };
 
 /** Process-owned window: project plugin reloads must not replace native chrome. */
@@ -34,12 +29,8 @@ export function createDesktopWindow(shutdown: () => Promise<void>) {
     height: 940,
   });
   const backend = loadNativeBrowser();
-  const browser = backend
-    ? new NativeBrowserHost(backend, window.windowId)
-    : undefined;
-  console.info(
-    `Native child browser backend: ${browser ? "available" : "unavailable"}`,
-  );
+  const browser = backend ? new NativeBrowserHost(backend, window.windowId) : undefined;
+  console.info(`Native child browser backend: ${browser ? "available" : "unavailable"}`);
   const notifications = new Map<string, Notification>();
   let closing: Promise<void> | undefined;
   let readyToClose = false;
@@ -72,27 +63,18 @@ export function createDesktopWindow(shutdown: () => Promise<void>) {
   });
   window.bind("showNotification", async (value: DesktopNotification) => {
     if (typeof Notification === "undefined") return false;
-    if (
-      !value || typeof value.title !== "string" ||
-      typeof value.body !== "string"
-    ) {
+    if (!value || typeof value.title !== "string" || typeof value.body !== "string") {
       throw new Error("Invalid notification");
     }
     const target = value.target;
-    if (
-      target &&
-      (typeof target.projectId !== "string" ||
-        typeof target.sessionId !== "string")
-    ) {
+    if (target && (typeof target.projectId !== "string" || typeof target.sessionId !== "string")) {
       throw new Error("Invalid notification target");
     }
     const permission = await navigator.permissions.query({
       name: "notifications",
     });
     if (permission.state !== "granted") return false;
-    const tag = target
-      ? `fathom:${target.projectId}:${target.sessionId}`
-      : "fathom-preview";
+    const tag = target ? `fathom:${target.projectId}:${target.sessionId}` : "fathom-preview";
     notifications.get(tag)?.close();
     if (notifications.size >= 64) {
       const oldest = notifications.entries().next().value!;
@@ -106,14 +88,8 @@ export function createDesktopWindow(shutdown: () => Promise<void>) {
     });
     notifications.set(tag, notification);
     console.info("Desktop notification requested");
-    notification.addEventListener(
-      "show",
-      () => console.info("Desktop notification shown"),
-    );
-    notification.addEventListener(
-      "error",
-      () => console.error("Desktop notification failed"),
-    );
+    notification.addEventListener("show", () => console.info("Desktop notification shown"));
+    notification.addEventListener("error", () => console.error("Desktop notification failed"));
     notification.addEventListener("close", () => {
       if (notifications.get(tag) === notification) notifications.delete(tag);
     });
@@ -121,11 +97,13 @@ export function createDesktopWindow(shutdown: () => Promise<void>) {
       window.focus();
       notification.close();
       if (target) {
-        void window.executeJs(
-          `globalThis.dispatchEvent(new CustomEvent("fathom:notification", {detail: ${
-            JSON.stringify(target)
-          }}))`,
-        ).catch(console.error);
+        void window
+          .executeJs(
+            `globalThis.dispatchEvent(new CustomEvent("fathom:notification", {detail: ${JSON.stringify(
+              target,
+            )}}))`,
+          )
+          .catch(console.error);
       }
     });
     return true;
@@ -186,9 +164,9 @@ export function createDesktopWindow(shutdown: () => Promise<void>) {
       return;
     }
     void window.executeJs(
-      `globalThis.dispatchEvent(new CustomEvent("fathom:desktop-command", {detail: ${
-        JSON.stringify(id)
-      }}))`,
+      `globalThis.dispatchEvent(new CustomEvent("fathom:desktop-command", {detail: ${JSON.stringify(
+        id,
+      )}}))`,
     );
   });
   window.addEventListener("close", (event) => {

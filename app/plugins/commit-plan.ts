@@ -13,10 +13,14 @@ export function validateCommitGroups(
   const commits: CommitGroup[] = [];
   for (const item of value) {
     if (
-      !item || typeof item !== "object" || typeof item.title !== "string" ||
-      !item.title.trim() || item.title.includes("\n") ||
+      !item ||
+      typeof item !== "object" ||
+      typeof item.title !== "string" ||
+      !item.title.trim() ||
+      item.title.includes("\n") ||
       item.title.includes("\r") ||
-      typeof item.body !== "string" || !Array.isArray(item.files) ||
+      typeof item.body !== "string" ||
+      !Array.isArray(item.files) ||
       !item.files.length
     ) {
       throw new Error(

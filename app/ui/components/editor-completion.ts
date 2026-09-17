@@ -1,8 +1,4 @@
-import type {
-  CompletionPosition,
-  CompletionRange,
-  CompletionResult,
-} from "../../sdk/editor.ts";
+import type { CompletionPosition, CompletionRange, CompletionResult } from "../../sdk/editor.ts";
 
 import * as monaco from "monaco-editor/editor/editor.api.js";
 import "monaco-editor/editor/contrib/suggest/browser/suggestController.js";
@@ -47,16 +43,18 @@ const kinds = [
 function range(value: CompletionRange, model: monaco.editor.ITextModel) {
   if (!value?.start || !value?.end) return;
   const valid = (position: CompletionPosition) =>
-    Number.isInteger(position.line) && Number.isInteger(position.character) &&
-    position.line >= 0 && position.line < model.getLineCount() &&
+    Number.isInteger(position.line) &&
+    Number.isInteger(position.character) &&
+    position.line >= 0 &&
+    position.line < model.getLineCount() &&
     position.character >= 0 &&
     position.character < model.getLineMaxColumn(position.line + 1);
   if (!valid(value.start) || !valid(value.end)) return;
   if (
     value.start.line > value.end.line ||
-    (value.start.line === value.end.line &&
-      value.start.character > value.end.character)
-  ) return;
+    (value.start.line === value.end.line && value.start.character > value.end.character)
+  )
+    return;
   return new monaco.Range(
     value.start.line + 1,
     value.start.character + 1,
@@ -89,9 +87,13 @@ export function registerEditorCompletion(
           return;
         }
         if (
-          disposed || token.isCancellationRequested || model.isDisposed() ||
-          model.getVersionId() !== version || pathFor(model) !== path
-        ) return;
+          disposed ||
+          token.isCancellationRequested ||
+          model.isDisposed() ||
+          model.getVersionId() !== version ||
+          pathFor(model) !== path
+        )
+          return;
         const word = model.getWordUntilPosition(position);
         const fallback = new monaco.Range(
           position.lineNumber,
@@ -102,56 +104,54 @@ export function registerEditorCompletion(
         const suggestions: monaco.languages.CompletionItem[] = [];
         for (const item of result.items) {
           const edit = item.textEdit;
-          const insert = edit
-            ? range("range" in edit ? edit.range : edit.insert, model)
-            : fallback;
+          const insert = edit ? range("range" in edit ? edit.range : edit.insert, model) : fallback;
           const replace = edit
             ? range("range" in edit ? edit.range : edit.replace, model)
             : fallback;
           if (
-            !insert || !replace || !insert.isSingleLine() ||
+            !insert ||
+            !replace ||
+            !insert.isSingleLine() ||
             !replace.isSingleLine() ||
             !insert.containsPosition(position) ||
             !replace.containsPosition(position) ||
             !insert.getStartPosition().equals(replace.getStartPosition()) ||
             !replace.containsRange(insert)
-          ) continue;
+          )
+            continue;
           const edits = (item.additionalTextEdits ?? []).map((edit) => ({
             range: range(edit.range, model),
             text: edit.newText,
           }));
           if (edits.some((edit) => !edit.range)) continue;
-          const additionalTextEdits =
-            edits as monaco.editor.ISingleEditOperation[];
-          const ranges = [
-            replace,
-            ...additionalTextEdits.map((edit) => edit.range),
-          ];
+          const additionalTextEdits = edits as monaco.editor.ISingleEditOperation[];
+          const ranges = [replace, ...additionalTextEdits.map((edit) => edit.range)];
           if (
             ranges.some((current, index) =>
-              ranges.slice(index + 1).some((other) =>
-                monaco.Range.areIntersecting(current, other)
-              )
+              ranges.slice(index + 1).some((other) => monaco.Range.areIntersecting(current, other)),
             )
-          ) continue;
+          )
+            continue;
           const documentation = item.documentation;
           suggestions.push({
             label: item.label,
             kind: kinds[item.kind ?? 1] ?? kind.Text,
             detail: item.detail,
-            documentation: typeof documentation === "string"
-              ? documentation
-              : documentation?.kind === "markdown"
-              ? {
-                value: documentation.value,
-                isTrusted: false,
-                supportHtml: false,
-              }
-              : documentation?.value,
+            documentation:
+              typeof documentation === "string"
+                ? documentation
+                : documentation?.kind === "markdown"
+                  ? {
+                      value: documentation.value,
+                      isTrusted: false,
+                      supportHtml: false,
+                    }
+                  : documentation?.value,
             insertText: item.textEdit?.newText ?? item.insertText ?? item.label,
-            insertTextRules: item.insertTextFormat === 2
-              ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-              : undefined,
+            insertTextRules:
+              item.insertTextFormat === 2
+                ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                : undefined,
             sortText: item.sortText,
             filterText: item.filterText,
             range: { insert, replace },

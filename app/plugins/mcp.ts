@@ -1,9 +1,6 @@
 import type { TSchema } from "@earendil-works/pi-ai";
 
-import {
-  Client,
-  StreamableHTTPClientTransport,
-} from "@modelcontextprotocol/client";
+import { Client, StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
 import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
 
 import { definePlugin } from "../sdk/mod.ts";
@@ -49,41 +46,33 @@ export default definePlugin({
       };
       const connect = async (config: ServerConfig) => {
         if (!/^[a-zA-Z][a-zA-Z0-9_]{0,40}$/.test(config.id)) {
-          throw new Error(
-            "MCP server ID must use letters, numbers and underscores",
-          );
+          throw new Error("MCP server ID must use letters, numbers and underscores");
         }
-        if (
-          servers.has(config.id) || connecting.has(config.id)
-        ) throw new Error("Server is already connected or connecting");
-        if (
-          config.url &&
-          !["http:", "https:"].includes(new URL(config.url).protocol)
-        ) throw new Error("Use an HTTP or HTTPS MCP endpoint");
+        if (servers.has(config.id) || connecting.has(config.id))
+          throw new Error("Server is already connected or connecting");
+        if (config.url && !["http:", "https:"].includes(new URL(config.url).protocol))
+          throw new Error("Use an HTTP or HTTPS MCP endpoint");
         if (!config.url && !config.command?.trim()) {
-          throw new Error(
-            "Enter the local MCP executable",
-          );
+          throw new Error("Enter the local MCP executable");
         }
         const client = new Client({ name: "fathom", version: "0.1.0" });
         const transport = config.url
           ? new StreamableHTTPClientTransport(new URL(config.url))
           : new StdioClientTransport({
-            command: config.command ?? "deno",
-            args: config.args ?? [],
-            cwd: workspace.root,
-          });
+              command: config.command ?? "deno",
+              args: config.args ?? [],
+              cwd: workspace.root,
+            });
         const registered: (() => void)[] = [];
         connecting.add(config.id);
         try {
           await client.connect(transport);
-          let cursor: string | undefined, count = 0;
+          let cursor: string | undefined,
+            count = 0;
           do {
             const page = await client.listTools({ cursor });
             for (const tool of page.tools) {
-              const name = `mcp_${config.id}_${
-                tool.name.replace(/[^a-zA-Z0-9_]/g, "_")
-              }`;
+              const name = `mcp_${config.id}_${tool.name.replace(/[^a-zA-Z0-9_]/g, "_")}`;
               registered.push(
                 tools.register({
                   name,
@@ -92,10 +81,13 @@ export default definePlugin({
                   deferred: true,
                   tags: [config.id, "mcp"],
                   execute: async (args, context) => {
-                    const result = await client.callTool({
-                      name: tool.name,
-                      arguments: args,
-                    }, { signal: context.signal });
+                    const result = await client.callTool(
+                      {
+                        name: tool.name,
+                        arguments: args,
+                      },
+                      { signal: context.signal },
+                    );
                     if (result.isError) {
                       throw new Error(JSON.stringify(result));
                     }
@@ -125,17 +117,20 @@ export default definePlugin({
       };
       const disposers = [
         rpc.register("mcp.list", () =>
-          [...servers.values()].map((server) => ({
-            ...server.config,
-            count: server.count,
-            status: "connected",
-          })).concat(
-            [...failures].map(([id, error]) => ({
-              id,
-              count: 0,
-              status: error,
-            })),
-          )),
+          [...servers.values()]
+            .map((server) => ({
+              ...server.config,
+              count: server.count,
+              status: "connected",
+            }))
+            .concat(
+              [...failures].map(([id, error]) => ({
+                id,
+                count: 0,
+                status: error,
+              })),
+            ),
+        ),
         rpc.register("mcp.connect", async (params) => {
           const config: ServerConfig = {
             id: String(params.id),
@@ -144,7 +139,8 @@ export default definePlugin({
             url: params.url ? String(params.url) : undefined,
           };
           await connect(config);
-          const saved = storage.setting<ServerConfig[]>("mcp.servers", [])
+          const saved = storage
+            .setting<ServerConfig[]>("mcp.servers", [])
             .filter((server) => server.id !== config.id);
           storage.setSetting("mcp.servers", [...saved, config]);
           return {};
@@ -155,25 +151,18 @@ export default definePlugin({
           failures.delete(id);
           storage.setSetting(
             "mcp.servers",
-            storage.setting<ServerConfig[]>("mcp.servers", []).filter(
-              (server) => server.id !== id,
-            ),
+            storage.setting<ServerConfig[]>("mcp.servers", []).filter((server) => server.id !== id),
           );
           events.publish({ type: "mcp" });
           return {};
         }),
       ];
       if (workspace.trusted()) {
-        for (
-          const config of storage.setting<ServerConfig[]>("mcp.servers", [])
-        ) {
+        for (const config of storage.setting<ServerConfig[]>("mcp.servers", [])) {
           try {
             await connect(config);
           } catch (error) {
-            failures.set(
-              config.id,
-              error instanceof Error ? error.message : String(error),
-            );
+            failures.set(config.id, error instanceof Error ? error.message : String(error));
           }
         }
       }

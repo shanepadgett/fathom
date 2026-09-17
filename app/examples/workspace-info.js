@@ -8,8 +8,7 @@ export default {
       const workspace = ctx.get("workspace");
       const storage = ctx.get("storage");
       const readInfo = () => ({
-        name: workspace.root.split(/[\\/]/).filter(Boolean).pop() ??
-          workspace.root,
+        name: workspace.root.split(/[\\/]/).filter(Boolean).pop() ?? workspace.root,
         path: workspace.root,
         trusted: workspace.trusted(),
         sessions: storage.listSessions().length,
@@ -22,11 +21,9 @@ export default {
           readOnly: true,
           parameters: { type: "object", properties: {} },
           execute: async () => JSON.stringify(readInfo()),
-        })
+        }),
       );
-      ctx.effect(() =>
-        ctx.get("rpc").register("example.workspaceInfo", readInfo)
-      );
+      ctx.effect(() => ctx.get("rpc").register("example.workspaceInfo", readInfo));
     },
   },
 };

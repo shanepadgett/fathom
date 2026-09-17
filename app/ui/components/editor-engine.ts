@@ -1,14 +1,12 @@
-import type { EditorPosition } from "./editor-status.tsx";
-import * as monaco from "monaco-editor/editor/editor.api.js";
-import { editorLanguage } from "./editor-runtime.ts";
-import { bindEditorLanguage, editorLanguageName } from "./editor-languages.ts";
-import { editorTheme } from "./editor-theme.ts";
-
 import type { Diagnostic, FileRange } from "../../sdk/editor.ts";
-import {
-  type CompleteDocument,
-  registerEditorCompletion,
-} from "./editor-completion.ts";
+import type { EditorPosition } from "./editor-status.tsx";
+
+import * as monaco from "monaco-editor/editor/editor.api.js";
+
+import { type CompleteDocument, registerEditorCompletion } from "./editor-completion.ts";
+import { bindEditorLanguage, editorLanguageName } from "./editor-languages.ts";
+import { editorLanguage } from "./editor-runtime.ts";
+import { editorTheme } from "./editor-theme.ts";
 
 export interface EditorDocument {
   path: string;
@@ -43,9 +41,7 @@ export function mountEditor(
     const uri = candidate.uri.toString();
     return models.get(uri) === candidate ? paths.get(uri) : undefined;
   }, complete);
-  const views = new Map<string, monaco.editor.ICodeEditorViewState>(
-    initialViews,
-  );
+  const views = new Map<string, monaco.editor.ICodeEditorViewState>(initialViews);
   const rememberView = () => {
     const view = editor.saveViewState();
     if (model && view) views.set(model.uri.toString(), view);
@@ -59,10 +55,10 @@ export function mountEditor(
     positionChanged(
       model && position
         ? {
-          line: position.lineNumber,
-          column: position.column,
-          language: editorLanguageName(model.getLanguageId()),
-        }
+            line: position.lineNumber,
+            column: position.column,
+            language: editorLanguageName(model.getLanguageId()),
+          }
         : undefined,
     );
   };
@@ -83,12 +79,7 @@ export function mountEditor(
               monaco.Uri.parse(document.uri),
             );
             models.set(document.uri, model);
-            bindEditorLanguage(
-              model,
-              projectId,
-              document.path,
-              editorLanguage(document.extension),
-            );
+            bindEditorLanguage(model, projectId, document.path, editorLanguage(document.extension));
           }
           editor.setModel(model);
           editor.restoreViewState(views.get(document.uri) ?? null);
@@ -101,13 +92,14 @@ export function mountEditor(
           "fathom-lsp",
           document.diagnostics.map((diagnostic) => ({
             message: diagnostic.message,
-            severity: diagnostic.severity === 2
-              ? monaco.MarkerSeverity.Warning
-              : diagnostic.severity === 3
-              ? monaco.MarkerSeverity.Info
-              : diagnostic.severity === 4
-              ? monaco.MarkerSeverity.Hint
-              : monaco.MarkerSeverity.Error,
+            severity:
+              diagnostic.severity === 2
+                ? monaco.MarkerSeverity.Warning
+                : diagnostic.severity === 3
+                  ? monaco.MarkerSeverity.Info
+                  : diagnostic.severity === 4
+                    ? monaco.MarkerSeverity.Hint
+                    : monaco.MarkerSeverity.Error,
             startLineNumber: diagnostic.range.start.line + 1,
             startColumn: diagnostic.range.start.character + 1,
             endLineNumber: diagnostic.range.end.line + 1,
@@ -142,29 +134,22 @@ export function mountEditor(
       positionChanged(undefined);
     },
     reveal(range: FileRange) {
-      if (
-        !model || !Number.isSafeInteger(range.startLine) ||
-        !Number.isSafeInteger(range.endLine)
-      ) return;
-      const start = Math.max(
-        1,
-        Math.min(range.startLine, model.getLineCount()),
-      );
-      const end = Math.max(
-        start,
-        Math.min(range.endLine, model.getLineCount()),
-      );
+      if (!model || !Number.isSafeInteger(range.startLine) || !Number.isSafeInteger(range.endLine))
+        return;
+      const start = Math.max(1, Math.min(range.startLine, model.getLineCount()));
+      const end = Math.max(start, Math.min(range.endLine, model.getLineCount()));
       editor.setPosition({ lineNumber: start, column: 1 });
       editor.revealLinesInCenter(start, end, monaco.editor.ScrollType.Smooth);
-      highlight.set([{
-        range: new monaco.Range(start, 1, end, 1),
-        options: {
-          isWholeLine: true,
-          className: "fathom-file-highlight",
-          stickiness:
-            monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+      highlight.set([
+        {
+          range: new monaco.Range(start, 1, end, 1),
+          options: {
+            isWholeLine: true,
+            className: "fathom-file-highlight",
+            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+          },
         },
-      }]);
+      ]);
       clearTimeout(highlightTimer);
       highlightTimer = setTimeout(() => highlight.clear(), 4000);
     },

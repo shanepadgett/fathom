@@ -72,10 +72,11 @@ export const feedbackIntegration = definePlugin({
     requires: ["feedback", "rpc"],
     activate(ctx) {
       ctx.effect(() =>
-        ctx.get("rpc").register(
-          "feedback.send",
-          (params) => ctx.get("feedback").send(String(params.sessionId)),
-        )
+        ctx
+          .get("rpc")
+          .register("feedback.send", (params) =>
+            ctx.get("feedback").send(String(params.sessionId)),
+          ),
       );
     },
   },

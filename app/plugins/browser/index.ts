@@ -1,9 +1,5 @@
-import type {
-  BrowserEvent,
-  BrowserFactory,
-  BrowserTransport,
-} from "./connection.ts";
 import type { BrowserViewport } from "../../sdk/browser.ts";
+import type { BrowserEvent, BrowserFactory, BrowserTransport } from "./connection.ts";
 
 import { Type } from "typebox";
 
@@ -17,16 +13,7 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
     id: "fathom:browser",
     apiVersion: 1,
     backend: {
-      requires: [
-        "rpc",
-        "tools",
-        "events",
-        "storage",
-        "runtime",
-        "media",
-        "feedback",
-        "devServers",
-      ],
+      requires: ["rpc", "tools", "events", "storage", "runtime", "media", "feedback", "devServers"],
       activate(ctx) {
         const rpc = ctx.get("rpc"),
           tools = ctx.get("tools"),
@@ -45,9 +32,7 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
         const connection = async () => {
           if (disposed) throw new Error("Browser environment is closed");
           if (browser?.closed) {
-            throw new Error(
-              "Browser disconnected. Reload the page to reconnect.",
-            );
+            throw new Error("Browser disconnected. Reload the page to reconnect.");
           }
           if (!browser) {
             let source: BrowserTransport | undefined;
@@ -66,9 +51,11 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
                     },
                   });
                 }
-                void source.call("Page.screencastFrameAck", {
-                  sessionId: params.sessionId,
-                }).catch(() => {});
+                void source
+                  .call("Page.screencastFrameAck", {
+                    sessionId: params.sessionId,
+                  })
+                  .catch(() => {});
               }
               if (method === "Page.frameNavigated") {
                 const frame = params.frame as {
@@ -91,7 +78,8 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
               }
               if (
                 method === "Page.navigatedWithinDocument" &&
-                params.frameId === mainFrameId && typeof params.url === "string"
+                params.frameId === mainFrameId &&
+                typeof params.url === "string"
               ) {
                 url = params.url;
                 pairing.remember(url);
@@ -104,8 +92,7 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
                 }
               }
             };
-            source = createBrowser?.(event) ??
-              new BrowserConnection(home, event);
+            source = createBrowser?.(event) ?? new BrowserConnection(home, event);
             browser = source;
             startup = browser.start();
           }
@@ -127,10 +114,7 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
         };
         const navigate = async (value: string) => {
           const target = new URL(value);
-          if (
-            value !== "about:blank" &&
-            !["http:", "https:"].includes(target.protocol)
-          ) {
+          if (value !== "about:blank" && !["http:", "https:"].includes(target.protocol)) {
             throw new Error("Use an HTTP or HTTPS browser address");
           }
           if (value === "about:blank" && !browser) return { url: value };
@@ -147,75 +131,82 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
           url = (tree.frameTree as { frame: { url: string } }).frame.url;
           return { url };
         };
-        const pairing = browserPairing(ctx, navigate, async () => {
-          await (await connection()).call("Page.startScreencast", {
-            format: "jpeg",
-            quality: 75,
-            maxWidth: 1280,
-            maxHeight: 800,
-            everyNthFrame: 1,
-          });
-        }, async () => {
-          await browser?.viewport?.({ ...viewport, visible: false });
-        });
+        const pairing = browserPairing(
+          ctx,
+          navigate,
+          async () => {
+            await (
+              await connection()
+            ).call("Page.startScreencast", {
+              format: "jpeg",
+              quality: 75,
+              maxWidth: 1280,
+              maxHeight: 800,
+              everyNthFrame: 1,
+            });
+          },
+          async () => {
+            await browser?.viewport?.({ ...viewport, visible: false });
+          },
+        );
         registerBrowserAnnotations(
           ctx,
           async (x, y, expectedUrl = url, bounds) => {
             if (expectedUrl !== url) {
-              throw new Error(
-                "The page changed. Select a point on the current page.",
-              );
+              throw new Error("The page changed. Select a point on the current page.");
             }
             const browser = await connection();
             const detail = await browser.call("Runtime.evaluate", {
-              expression:
-                `(()=>{const e=document.elementFromPoint(${x},${y});const r=e?.getBoundingClientRect();return {scrollX:window.scrollX,scrollY:window.scrollY,viewport:{width:window.visualViewport?.width??window.innerWidth,height:window.visualViewport?.height??window.innerHeight},element:e?{tag:e.tagName,id:e.id,classes:e.className,text:e.textContent?.slice(0,500),bounds:{x:r.x,y:r.y,width:r.width,height:r.height},ancestors:[e.parentElement?.tagName,e.parentElement?.id]}:null};})()`,
+              expression: `(()=>{const e=document.elementFromPoint(${x},${y});const r=e?.getBoundingClientRect();return {scrollX:window.scrollX,scrollY:window.scrollY,viewport:{width:window.visualViewport?.width??window.innerWidth,height:window.visualViewport?.height??window.innerHeight},element:e?{tag:e.tagName,id:e.id,classes:e.className,text:e.textContent?.slice(0,500),bounds:{x:r.x,y:r.y,width:r.width,height:r.height},ancestors:[e.parentElement?.tagName,e.parentElement?.id]}:null};})()`,
               returnByValue: true,
             });
-            const detailValue = (detail.result as {
-              value?: {
-                element?: unknown;
-                scrollX: number;
-                scrollY: number;
-                viewport: { width: number; height: number };
-              };
-            })?.value;
+            const detailValue = (
+              detail.result as {
+                value?: {
+                  element?: unknown;
+                  scrollX: number;
+                  scrollY: number;
+                  viewport: { width: number; height: number };
+                };
+              }
+            )?.value;
             if (
-              !detailValue || !Number.isFinite(detailValue.scrollX) ||
+              !detailValue ||
+              !Number.isFinite(detailValue.scrollX) ||
               !Number.isFinite(detailValue.scrollY)
-            ) throw new Error("Unable to inspect the annotation position");
+            )
+              throw new Error("Unable to inspect the annotation position");
             const viewport = detailValue.viewport;
             if (
-              !viewport || !Number.isFinite(viewport.width) ||
+              !viewport ||
+              !Number.isFinite(viewport.width) ||
               !Number.isFinite(viewport.height) ||
-              viewport.width <= 0 || viewport.height <= 0 ||
-              x > viewport.width || y > viewport.height ||
+              viewport.width <= 0 ||
+              viewport.height <= 0 ||
+              x > viewport.width ||
+              y > viewport.height ||
               (bounds &&
                 (bounds.x + bounds.width > viewport.width ||
                   bounds.y + bounds.height > viewport.height))
             ) {
-              throw new Error(
-                "The annotation is outside the current page viewport",
-              );
+              throw new Error("The annotation is outside the current page viewport");
             }
             const snapshot = await browser.call("Page.captureScreenshot", {
               format: "png",
               ...(bounds
                 ? {
-                  clip: {
-                    x: bounds.x + detailValue.scrollX,
-                    y: bounds.y + detailValue.scrollY,
-                    width: bounds.width,
-                    height: bounds.height,
-                    scale: 1,
-                  },
-                }
+                    clip: {
+                      x: bounds.x + detailValue.scrollX,
+                      y: bounds.y + detailValue.scrollY,
+                      width: bounds.width,
+                      height: bounds.height,
+                      scale: 1,
+                    },
+                  }
                 : {}),
             });
             if (expectedUrl !== url) {
-              throw new Error(
-                "The page changed. Select a point on the current page.",
-              );
+              throw new Error("The page changed. Select a point on the current page.");
             }
             return {
               url,
@@ -242,15 +233,18 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
             pairing.assertView(params.viewId, params.visible !== false);
             const { x, y, width, height, visible } = params;
             if (
-              ![x, y, width, height].every((value) =>
-                typeof value === "number" && Number.isSafeInteger(value)
+              ![x, y, width, height].every(
+                (value) => typeof value === "number" && Number.isSafeInteger(value),
               ) ||
-              Number(x) < 0 || Number(y) < 0 || Number(width) < 1 ||
+              Number(x) < 0 ||
+              Number(y) < 0 ||
+              Number(width) < 1 ||
               Number(height) < 1 ||
               Number(x) + Number(width) > 2_147_483_647 ||
               Number(y) + Number(height) > 2_147_483_647 ||
               typeof visible !== "boolean"
-            ) throw new Error("Invalid browser viewport");
+            )
+              throw new Error("Invalid browser viewport");
             const active = browser;
             if (!active?.viewport) return { native: false };
             viewport = {
@@ -299,9 +293,9 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
                 clickCount: 1,
                 ...(params.type === "mouseWheel"
                   ? {
-                    deltaX: Number(params.deltaX ?? 0),
-                    deltaY: Number(params.deltaY ?? 0),
-                  }
+                      deltaX: Number(params.deltaX ?? 0),
+                      deltaY: Number(params.deltaY ?? 0),
+                    }
                   : {}),
               });
             }
@@ -314,9 +308,7 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
             deferred: true,
             parameters: Type.Object({ url: Type.String() }),
             execute: async (args, context) =>
-              JSON.stringify(
-                await pairing.open(String(args.url), context.sessionId),
-              ),
+              JSON.stringify(await pairing.open(String(args.url), context.sessionId)),
           }),
           tools.register({
             name: "read_url",
@@ -327,13 +319,12 @@ export function browserPlugin(home: string, createBrowser?: BrowserFactory) {
             parameters: Type.Object({ url: Type.String() }),
             async execute(args, context) {
               await pairing.open(String(args.url), context.sessionId);
-              const result = await (await connection()).call(
-                "Runtime.evaluate",
-                {
-                  expression: "document.body.innerText.slice(0,50000)",
-                  returnByValue: true,
-                },
-              );
+              const result = await (
+                await connection()
+              ).call("Runtime.evaluate", {
+                expression: "document.body.innerText.slice(0,50000)",
+                returnByValue: true,
+              });
               return String((result.result as { value: string }).value);
             },
           }),

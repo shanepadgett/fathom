@@ -4,10 +4,10 @@ export function widgetTokens(element: HTMLElement) {
   const token = (name: string) => styles.getPropertyValue(name).trim();
   const pixels = (name: string) => {
     const value = token(name);
-    return parseFloat(value) *
-      (value.endsWith("rem")
-        ? parseFloat(getComputedStyle(document.documentElement).fontSize)
-        : 1);
+    return (
+      parseFloat(value) *
+      (value.endsWith("rem") ? parseFloat(getComputedStyle(document.documentElement).fontSize) : 1)
+    );
   };
   return {
     canvas: token("--color-canvas"),

@@ -10,16 +10,7 @@ export const artifactIntegration = definePlugin({
   id: "fathom:artifact-integration",
   apiVersion: 1,
   backend: {
-    requires: [
-      "artifacts",
-      "feedback",
-      "tools",
-      "rpc",
-      "context",
-      "storage",
-      "runtime",
-      "events",
-    ],
+    requires: ["artifacts", "feedback", "tools", "rpc", "context", "storage", "runtime", "events"],
     activate(ctx) {
       const service = ctx.get("artifacts"),
         tools = ctx.get("tools"),
@@ -45,14 +36,10 @@ export const artifactIntegration = definePlugin({
           execute: async (args, input) =>
             JSON.stringify(
               await service.create(input.sessionId, {
-                title: args.title === undefined
-                  ? undefined
-                  : String(args.title),
+                title: args.title === undefined ? undefined : String(args.title),
                 name: String(args.name),
                 content: String(args.content),
-                supersedes: args.supersedes === undefined
-                  ? undefined
-                  : String(args.supersedes),
+                supersedes: args.supersedes === undefined ? undefined : String(args.supersedes),
               }),
             ),
         }),
@@ -65,20 +52,13 @@ export const artifactIntegration = definePlugin({
           execute: async (args, input) =>
             (await service.read(input.sessionId, String(args.id))).content,
         }),
-        rpc.register(
-          "artifacts.list",
-          (params) => service.list(String(params.sessionId)),
-        ),
-        rpc.register(
-          "artifact.read",
-          (params) => service.read(String(params.sessionId), String(params.id)),
+        rpc.register("artifacts.list", (params) => service.list(String(params.sessionId))),
+        rpc.register("artifact.read", (params) =>
+          service.read(String(params.sessionId), String(params.id)),
         ),
         rpc.register("artifact.materialize", (params) =>
-          service.materialize(
-            String(params.sessionId),
-            String(params.id),
-            String(params.path),
-          )),
+          service.materialize(String(params.sessionId), String(params.id), String(params.path)),
+        ),
         rpc.register("artifact.approve", async (params) => {
           await service.approve(String(params.sessionId), String(params.id));
           return {};
@@ -87,8 +67,7 @@ export const artifactIntegration = definePlugin({
           const artifact = data as Artifact;
           return {
             role: "user",
-            content:
-              `Artifact saved: ${artifact.title}, id=${artifact.id}. Use artifact_read to read it.`,
+            content: `Artifact saved: ${artifact.title}, id=${artifact.id}. Use artifact_read to read it.`,
             timestamp: artifact.createdAt,
           };
         }),

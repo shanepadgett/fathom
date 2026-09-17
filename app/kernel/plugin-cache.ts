@@ -20,21 +20,20 @@ function exited(pid: number) {
 export async function prunePluginCache(root: string) {
   try {
     for await (const entry of Deno.readDir(root)) {
-      if (
-        !entry.isDirectory || entry.isSymlink || !GENERATION.test(entry.name)
-      ) continue;
+      if (!entry.isDirectory || entry.isSymlink || !GENERATION.test(entry.name)) continue;
       const directory = join(root, entry.name);
       try {
-        const owner = await readJson<unknown>(
-          join(directory, OWNER),
-          undefined,
-        );
+        const owner = await readJson<unknown>(join(directory, OWNER), undefined);
         if (!owner || typeof owner !== "object") continue;
         const { kind, pid } = owner as { kind?: unknown; pid?: unknown };
         if (
-          kind !== KIND || typeof pid !== "number" ||
-          !Number.isSafeInteger(pid) || pid <= 0 || !exited(pid)
-        ) continue;
+          kind !== KIND ||
+          typeof pid !== "number" ||
+          !Number.isSafeInteger(pid) ||
+          pid <= 0 ||
+          !exited(pid)
+        )
+          continue;
         await Deno.remove(directory, { recursive: true });
       } catch (error) {
         if (!(error instanceof Deno.errors.NotFound)) {
@@ -51,9 +50,6 @@ export async function prunePluginCache(root: string) {
 
 export async function createPluginCache(root: string) {
   const directory = join(root, crypto.randomUUID());
-  await atomicWrite(
-    join(directory, OWNER),
-    JSON.stringify({ kind: KIND, pid: Deno.pid }),
-  );
+  await atomicWrite(join(directory, OWNER), JSON.stringify({ kind: KIND, pid: Deno.pid }));
   return directory;
 }

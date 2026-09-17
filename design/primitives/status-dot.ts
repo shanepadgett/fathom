@@ -10,14 +10,11 @@ const dots: Record<Tone, string> = {
   danger: "bg-danger",
 };
 
-export const statusDot = (tone: Tone, label = "", small = false) =>
-  html`
-    <span
-      class="shrink-0 rounded-full ${small
-        ? "h-1.5 w-1.5"
-        : "h-2 w-2"} ${dots[tone]}"
-      role=${label ? "img" : nothing}
-      aria-label=${label || nothing}
-      aria-hidden=${label ? nothing : "true"}
-    ></span>
-  `;
+export const statusDot = (tone: Tone, label = "", small = false) => html`
+  <span
+    class="shrink-0 rounded-full ${small ? "h-1.5 w-1.5" : "h-2 w-2"} ${dots[tone]}"
+    role=${label ? "img" : nothing}
+    aria-label=${label || nothing}
+    aria-hidden=${label ? nothing : "true"}
+  ></span>
+`;

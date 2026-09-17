@@ -14,41 +14,26 @@ export function artifactsPlugin(home: string) {
     id: "fathom:artifacts",
     apiVersion: 1,
     backend: {
-      requires: [
-        "storage",
-        "workspace",
-        "runtime",
-        "events",
-      ],
+      requires: ["storage", "workspace", "runtime", "events"],
       provides: ["artifacts"],
       activate(ctx) {
         const storage = ctx.get("storage"),
           workspace = ctx.get("workspace"),
           runtime = ctx.get("runtime"),
           events = ctx.get("events");
-        const list = (sessionId: string) =>
-          artifactsOnBranch(storage.entries(sessionId));
+        const list = (sessionId: string) => artifactsOnBranch(storage.entries(sessionId));
         const get = (sessionId: string, id: string) => {
-          const artifact = list(sessionId).find((artifact) =>
-            artifact.id === id
-          );
+          const artifact = list(sessionId).find((artifact) => artifact.id === id);
           if (!artifact) throw new Error("Artifact not found on this branch");
           return artifact;
         };
         const path = (artifact: Artifact) =>
-          join(
-            home,
-            "artifacts",
-            artifact.sessionId,
-            `${artifact.id}-${artifact.name}`,
-          );
-        const create = async (
-          sessionId: string,
-          input: ArtifactInput,
-        ) => {
+          join(home, "artifacts", artifact.sessionId, `${artifact.id}-${artifact.name}`);
+        const create = async (sessionId: string, input: ArtifactInput) => {
           storage.getSession(sessionId);
           if (
-            !input || typeof input.name !== "string" ||
+            !input ||
+            typeof input.name !== "string" ||
             !/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,100}$/.test(input.name)
           ) {
             throw new Error("Use a plain artifact filename");
@@ -56,28 +41,20 @@ export function artifactsPlugin(home: string) {
           if (typeof input.content !== "string") {
             throw new Error("Artifact content must be text");
           }
-          const name = input.name, content = input.content;
+          const name = input.name,
+            content = input.content;
           const title = input.title === undefined ? name : input.title;
-          if (
-            typeof title !== "string" || !title.trim() || title.length > 200
-          ) {
-            throw new Error(
-              "Use an artifact title between 1 and 200 characters",
-            );
+          if (typeof title !== "string" || !title.trim() || title.length > 200) {
+            throw new Error("Use an artifact title between 1 and 200 characters");
           }
           const bytes = new TextEncoder().encode(content).length;
           if (bytes > 2_000_000) throw new Error("Artifact exceeds 2 MB");
           const supersedes = input.supersedes;
-          if (
-            supersedes !== undefined &&
-            (typeof supersedes !== "string" || !supersedes)
-          ) {
+          if (supersedes !== undefined && (typeof supersedes !== "string" || !supersedes)) {
             throw new Error("Use an existing artifact ID for supersedes");
           }
           const checkRevision = () => {
-            if (
-              supersedes && get(sessionId, supersedes).status === "superseded"
-            ) {
+            if (supersedes && get(sessionId, supersedes).status === "superseded") {
               throw new Error("Revise the latest artifact version");
             }
           };
@@ -90,10 +67,10 @@ export function artifactsPlugin(home: string) {
             mime: name.endsWith(".html")
               ? "text/html"
               : name.endsWith(".svg")
-              ? "image/svg+xml"
-              : name.endsWith(".md")
-              ? "text/markdown"
-              : "text/plain",
+                ? "image/svg+xml"
+                : name.endsWith(".md")
+                  ? "text/markdown"
+                  : "text/plain",
             status: "pending",
             supersedes,
             bytes,
@@ -114,10 +91,13 @@ export function artifactsPlugin(home: string) {
           } catch (error) {
             let recorded: boolean;
             try {
-              recorded = storage.allEntries(sessionId).some((entry) =>
-                entry.custom?.type === "artifact" &&
-                (entry.custom.data as Artifact).id === artifact.id
-              );
+              recorded = storage
+                .allEntries(sessionId)
+                .some(
+                  (entry) =>
+                    entry.custom?.type === "artifact" &&
+                    (entry.custom.data as Artifact).id === artifact.id,
+                );
             } catch (inspection) {
               throw new AggregateError(
                 [error, inspection],
@@ -153,16 +133,9 @@ export function artifactsPlugin(home: string) {
           },
           async materialize(sessionId, id, destinationPath) {
             const artifact = get(sessionId, id);
-            const destination = await workspace.resolve(
-              destinationPath,
-              true,
-            );
+            const destination = await workspace.resolve(destinationPath, true);
             await assertNewFile(destination);
-            await atomicCreate(
-              destination,
-              await Deno.readTextFile(path(artifact)),
-              0o644,
-            );
+            await atomicCreate(destination, await Deno.readTextFile(path(artifact)), 0o644);
             return { path: destination };
           },
           async approve(sessionId, id) {

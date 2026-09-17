@@ -1,25 +1,19 @@
-import { DrawerControl } from "./workspace-drawer.tsx";
 import type { createWorkspace } from "../state/workspace.ts";
-import { createSignal, Show } from "solid-js";
-import { RenameSession } from "./rename-session.tsx";
-import { ActionMenu } from "./action-menu.tsx";
 
-export function ConversationHeader(
-  props: { app: ReturnType<typeof createWorkspace> },
-) {
-  const {
-    state,
-    detailed,
-    setDetailed,
-    act,
-    transport,
-    sessionId,
-    refresh,
-    newSession,
-  } = props.app;
-  const [renaming, setRenaming] = createSignal<
-    { projectId: string; sessionId: string; title: string }
-  >();
+import { createSignal, Show } from "solid-js";
+
+import { ActionMenu } from "./action-menu.tsx";
+import { RenameSession } from "./rename-session.tsx";
+import { DrawerControl } from "./workspace-drawer.tsx";
+
+export function ConversationHeader(props: { app: ReturnType<typeof createWorkspace> }) {
+  const { state, detailed, setDetailed, act, transport, sessionId, refresh, newSession } =
+    props.app;
+  const [renaming, setRenaming] = createSignal<{
+    projectId: string;
+    sessionId: string;
+    title: string;
+  }>();
   return (
     <>
       <header
@@ -41,27 +35,18 @@ export function ConversationHeader(
         </h2>
         <Show
           when={props.app.mode() !== "editor"}
-          fallback={
-            <DrawerControl
-              kind="agent"
-              close={() => props.app.setAgentDrawer(false)}
-            />
-          }
+          fallback={<DrawerControl kind="agent" close={() => props.app.setAgentDrawer(false)} />}
         >
           <ActionMenu
             label="Conversation options"
             actions={[
               {
-                label: detailed()
-                  ? "Compact transcript"
-                  : "Detailed transcript",
+                label: detailed() ? "Compact transcript" : "Detailed transcript",
                 icon: "chat-circle-text",
                 run: () => setDetailed((value) => !value),
               },
               {
-                label: state()?.session.pinned
-                  ? "Unpin session"
-                  : "Pin session",
+                label: state()?.session.pinned ? "Unpin session" : "Pin session",
                 icon: "push-pin",
                 run: () =>
                   void act(async () => {
@@ -99,14 +84,12 @@ export function ConversationHeader(
                       sessionId: id,
                       changes: { archived: true },
                     });
-                    if (
-                      transport.projectId !== projectId || sessionId() !== id
-                    ) {
+                    if (transport.projectId !== projectId || sessionId() !== id) {
                       return;
                     }
-                    const next = props.app.sessions().find((session) =>
-                      session.id !== id && !session.archived
-                    );
+                    const next = props.app
+                      .sessions()
+                      .find((session) => session.id !== id && !session.archived);
                     if (next) await props.app.chooseSession(next.id);
                     else await newSession();
                   }),

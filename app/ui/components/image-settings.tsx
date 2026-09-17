@@ -2,6 +2,7 @@ import type { ImageSelection } from "../../sdk/images.ts";
 import type { Transport } from "../transport.ts";
 
 import { createResource, createSignal, For, onCleanup, Show } from "solid-js";
+
 import { Button, Field } from "./primitives.tsx";
 
 interface ImageSettingsState {
@@ -14,25 +15,25 @@ export function ImageSettings(props: { transport: Transport }) {
   const [state, { refetch }] = createResource(() =>
     props.transport.request<ImageSettingsState>("images.settings", {
       projectId,
-    })
+    }),
   );
   const [busy, setBusy] = createSignal(false),
     [error, setError] = createSignal("");
-  onCleanup(props.transport.onEvent((event) => {
-    if (
-      event.type === "connected" ||
-      (event.projectId === projectId &&
-        ["providers", "environment"].includes(event.type))
-    ) void Promise.resolve(refetch()).catch(() => {});
-  }));
+  onCleanup(
+    props.transport.onEvent((event) => {
+      if (
+        event.type === "connected" ||
+        (event.projectId === projectId && ["providers", "environment"].includes(event.type))
+      )
+        void Promise.resolve(refetch()).catch(() => {});
+    }),
+  );
   async function select(value: string) {
     if (busy()) return;
     setBusy(true);
     setError("");
     try {
-      const selected = value
-        ? JSON.parse(value) as ImageSelection
-        : { model: null };
+      const selected = value ? (JSON.parse(value) as ImageSelection) : { model: null };
       await props.transport.request("images.select", {
         ...selected,
         projectId,
@@ -49,16 +50,13 @@ export function ImageSettings(props: { transport: Transport }) {
     <section class="mt-6 space-y-3">
       <h3>Image generation</h3>
       <p class="text-sm text-muted">
-        Choose an image model to enable the agent's image tool. Your chat model
-        stays separate.
+        Choose an image model to enable the agent's image tool. Your chat model stays separate.
       </p>
       <Show when={state.error}>
         <p role="alert" class="text-sm text-danger">
           Image models could not load.
         </p>
-        <Button onClick={() => void Promise.resolve(refetch()).catch(() => {})}>
-          Retry
-        </Button>
+        <Button onClick={() => void Promise.resolve(refetch()).catch(() => {})}>Retry</Button>
       </Show>
       <Show when={!state.error && state()}>
         {(value) => (
@@ -86,15 +84,15 @@ export function ImageSettings(props: { transport: Transport }) {
               </For>
             </select>
             <Show when={!value().models.length}>
-              <span class="text-sm text-muted">
-                Connect an image provider to choose a model.
-              </span>
+              <span class="text-sm text-muted">Connect an image provider to choose a model.</span>
             </Show>
           </Field>
         )}
       </Show>
       <Show when={error()}>
-        <p role="alert" class="text-sm text-danger">{error()}</p>
+        <p role="alert" class="text-sm text-danger">
+          {error()}
+        </p>
       </Show>
     </section>
   );

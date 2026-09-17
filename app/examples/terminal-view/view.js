@@ -26,14 +26,8 @@ export default {
               onClose: close,
               onError: (error) => host.toast(String(error)),
             });
-            const terminal = host.ui.getComponent("fathom.terminal")(
-              element,
-              host,
-              props(),
-            );
-            const observer = new MutationObserver(() =>
-              terminal.update(props())
-            );
+            const terminal = host.ui.getComponent("fathom.terminal")(element, host, props());
+            const observer = new MutationObserver(() => terminal.update(props()));
             observer.observe(document.documentElement, {
               attributes: true,
               attributeFilter: ["data-theme"],

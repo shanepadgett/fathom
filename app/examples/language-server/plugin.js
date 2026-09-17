@@ -15,7 +15,7 @@ export default {
           languages: { ".rs": "rust" },
           initializationOptions: { checkOnSave: false },
           priority: 0,
-        })
+        }),
       );
     },
   },

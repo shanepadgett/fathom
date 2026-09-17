@@ -1,13 +1,13 @@
 import { html, nothing } from "lit";
 
-import { DesignElement } from "../foundation/design-element.ts";
 import { chatScenario as scenario } from "../fixtures/chat-scenario.ts";
+import { systemStatus } from "../fixtures/system-status.ts";
 import "../components/messages/conversation-pane.ts";
 import "../components/workspace/session-inspector.ts";
 import "../components/navigation/session-sidebar.ts";
 import "../components/workspace/workspace-header.ts";
 import "../components/workspace/workspace-status-bar.ts";
-import { systemStatus } from "../fixtures/system-status.ts";
+import { DesignElement } from "../foundation/design-element.ts";
 import "../layouts/workspace-layout.ts";
 import "../layouts/workspace-sidebar.ts";
 
@@ -49,16 +49,19 @@ export class ChatScreen extends DesignElement {
               .reasoning=${scenario.reasoning}
             ></conversation-pane>
 
-            ${this.state === "inspector-closed" ? nothing : html`
-              <workspace-sidebar
-                placement="inspector"
-                role="complementary"
-                aria-label="Session inspector"
-              >
-                <session-inspector .data=${scenario
-                  .inspector}></session-inspector>
-              </workspace-sidebar>
-            `}
+            ${
+              this.state === "inspector-closed"
+                ? nothing
+                : html`
+                    <workspace-sidebar
+                      placement="inspector"
+                      role="complementary"
+                      aria-label="Session inspector"
+                    >
+                      <session-inspector .data=${scenario.inspector}></session-inspector>
+                    </workspace-sidebar>
+                  `
+            }
           </div>
 
           <workspace-status-bar

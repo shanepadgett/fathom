@@ -4,12 +4,10 @@ import { onCleanup, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { EdgeResizer } from "../../../design/primitives/edge-resizer.ts";
-import { Icon } from "./icon.tsx";
 import { occludeNativeSurfaces } from "../state/native-surfaces.ts";
+import { Icon } from "./icon.tsx";
 
-export function DrawerControl(
-  props: { kind: "agent" | "diff"; close(): void },
-) {
+export function DrawerControl(props: { kind: "agent" | "diff"; close(): void }) {
   return (
     <button
       type="button"
@@ -46,13 +44,16 @@ export function WorkspaceDrawer(props: {
     panel.append(handle);
     const escape = (event: KeyboardEvent) => {
       if (
-        event.defaultPrevented || event.key !== "Escape" || !enabled() ||
+        event.defaultPrevented ||
+        event.key !== "Escape" ||
+        !enabled() ||
         props.open === false ||
         document.querySelector("dialog[open], [popover]:popover-open")
-      ) return;
-      const visible = [
-        ...document.querySelectorAll<HTMLElement>(".workspace-drawer-panel"),
-      ].filter((element) => element.getClientRects().length);
+      )
+        return;
+      const visible = [...document.querySelectorAll<HTMLElement>(".workspace-drawer-panel")].filter(
+        (element) => element.getClientRects().length,
+      );
       if (visible.at(-1) !== panel) return;
       event.preventDefault();
       props.close();
@@ -67,9 +68,9 @@ export function WorkspaceDrawer(props: {
     <div
       ref={scrim}
       classList={{
-        "contents": !enabled(),
+        contents: !enabled(),
         "absolute inset-0 z-20 overlay-glass": enabled(),
-        "hidden": enabled() && props.open === false,
+        hidden: enabled() && props.open === false,
       }}
       onClick={(event) => {
         if (enabled() && event.target === scrim) props.close();
@@ -78,11 +79,11 @@ export function WorkspaceDrawer(props: {
       <div
         ref={panel}
         role={enabled() ? "region" : undefined}
-        aria-label={enabled()
-          ? `${props.kind === "agent" ? "Agent" : "File diff"} drawer`
-          : undefined}
+        aria-label={
+          enabled() ? `${props.kind === "agent" ? "Agent" : "File diff"} drawer` : undefined
+        }
         classList={{
-          "contents": !enabled(),
+          contents: !enabled(),
           "workspace-drawer-panel pointer-events-auto absolute inset-y-0 right-0 z-10 flex max-w-full flex-col border-l border-line bg-canvas shadow-md":
             enabled(),
           "w-conversation-drawer": enabled() && props.kind === "agent",

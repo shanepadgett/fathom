@@ -6,9 +6,7 @@ import { createLanguageServers } from "../state/language-server.ts";
 import { InspectorSection } from "./inspector-section.tsx";
 import { LanguageServerRestart } from "./language-server-restart.tsx";
 
-export function LanguageServerSection(
-  props: { transport: Transport; projectId?: string },
-) {
+export function LanguageServerSection(props: { transport: Transport; projectId?: string }) {
   const servers = createLanguageServers(props.transport, () => props.projectId);
   const count = (key: "errors" | "warnings") =>
     servers()?.reduce((total, server) => total + server[key], 0) ?? 0;
@@ -21,24 +19,25 @@ export function LanguageServerSection(
             fallback={<p class="text-muted">No language servers registered.</p>}
           >
             {(id) => {
-              const status = () =>
-                servers()?.find((server) => server.id === id);
+              const status = () => servers()?.find((server) => server.id === id);
               return (
                 <div class="space-y-2">
                   <p class="flex justify-between gap-3" title={status()?.error}>
                     {status()?.name}
                     <span
-                      class={status()?.running
-                        ? "text-success"
-                        : status()?.state === "starting"
-                        ? "text-muted"
-                        : "text-warning"}
+                      class={
+                        status()?.running
+                          ? "text-success"
+                          : status()?.state === "starting"
+                            ? "text-muted"
+                            : "text-warning"
+                      }
                     >
                       {status()?.running
                         ? "Connected"
                         : status()?.state === "starting"
-                        ? "Starting…"
-                        : "Unavailable"}
+                          ? "Starting…"
+                          : "Unavailable"}
                     </span>
                   </p>
                   <Show when={Object.keys(status()?.languages ?? {}).length}>
@@ -51,10 +50,7 @@ export function LanguageServerSection(
                       disabled={status()?.state === "starting"}
                     />
                   </Show>
-                  <Show
-                    when={!Object.keys(status()?.languages ?? {}).length &&
-                      status()?.error}
-                  >
+                  <Show when={!Object.keys(status()?.languages ?? {}).length && status()?.error}>
                     <p role="alert" class="text-sm text-danger">
                       {status()?.error}
                     </p>
@@ -65,9 +61,7 @@ export function LanguageServerSection(
           </For>
           <Show when={servers()?.some((server) => server.running)}>
             <p class="text-muted">
-              {count("errors")} {count("errors") === 1 ? "error" : "errors"} ·
-              {" "}
-              {count("warnings")}{" "}
+              {count("errors")} {count("errors") === 1 ? "error" : "errors"} · {count("warnings")}{" "}
               {count("warnings") === 1 ? "warning" : "warnings"}
             </p>
           </Show>

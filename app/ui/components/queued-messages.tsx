@@ -1,18 +1,19 @@
 import type { SessionState } from "../../sdk/session.ts";
 import type { Transport } from "../transport.ts";
-import { createEffect, createSignal, For, Show } from "solid-js";
-import { Button } from "./primitives.tsx";
-import { EditMessage } from "./edit-message.tsx";
 
-export function QueuedMessages(
-  props: { state?: SessionState; transport: Transport },
-) {
-  const [editing, setEditing] = createSignal<
-    { id: string; text: string; sessionId: string; projectId: string }
-  >();
-  const [pending, setPending] = createSignal<
-    { id: string; action: "send" | "remove" }
-  >();
+import { createEffect, createSignal, For, Show } from "solid-js";
+
+import { EditMessage } from "./edit-message.tsx";
+import { Button } from "./primitives.tsx";
+
+export function QueuedMessages(props: { state?: SessionState; transport: Transport }) {
+  const [editing, setEditing] = createSignal<{
+    id: string;
+    text: string;
+    sessionId: string;
+    projectId: string;
+  }>();
+  const [pending, setPending] = createSignal<{ id: string; action: "send" | "remove" }>();
   const [error, setError] = createSignal("");
   let selectedSession: string | undefined;
   createEffect(() => {
@@ -31,15 +32,12 @@ export function QueuedMessages(
     setPending({ id, action });
     setError("");
     try {
-      await props.transport.request(
-        action === "send" ? "queue.send" : "queue.update",
-        {
-          projectId,
-          sessionId,
-          id,
-          text: null,
-        },
-      );
+      await props.transport.request(action === "send" ? "queue.send" : "queue.update", {
+        projectId,
+        sessionId,
+        id,
+        text: null,
+      });
     } catch (error) {
       if (props.state?.session.id === sessionId) {
         setError(error instanceof Error ? error.message : String(error));
@@ -60,19 +58,16 @@ export function QueuedMessages(
                   {item.mode === "steer" ? "Steering" : "Queued"}: {item.text}
                 </p>
                 <Show when={item.attachments?.length}>
-                  <span class="text-xs text-muted">
-                    {item.attachments!.length} attached
-                  </span>
+                  <span class="text-xs text-muted">{item.attachments!.length} attached</span>
                 </Show>
                 <Show
-                  when={!["running", "retry_waiting", "approval"].includes(
-                    props.state?.session.status ?? "",
-                  )}
+                  when={
+                    !["running", "retry_waiting", "approval"].includes(
+                      props.state?.session.status ?? "",
+                    )
+                  }
                 >
-                  <Button
-                    disabled={!!pending()}
-                    onClick={() => void act(item.id, "send")}
-                  >
+                  <Button disabled={!!pending()} onClick={() => void act(item.id, "send")}>
                     {pending()?.id === item.id && pending()?.action === "send"
                       ? "Sending…"
                       : "Send now"}
@@ -85,14 +80,12 @@ export function QueuedMessages(
                       ...item,
                       sessionId: props.state!.session.id,
                       projectId: props.transport.projectId,
-                    })}
+                    })
+                  }
                 >
                   Edit
                 </Button>
-                <Button
-                  disabled={!!pending()}
-                  onClick={() => void act(item.id, "remove")}
-                >
+                <Button disabled={!!pending()} onClick={() => void act(item.id, "remove")}>
                   {pending()?.id === item.id && pending()?.action === "remove"
                     ? "Removing…"
                     : "Remove"}
@@ -101,7 +94,9 @@ export function QueuedMessages(
             )}
           </For>
           <Show when={error()}>
-            <p role="alert" class="text-danger">{error()}</p>
+            <p role="alert" class="text-danger">
+              {error()}
+            </p>
           </Show>
         </div>
       </Show>

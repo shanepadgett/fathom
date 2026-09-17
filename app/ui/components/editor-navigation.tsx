@@ -19,9 +19,7 @@ export function EditorTabs(props: {
         {(path) => (
           <div
             class={`flex shrink-0 items-center gap-3 border-r border-line px-4 ${
-              props.selected === path
-                ? "border-t-2 border-t-action bg-canvas"
-                : "text-muted"
+              props.selected === path ? "border-t-2 border-t-action bg-canvas" : "text-muted"
             }`}
           >
             <button
@@ -34,13 +32,11 @@ export function EditorTabs(props: {
               {path.split("/").at(-1)}
             </button>
             <Show when={props.dirty(path)}>
-              <span class="text-warning" aria-label="Unsaved changes">●</span>
+              <span class="text-warning" aria-label="Unsaved changes">
+                ●
+              </span>
             </Show>
-            <IconButton
-              name="x"
-              label={`Close ${path}`}
-              onClick={() => props.close(path)}
-            />
+            <IconButton name="x" label={`Close ${path}`} onClick={() => props.close(path)} />
           </div>
         )}
       </For>
@@ -61,9 +57,7 @@ export function FileBreadcrumbs(props: { path: string }) {
               <span aria-hidden="true">/</span>
             </Show>
             <span
-              class={`truncate ${
-                index() === props.path.split("/").length - 1 ? "text-ink" : ""
-              }`}
+              class={`truncate ${index() === props.path.split("/").length - 1 ? "text-ink" : ""}`}
             >
               {part}
             </span>

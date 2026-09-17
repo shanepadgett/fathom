@@ -13,10 +13,7 @@ export class DialogOverlay extends HTMLElement {
 
   protected onClick(event: MouseEvent) {
     const target = event.target;
-    if (
-      !(target instanceof Element) ||
-      target.closest("ds-modal, ds-drawer") !== this
-    ) return;
+    if (!(target instanceof Element) || target.closest("ds-modal, ds-drawer") !== this) return;
     const dialog = this.querySelector<HTMLDialogElement>(":scope > dialog");
     if (!dialog) return;
     if (target.closest("[data-open]")) dialog.showModal();

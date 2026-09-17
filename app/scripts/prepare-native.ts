@@ -13,9 +13,6 @@ try {
     throw new Error(`Native terminal download failed: ${response.status}`);
   }
   await Deno.mkdir(new URL("../native/", import.meta.url), { recursive: true });
-  await Deno.writeFile(
-    destination,
-    new Uint8Array(await response.arrayBuffer()),
-  );
+  await Deno.writeFile(destination, new Uint8Array(await response.arrayBuffer()));
 }
 console.log(`Prepared native/${name}`);

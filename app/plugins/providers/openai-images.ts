@@ -1,6 +1,7 @@
 import type { AssistantImages, ImagesModel } from "@earendil-works/pi-ai";
 
 import { Buffer } from "node:buffer";
+
 import { createImagesProvider } from "@earendil-works/pi-ai";
 import { openaiProvider } from "@earendil-works/pi-ai/providers/openai";
 
@@ -23,11 +24,7 @@ interface OpenaiImageResponse {
   }[];
 }
 
-function appendImage(
-  output: AssistantImages["output"],
-  data: unknown,
-  prompt?: string,
-) {
+function appendImage(output: AssistantImages["output"], data: unknown, prompt?: string) {
   if (typeof data !== "string" || !data) {
     throw new Error("OpenAI returned an image without base64 data");
   }
@@ -67,12 +64,8 @@ export function openaiImagesProvider() {
           throw new Error("Use at most four reference images");
         }
         for (const image of images) {
-          if (
-            !["image/png", "image/jpeg", "image/webp"].includes(image.mimeType)
-          ) {
-            throw new Error(
-              "OpenAI image references must be PNG, JPEG or WebP",
-            );
+          if (!["image/png", "image/jpeg", "image/webp"].includes(image.mimeType)) {
+            throw new Error("OpenAI image references must be PNG, JPEG or WebP");
           }
         }
         const headers = { authorization: `Bearer ${options.apiKey}` };
@@ -85,36 +78,35 @@ export function openaiImagesProvider() {
             {
               model: "gpt-5.6-luna",
               store: false,
-              input: [{
-                role: "user",
-                content: context.input.map((block) =>
-                  block.type === "text"
-                    ? { type: "input_text", text: block.text }
-                    : {
-                      type: "input_image",
-                      image_url: `data:${block.mimeType};base64,${block.data}`,
-                      detail: "auto",
-                    }
-                ),
-              }],
-              tools: [{
-                type: "image_generation",
-                model: "gpt-image-2",
-                output_format: "png",
-              }],
+              input: [
+                {
+                  role: "user",
+                  content: context.input.map((block) =>
+                    block.type === "text"
+                      ? { type: "input_text", text: block.text }
+                      : {
+                          type: "input_image",
+                          image_url: `data:${block.mimeType};base64,${block.data}`,
+                          detail: "auto",
+                        },
+                  ),
+                },
+              ],
+              tools: [
+                {
+                  type: "image_generation",
+                  model: "gpt-image-2",
+                  output_format: "png",
+                },
+              ],
               tool_choice: "required",
               parallel_tool_calls: false,
             },
             options,
             headers,
           );
-          if (
-            response?.status !== "completed" || !Array.isArray(response.output)
-          ) {
-            throw new Error(
-              response?.error?.message ||
-                "OpenAI image response did not complete",
-            );
+          if (response?.status !== "completed" || !Array.isArray(response.output)) {
+            throw new Error(response?.error?.message || "OpenAI image response did not complete");
           }
           responseId = response.id;
           for (const item of response.output) {
@@ -126,22 +118,19 @@ export function openaiImagesProvider() {
             } else if (item.type === "message") {
               for (const content of item.content ?? []) {
                 if (content.type === "refusal") {
-                  throw new Error(
-                    content.refusal || "OpenAI declined image generation",
-                  );
+                  throw new Error(content.refusal || "OpenAI declined image generation");
                 }
-                if (
-                  content.type === "output_text" &&
-                  typeof content.text === "string"
-                ) {
+                if (content.type === "output_text" && typeof content.text === "string") {
                   output.push({ type: "text", text: content.text });
                 }
               }
             }
           }
         } else {
-          const prompt = context.input.filter((block) => block.type === "text")
-            .map((block) => block.text).join("\n");
+          const prompt = context.input
+            .filter((block) => block.type === "text")
+            .map((block) => block.text)
+            .join("\n");
           let payload: unknown = {
             model: "gpt-image-2",
             prompt,
@@ -150,11 +139,8 @@ export function openaiImagesProvider() {
           };
           if (images.length) {
             const form = new FormData();
-            for (
-              const [key, value] of Object.entries(
-                payload as Record<string, unknown>,
-              )
-            ) form.set(key, String(value));
+            for (const [key, value] of Object.entries(payload as Record<string, unknown>))
+              form.set(key, String(value));
             for (const [index, image] of images.entries()) {
               const bytes = new Uint8Array(Buffer.from(image.data, "base64"));
               const extension = image.mimeType.split("/")[1];

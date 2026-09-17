@@ -12,25 +12,19 @@ export function diffLines(patch: string) {
   return patch.split("\n").map((text) => {
     if (text.startsWith("diff --git ")) hunk = false;
     if (text.startsWith("@@ ")) hunk = true;
-    const kind = hunk && text.startsWith("+")
-      ? "added"
-      : hunk && text.startsWith("-")
-      ? "removed"
-      : "context";
+    const kind =
+      hunk && text.startsWith("+") ? "added" : hunk && text.startsWith("-") ? "removed" : "context";
     return { text, kind } as const;
   });
 }
 
 export function DiffPreview(props: { patch: string }) {
   const lines = createMemo(() => diffLines(props.patch));
-  const count = (kind: "added" | "removed") =>
-    lines().filter((line) => line.kind === kind).length;
+  const count = (kind: "added" | "removed") => lines().filter((line) => line.kind === kind).length;
   return (
     <Show
       when={props.patch}
-      fallback={
-        <p class="px-6 py-6 text-sm text-muted">No text diff available.</p>
-      }
+      fallback={<p class="px-6 py-6 text-sm text-muted">No text diff available.</p>}
     >
       <div
         class="flex gap-2 border-b border-line px-6 py-2 font-mono text-sm"
@@ -45,11 +39,7 @@ export function DiffPreview(props: { patch: string }) {
         aria-label="File diff"
       >
         <For each={lines()}>
-          {(line) => (
-            <pre
-              class={`px-6 ${lineColors[line.kind]}`}
-            >{line.text || " "}</pre>
-          )}
+          {(line) => <pre class={`px-6 ${lineColors[line.kind]}`}>{line.text || " "}</pre>}
         </For>
       </div>
     </Show>

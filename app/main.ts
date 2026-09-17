@@ -3,15 +3,14 @@ import { fileURLToPath } from "node:url";
 
 import { atomicWrite } from "./kernel/files.ts";
 import { Application } from "./server/application.ts";
-import { handler } from "./server/http.ts";
 import { createDesktopWindow } from "./server/desktop.ts";
-import { NativeBrowserConnection } from "./server/native-browser-connection.ts";
+import { handler } from "./server/http.ts";
 import { restoreDesktopLaunch } from "./server/launch.ts";
+import { NativeBrowserConnection } from "./server/native-browser-connection.ts";
 
 const native = await restoreDesktopLaunch();
 const appRoot = fileURLToPath(new URL(".", import.meta.url));
-const home = Deno.env.get("FATHOM_HOME") ??
-  join(Deno.env.get("HOME")!, ".fathom");
+const home = Deno.env.get("FATHOM_HOME") ?? join(Deno.env.get("HOME")!, ".fathom");
 const piAuthPath = join(Deno.env.get("HOME")!, ".pi/agent/auth.json");
 let defaultAuthPath = join(home, "auth.json");
 try {
@@ -41,10 +40,9 @@ try {
 const app = new Application(home, authPath);
 await app.projects.initialize();
 try {
-  const workspace = Deno.env.get("FATHOM_WORKSPACE") ??
-    (native
-      ? app.projects.list().find((project) => project.path !== "/")?.path
-      : Deno.cwd());
+  const workspace =
+    Deno.env.get("FATHOM_WORKSPACE") ??
+    (native ? app.projects.list().find((project) => project.path !== "/")?.path : Deno.cwd());
   if (workspace) await app.open(resolve(workspace));
 } catch (error) {
   // Keep project selection available when a workspace or its plugin cannot load.
@@ -60,21 +58,20 @@ origin = `http://127.0.0.1:${(server.addr as Deno.NetAddr).port}`;
 const desktop = createDesktopWindow(stop);
 if (desktop?.browser) {
   const browser = desktop.browser;
-  app.browserConnection = (event) =>
-    new NativeBrowserConnection(browser, event);
+  app.browserConnection = (event) => new NativeBrowserConnection(browser, event);
 }
 console.log(`Fathom is ready at ${origin}`);
 desktop?.navigate(origin);
 
 let stopping: Promise<void> | undefined;
 function stop() {
-  return stopping ??= (async () => {
+  return (stopping ??= (async () => {
     try {
       await app.dispose();
     } finally {
       await server.shutdown();
     }
-  })();
+  })());
 }
 
 function requestShutdown() {

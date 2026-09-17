@@ -1,6 +1,8 @@
 import type { AssistantImages, ImagesModel } from "@earendil-works/pi-ai";
+
 import { createImagesProvider } from "@earendil-works/pi-ai";
 import { xaiProvider } from "@earendil-works/pi-ai/providers/xai";
+
 import { imageRequest } from "./image-http.ts";
 
 interface XaiImagesResponse {
@@ -32,9 +34,12 @@ export function xaiImagesProvider() {
         if (!options?.apiKey) {
           throw new Error("Connect xAI in Settings → Providers");
         }
-        const prompt = context.input.filter((block) => block.type === "text")
-          .map((block) => block.text).join("\n");
-        const images = context.input.filter((block) => block.type === "image")
+        const prompt = context.input
+          .filter((block) => block.type === "text")
+          .map((block) => block.text)
+          .join("\n");
+        const images = context.input
+          .filter((block) => block.type === "image")
           .map((block) => ({
             type: "image_url",
             url: `data:${block.mimeType};base64,${block.data}`,
@@ -50,11 +55,7 @@ export function xaiImagesProvider() {
             prompt,
             n: 1,
             response_format: "b64_json",
-            ...(images.length === 1
-              ? { image: images[0] }
-              : images.length
-              ? { images }
-              : {}),
+            ...(images.length === 1 ? { image: images[0] } : images.length ? { images } : {}),
           },
           options,
           { authorization: `Bearer ${options.apiKey}` },

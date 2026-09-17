@@ -1,13 +1,11 @@
 import { Field } from "./primitives.tsx";
 
-export function CommentField(
-  props: {
-    value: string;
-    change(value: string): void;
-    input?: (element: HTMLTextAreaElement) => void;
-    disabled?: boolean;
-  },
-) {
+export function CommentField(props: {
+  value: string;
+  change(value: string): void;
+  input?: (element: HTMLTextAreaElement) => void;
+  disabled?: boolean;
+}) {
   return (
     <Field label="Comment">
       <textarea

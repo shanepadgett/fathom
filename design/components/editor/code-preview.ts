@@ -28,18 +28,16 @@ export class CodePreviewElement extends DesignElement {
           aria-label="Sample TypeScript code"
         >
       ${lines.map(
-        (line) =>
-          html`
-            <span class="block whitespace-pre ${line.added
-              ? "bg-success/10"
-              : ""}"
-            >${line.tokens.map((token) =>
-              typeof token === "string"
-                ? token
-                : html`<span class=${tones[token.tone]}>${token.text}</span>`
-            )}</span>
-          `,
-      )}</pre>
+            (line) => html`
+              <span class="block whitespace-pre ${line.added ? "bg-success/10" : ""}"
+                >${line.tokens.map((token) =>
+                  typeof token === "string"
+                    ? token
+                    : html`<span class=${tones[token.tone]}>${token.text}</span>`,
+                )}</span
+              >
+            `,
+          )}</pre>
       </div>
     `;
   }

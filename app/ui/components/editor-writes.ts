@@ -26,12 +26,13 @@ export class EditorWrites {
   }
 
   run<T>(path: string, write: () => Promise<T>): Promise<T> {
-    const result = (this.tails.get(path) ?? Promise.resolve()).catch(() => {})
-      .then(write);
+    const result = (this.tails.get(path) ?? Promise.resolve()).catch(() => {}).then(write);
     this.tails.set(path, result);
-    void result.finally(() => {
-      if (this.tails.get(path) === result) this.tails.delete(path);
-    }).catch(() => {});
+    void result
+      .finally(() => {
+        if (this.tails.get(path) === result) this.tails.delete(path);
+      })
+      .catch(() => {});
     return result;
   }
 

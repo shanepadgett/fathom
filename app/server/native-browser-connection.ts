@@ -1,7 +1,4 @@
-import type {
-  BrowserEvent,
-  BrowserTransport,
-} from "../plugins/browser/connection.ts";
+import type { BrowserEvent, BrowserTransport } from "../plugins/browser/connection.ts";
 import type { BrowserViewport } from "../sdk/browser.ts";
 import type { NativeBrowserHost } from "./native-browser-host.ts";
 
@@ -26,7 +23,10 @@ export class NativeBrowserConnection implements BrowserTransport {
     return this.disposed || this.protocol.closed;
   }
 
-  constructor(private host: NativeBrowserHost, event: BrowserEvent) {
+  constructor(
+    private host: NativeBrowserHost,
+    event: BrowserEvent,
+  ) {
     this.protocol = new BrowserProtocol((message) => {
       if (!this.child || this.disposed) {
         throw new Error("Native browser is closed");
@@ -119,17 +119,13 @@ export class NativeBrowserConnection implements BrowserTransport {
         if (status !== 1 || length > this.output.byteLength) {
           throw new Error("Invalid native browser poll result");
         }
-        this.protocol.receive(
-          this.decoder.decode(this.output.subarray(0, length)),
-        );
+        this.protocol.receive(this.decoder.decode(this.output.subarray(0, length)));
       }
       this.timer = setTimeout(this.pump, 16);
     } catch (error) {
-      this.protocol.close(
-        error instanceof Error ? error : new Error(String(error)),
-      );
+      this.protocol.close(error instanceof Error ? error : new Error(String(error)));
       void this.dispose().catch((failure) =>
-        console.error("Native browser cleanup failed", failure)
+        console.error("Native browser cleanup failed", failure),
       );
     }
   };

@@ -4,9 +4,7 @@ import type { Transport } from "../transport.ts";
 import { createResource, createSignal, Show } from "solid-js";
 
 import { AudioSettings } from "./audio-settings.tsx";
-
 import { NotificationPermissionControl } from "./notification-permission.tsx";
-
 import { Button, Field } from "./primitives.tsx";
 
 interface Preferences {
@@ -21,21 +19,16 @@ interface Preferences {
   volume: number;
 }
 
-export function RuntimeSettings(
-  props: { transport: Transport; error(error: unknown): void },
-) {
+export function RuntimeSettings(props: { transport: Transport; error(error: unknown): void }) {
   const projectId = props.transport.projectId;
   const [failure, setFailure] = createSignal("");
   const [preferences, { mutate }] = createResource(() =>
-    props.transport.request<Preferences>("settings.runtime.get", { projectId })
+    props.transport.request<Preferences>("settings.runtime.get", { projectId }),
   );
   const [saving, setSaving] = createSignal(false);
   const [saved, setSaved] = createSignal(false);
-  const update = <K extends keyof Preferences>(
-    key: K,
-    value: Preferences[K],
-  ) => {
-    mutate((current) => current ? { ...current, [key]: value } : current);
+  const update = <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
+    mutate((current) => (current ? { ...current, [key]: value } : current));
     setSaved(false);
   };
   const save = async () => {
@@ -72,12 +65,9 @@ export function RuntimeSettings(
               <Field label="Tool execution">
                 <select
                   value={value().toolExecution}
-                  onChange={(event) =>
-                    update("toolExecution", event.currentTarget.value)}
+                  onChange={(event) => update("toolExecution", event.currentTarget.value)}
                 >
-                  <option value="adaptive">
-                    Parallel reads, sequential changes
-                  </option>
+                  <option value="adaptive">Parallel reads, sequential changes</option>
                   <option value="sequential">One tool at a time</option>
                   <option value="parallel">Parallel tools</option>
                 </select>
@@ -89,15 +79,13 @@ export function RuntimeSettings(
                   max="10000"
                   required
                   value={value().maxSteps}
-                  onChange={(event) =>
-                    update("maxSteps", event.currentTarget.valueAsNumber)}
+                  onChange={(event) => update("maxSteps", event.currentTarget.valueAsNumber)}
                 />
               </Field>
               <Field label="Messages sent during a run">
                 <select
                   value={value().defaultInput}
-                  onChange={(event) =>
-                    update("defaultInput", event.currentTarget.value)}
+                  onChange={(event) => update("defaultInput", event.currentTarget.value)}
                 >
                   <option value="steer">Steer at the next step</option>
                   <option value="follow_up">Queue for the next run</option>
@@ -109,16 +97,14 @@ export function RuntimeSettings(
                 <input
                   value={value().expertProvider}
                   placeholder="openai-codex"
-                  onChange={(event) =>
-                    update("expertProvider", event.currentTarget.value)}
+                  onChange={(event) => update("expertProvider", event.currentTarget.value)}
                 />
               </Field>
               <Field label="Expert model ID">
                 <input
                   value={value().expertModel}
                   placeholder="gpt-6-astra"
-                  onChange={(event) =>
-                    update("expertModel", event.currentTarget.value)}
+                  onChange={(event) => update("expertModel", event.currentTarget.value)}
                 />
               </Field>
               <h4>Notifications</h4>
@@ -126,12 +112,9 @@ export function RuntimeSettings(
               <Field label="Notify when work needs attention">
                 <select
                   value={value().notifications}
-                  onChange={(event) =>
-                    update("notifications", event.currentTarget.value)}
+                  onChange={(event) => update("notifications", event.currentTarget.value)}
                 >
-                  <option value="background_only">
-                    While Fathom is in the background
-                  </option>
+                  <option value="background_only">While Fathom is in the background</option>
                   <option value="always">Always</option>
                   <option value="muted">Muted</option>
                 </select>
@@ -145,7 +128,9 @@ export function RuntimeSettings(
                 setCues={(cues) => update("audioCues", cues)}
               />
               <Show when={failure()}>
-                <p role="alert" class="my-3 text-danger">{failure()}</p>
+                <p role="alert" class="my-3 text-danger">
+                  {failure()}
+                </p>
               </Show>
               <Button type="submit" variant="primary" disabled={saving()}>
                 {saving() ? "Saving…" : saved() ? "Saved" : "Save preferences"}

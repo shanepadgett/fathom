@@ -1,7 +1,7 @@
 import { Show } from "solid-js";
 
-import { Button } from "./primitives.tsx";
 import { Icon } from "./icon.tsx";
+import { Button } from "./primitives.tsx";
 
 export function SelectorButton(props: {
   value: string;
@@ -20,7 +20,10 @@ export function SelectorButton(props: {
       <span>
         {props.value}
         <Show when={props.secondary}>
-          <span class="text-muted">{" · "}{props.secondary}</span>
+          <span class="text-muted">
+            {" · "}
+            {props.secondary}
+          </span>
         </Show>
       </span>
       <Icon name="caret-down" size="small" />

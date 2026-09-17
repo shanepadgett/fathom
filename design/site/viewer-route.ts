@@ -22,11 +22,7 @@ export function viewerRoute(path: string): ViewerRoute {
     };
   }
   const group = path.split("/")[1];
-  const entries = group === "components"
-    ? components
-    : group === "screens"
-    ? screens
-    : undefined;
+  const entries = group === "components" ? components : group === "screens" ? screens : undefined;
   const entry = entries?.find((item) => path === `/${group}/${item.id}`);
   if (entry) {
     return {

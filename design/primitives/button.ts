@@ -16,13 +16,13 @@ export const button = ({
   variant = "secondary",
   size = "compact",
   disabled = false,
-}: ButtonOptions) =>
-  html`
-    <ds-button variant="${variant}" size="${size}"
+}: ButtonOptions) => html`
+  <ds-button variant="${variant}" size="${size}"
     ><button type="button" aria-label="${label}" ?disabled=${disabled}>
-        ${content ?? label}
-      </button></ds-button>
-  `;
+      ${content ?? label}
+    </button></ds-button
+  >
+`;
 
 /** Native children retain their labels, events, and form semantics. */
 export class DesignButton extends DesignElement {

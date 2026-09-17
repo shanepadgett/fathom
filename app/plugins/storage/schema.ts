@@ -8,7 +8,9 @@ export const sessions = sqliteTable("sessions", {
 
 export const entries = sqliteTable("entries", {
   id: text().primaryKey(),
-  sessionId: text("session_id").notNull().references(() => sessions.id),
+  sessionId: text("session_id")
+    .notNull()
+    .references(() => sessions.id),
   parentId: text("parent_id"),
   data: text().notNull(),
   createdAt: integer("created_at").notNull(),
@@ -16,7 +18,9 @@ export const entries = sqliteTable("entries", {
 
 export const executions = sqliteTable("executions", {
   id: text().primaryKey(),
-  sessionId: text("session_id").notNull().references(() => sessions.id),
+  sessionId: text("session_id")
+    .notNull()
+    .references(() => sessions.id),
   data: text().notNull(),
 });
 

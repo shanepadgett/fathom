@@ -1,5 +1,6 @@
-import type { LoginFlow } from "../../sdk/auth.ts";
 import type { AuthType, MutableModels } from "@earendil-works/pi-ai";
+
+import type { LoginFlow } from "../../sdk/auth.ts";
 
 interface Login extends LoginFlow {
   controller: AbortController;
@@ -11,7 +12,10 @@ interface Login extends LoginFlow {
 export class LoginManager {
   private disposed = false;
   private flows = new Map<string, Login>();
-  constructor(private models: MutableModels, private changed: () => void) {}
+  constructor(
+    private models: MutableModels,
+    private changed: () => void,
+  ) {}
 
   start(providerId: string, type: AuthType) {
     if (this.disposed) {
@@ -19,9 +23,8 @@ export class LoginManager {
     }
     const provider = this.models.getProvider(providerId);
     if (!provider) throw new Error("Unknown provider");
-    if (
-      type === "oauth" ? !provider.auth.oauth : !provider.auth.apiKey?.login
-    ) throw new Error("This sign-in method is not supported by the provider");
+    if (type === "oauth" ? !provider.auth.oauth : !provider.auth.apiKey?.login)
+      throw new Error("This sign-in method is not supported by the provider");
     this.cancelProvider(providerId);
     const id = crypto.randomUUID();
     const controller = new AbortController();
@@ -43,77 +46,83 @@ export class LoginManager {
       }, 10 * 60_000),
     };
     this.flows.set(id, flow);
-    void this.models.login(providerId, type, {
-      signal: controller.signal,
-      notify: (event) => {
-        if (this.disposed || flow.status !== "pending") return;
-        flow.events.push(event);
-        if (flow.events.length > 30) flow.events.shift();
-        this.changed();
-      },
-      prompt: (prompt) =>
-        new Promise<string>((resolve, reject) => {
-          const { signal: promptSignal, ...publicPrompt } = prompt;
-          const signal = promptSignal
-            ? AbortSignal.any([controller.signal, promptSignal])
-            : controller.signal;
-          if (signal.aborted) {
-            reject(signal.reason);
-            return;
-          }
-          const cleanup = () => {
-            signal.removeEventListener("abort", abort);
-            delete flow.answer;
-            delete flow.prompt;
-          };
-          const abort = () => {
-            cleanup();
-            reject(signal.reason);
-            if (!this.disposed) this.changed();
-          };
-          flow.prompt = { ...publicPrompt, id: crypto.randomUUID() };
-          flow.answer = (answer) => {
-            cleanup();
-            resolve(answer);
-            this.changed();
-          };
-          signal.addEventListener("abort", abort, { once: true });
+    void this.models
+      .login(providerId, type, {
+        signal: controller.signal,
+        notify: (event) => {
+          if (this.disposed || flow.status !== "pending") return;
+          flow.events.push(event);
+          if (flow.events.length > 30) flow.events.shift();
           this.changed();
-        }),
-    }).then(() => {
-      if (flow.status !== "pending") return;
-      flow.status = controller.signal.aborted ? "cancelled" : "complete";
-    }, () => {
-      if (flow.status !== "pending") return;
-      flow.status = controller.signal.aborted ? "cancelled" : "error";
-      flow.error = controller.signal.aborted
-        ? undefined
-        : "Sign-in failed. Please retry or check your provider account.";
-    }).finally(() => {
-      clearTimeout(flow.timer);
-      delete flow.prompt;
-      delete flow.answer;
-      if (this.disposed) return;
-      this.changed();
-      flow.cleanupTimer = setTimeout(() => {
-        this.flows.delete(id);
+        },
+        prompt: (prompt) =>
+          new Promise<string>((resolve, reject) => {
+            const { signal: promptSignal, ...publicPrompt } = prompt;
+            const signal = promptSignal
+              ? AbortSignal.any([controller.signal, promptSignal])
+              : controller.signal;
+            if (signal.aborted) {
+              reject(signal.reason);
+              return;
+            }
+            const cleanup = () => {
+              signal.removeEventListener("abort", abort);
+              delete flow.answer;
+              delete flow.prompt;
+            };
+            const abort = () => {
+              cleanup();
+              reject(signal.reason);
+              if (!this.disposed) this.changed();
+            };
+            flow.prompt = { ...publicPrompt, id: crypto.randomUUID() };
+            flow.answer = (answer) => {
+              cleanup();
+              resolve(answer);
+              this.changed();
+            };
+            signal.addEventListener("abort", abort, { once: true });
+            this.changed();
+          }),
+      })
+      .then(
+        () => {
+          if (flow.status !== "pending") return;
+          flow.status = controller.signal.aborted ? "cancelled" : "complete";
+        },
+        () => {
+          if (flow.status !== "pending") return;
+          flow.status = controller.signal.aborted ? "cancelled" : "error";
+          flow.error = controller.signal.aborted
+            ? undefined
+            : "Sign-in failed. Please retry or check your provider account.";
+        },
+      )
+      .finally(() => {
+        clearTimeout(flow.timer);
+        delete flow.prompt;
+        delete flow.answer;
+        if (this.disposed) return;
         this.changed();
-      }, 60_000);
-      flow.cleanupTimer.unref();
-    });
+        flow.cleanupTimer = setTimeout(() => {
+          this.flows.delete(id);
+          this.changed();
+        }, 60_000);
+        flow.cleanupTimer.unref();
+      });
     return { id };
   }
 
   list(): LoginFlow[] {
-    return [...this.flows.values()].map((
-      {
+    return [...this.flows.values()].map(
+      ({
         controller: _controller,
         answer: _answer,
         timer: _timer,
         cleanupTimer: _cleanupTimer,
         ...state
-      },
-    ) => state);
+      }) => state,
+    );
   }
 
   answer(id: string, promptId: string, value: string) {

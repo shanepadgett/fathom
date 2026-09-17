@@ -18,14 +18,19 @@ export function workspaceLayout(
     if (!id) return;
     const next = { ...value(), ...patch };
     restore(next);
-    pending = pending.then(() =>
-      transport.request("settings.layout.set", {
-        projectId: id,
-        value: next,
-      })
-    ).then(() => {}, (failure) => {
-      if (projectId() === id) error(failure);
-    });
+    pending = pending
+      .then(() =>
+        transport.request("settings.layout.set", {
+          projectId: id,
+          value: next,
+        }),
+      )
+      .then(
+        () => {},
+        (failure) => {
+          if (projectId() === id) error(failure);
+        },
+      );
   };
   return { value, restore, update, settled: () => pending };
 }

@@ -2,17 +2,15 @@ import { createSignal, Show } from "solid-js";
 
 import { Button, Field, Modal } from "./primitives.tsx";
 
-export function EditMessage(
-  props: {
-    text: string;
-    submit(text: string): Promise<void>;
-    close(): void;
-    title?: string;
-    description?: string;
-    submitLabel?: string;
-    pendingLabel?: string;
-  },
-) {
+export function EditMessage(props: {
+  text: string;
+  submit(text: string): Promise<void>;
+  close(): void;
+  title?: string;
+  description?: string;
+  submitLabel?: string;
+  pendingLabel?: string;
+}) {
   const [text, setText] = createSignal(props.text);
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
@@ -52,18 +50,18 @@ export function EditMessage(
         />
       </Field>
       <Show when={error()}>
-        <p role="alert" class="my-3 text-danger">{error()}</p>
+        <p role="alert" class="my-3 text-danger">
+          {error()}
+        </p>
       </Show>
       <div class="mt-4 flex justify-end gap-3">
-        <Button disabled={busy()} onClick={props.close}>Cancel</Button>
-        <Button
-          variant="primary"
-          disabled={busy() || !text().trim()}
-          onClick={() => void send()}
-        >
+        <Button disabled={busy()} onClick={props.close}>
+          Cancel
+        </Button>
+        <Button variant="primary" disabled={busy() || !text().trim()} onClick={() => void send()}>
           {busy()
-            ? props.pendingLabel ?? "Sending…"
-            : props.submitLabel ?? "Send edited message"}
+            ? (props.pendingLabel ?? "Sending…")
+            : (props.submitLabel ?? "Send edited message")}
         </Button>
       </div>
     </Modal>

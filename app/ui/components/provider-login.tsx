@@ -1,15 +1,9 @@
 import type { LoginFlow } from "../../sdk/auth.ts";
-import { ProviderAuthEvent } from "./provider-auth-event.tsx";
-import {
-  createComputed,
-  createMemo,
-  createSignal,
-  For,
-  onCleanup,
-  Show,
-} from "solid-js";
+
+import { createComputed, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
 
 import { Button, Field } from "./primitives.tsx";
+import { ProviderAuthEvent } from "./provider-auth-event.tsx";
 
 export function ProviderLogin(props: {
   flow: LoginFlow;
@@ -20,11 +14,8 @@ export function ProviderLogin(props: {
   const [answer, setAnswer] = createSignal("");
   const [pending, setPending] = createSignal(false);
   const [failure, setFailure] = createSignal("");
-  const prompt = () =>
-    props.flow.status === "pending" ? props.flow.prompt : undefined;
-  const key = createMemo(() =>
-    JSON.stringify([props.flow.id, props.flow.status, prompt()?.id])
-  );
+  const prompt = () => (props.flow.status === "pending" ? props.flow.prompt : undefined);
+  const key = createMemo(() => JSON.stringify([props.flow.id, props.flow.status, prompt()?.id]));
   const disabled = () => props.busy || pending();
   let generation = 0;
 
@@ -45,16 +36,15 @@ export function ProviderLogin(props: {
     if (method === "provider.answer" && (!currentPrompt || !answer())) return;
     const currentGeneration = generation;
     const currentKey = key();
-    const params = method === "provider.answer"
-      ? { id: props.flow.id, promptId: currentPrompt!.id, answer: answer() }
-      : { id: props.flow.id };
+    const params =
+      method === "provider.answer"
+        ? { id: props.flow.id, promptId: currentPrompt!.id, answer: answer() }
+        : { id: props.flow.id };
     setPending(true);
     setFailure("");
     try {
       const accepted = await props.act(method, params);
-      if (
-        accepted && generation === currentGeneration && key() === currentKey
-      ) {
+      if (accepted && generation === currentGeneration && key() === currentKey) {
         setAnswer("");
       }
     } catch {
@@ -69,17 +59,16 @@ export function ProviderLogin(props: {
   return (
     <div class="mt-4 rounded-control border border-line p-4">
       <h4>
-        {props.providerName} · {props.flow.status === "pending"
+        {props.providerName} ·{" "}
+        {props.flow.status === "pending"
           ? "Signing in"
           : props.flow.status === "complete"
-          ? "Connected"
-          : props.flow.status === "error"
-          ? "Sign-in failed"
-          : "Cancelled"}
+            ? "Connected"
+            : props.flow.status === "error"
+              ? "Sign-in failed"
+              : "Cancelled"}
       </h4>
-      <For each={props.flow.events}>
-        {(event) => <ProviderAuthEvent event={event} />}
-      </For>
+      <For each={props.flow.events}>{(event) => <ProviderAuthEvent event={event} />}</For>
       <Show when={prompt()}>
         {(currentPrompt) => (
           <form
@@ -94,9 +83,7 @@ export function ProviderLogin(props: {
                 fallback={
                   <input
                     autofocus
-                    type={currentPrompt().type === "secret"
-                      ? "password"
-                      : "text"}
+                    type={currentPrompt().type === "secret" ? "password" : "text"}
                     autocomplete="off"
                     value={answer()}
                     readOnly={disabled()}
@@ -105,9 +92,7 @@ export function ProviderLogin(props: {
                     }}
                     placeholder={(() => {
                       const value = currentPrompt();
-                      return "placeholder" in value
-                        ? value.placeholder
-                        : undefined;
+                      return "placeholder" in value ? value.placeholder : undefined;
                     })()}
                   />
                 }
@@ -126,18 +111,12 @@ export function ProviderLogin(props: {
                       return value.type === "select" ? value.options : [];
                     })()}
                   >
-                    {(option) => (
-                      <option value={option.id}>{option.label}</option>
-                    )}
+                    {(option) => <option value={option.id}>{option.label}</option>}
                   </For>
                 </select>
               </Show>
             </Field>
-            <Button
-              variant="primary"
-              disabled={!answer() || disabled()}
-              type="submit"
-            >
+            <Button variant="primary" disabled={!answer() || disabled()} type="submit">
               Continue
             </Button>
           </form>
@@ -147,13 +126,12 @@ export function ProviderLogin(props: {
         <p class="error">{props.flow.error}</p>
       </Show>
       <Show when={failure()}>
-        <p class="error" role="alert">{failure()}</p>
+        <p class="error" role="alert">
+          {failure()}
+        </p>
       </Show>
       <Show when={props.flow.status === "pending"}>
-        <Button
-          disabled={disabled()}
-          onClick={() => void act("provider.cancel")}
-        >
+        <Button disabled={disabled()} onClick={() => void act("provider.cancel")}>
           Cancel sign-in
         </Button>
       </Show>

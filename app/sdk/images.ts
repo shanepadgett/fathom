@@ -1,4 +1,5 @@
 import type { MutableImagesModels } from "@earendil-works/pi-ai";
+
 import type { MediaAsset } from "./media.ts";
 
 export interface ImageSelection {

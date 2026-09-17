@@ -9,37 +9,37 @@ import { projectIdentity } from "./project-identity.ts";
 
 function sessionStatus(chat: Chat, selected: boolean) {
   const unread = chat.unread && !selected;
-  const state = chat.activity === "running"
-    ? ({
-      label: chat.status ?? "Working",
-      symbol: "spinner-gap",
-      tone: "text-action",
-    } as const)
-    : chat.activity === "attention"
-    ? ({
-      label: "Needs your input",
-      symbol: "chat-circle-text",
-      tone: "text-warning",
-    } as const)
-    : chat.activity === "completed" && unread
-    ? ({
-      label: "Completed · Unread",
-      symbol: "check",
-      tone: "text-success",
-    } as const)
-    : ({ label: "Idle", symbol: "moon", tone: "text-muted" } as const);
+  const state =
+    chat.activity === "running"
+      ? ({
+          label: chat.status ?? "Working",
+          symbol: "spinner-gap",
+          tone: "text-action",
+        } as const)
+      : chat.activity === "attention"
+        ? ({
+            label: "Needs your input",
+            symbol: "chat-circle-text",
+            tone: "text-warning",
+          } as const)
+        : chat.activity === "completed" && unread
+          ? ({
+              label: "Completed · Unread",
+              symbol: "check",
+              tone: "text-success",
+            } as const)
+          : ({ label: "Idle", symbol: "moon", tone: "text-muted" } as const);
   return html`
     <span
       role="img"
       aria-label=${state.label}
       title=${state.label}
       class="ml-auto inline-flex shrink-0 ${state.tone}"
-    ><span
-          class="inline-flex ${chat.activity === "running"
-            ? "motion-safe:animate-session-spin"
-            : ""}"
-          >${icon(state.symbol, "small")}</span
-        ></span>
+      ><span
+        class="inline-flex ${chat.activity === "running" ? "motion-safe:animate-session-spin" : ""}"
+        >${icon(state.symbol, "small")}</span
+      ></span
+    >
   `;
 }
 
@@ -74,26 +74,25 @@ export class ChatListItemElement extends DesignElement {
           tabindex="0"
           aria-haspopup="menu"
           data-chat-item
-          class="min-w-0 rounded-control px-2 py-1.5 ${selected
-            ? "bg-action/10"
-            : "hover:bg-canvas"}"
+          class="min-w-0 rounded-control px-2 py-1.5 ${
+            selected ? "bg-action/10" : "hover:bg-canvas"
+          }"
           aria-current=${selected ? "true" : nothing}
         >
           <div class="flex min-w-0 items-baseline gap-2">
             <p
-              class="min-w-0 flex-1 truncate text-dense ${selected
-                ? "text-action"
-                : "text-ink"} ${unread ? "font-medium" : ""}"
+              class="min-w-0 flex-1 truncate text-dense ${
+                selected ? "text-action" : "text-ink"
+              } ${unread ? "font-medium" : ""}"
               title=${chat.title}
             >
-                    ${chat.title}
-                  </p>
+              ${chat.title}
+            </p>
           </div>
-          <div
-            class="mt-0.5 flex min-w-0 items-center justify-between gap-2 text-micro">
-                  <span class="shrink-0 text-muted">${chat.time}</span>
-                  ${sessionStatus(chat, selected)}
-                </div>
+          <div class="mt-0.5 flex min-w-0 items-center justify-between gap-2 text-micro">
+            <span class="shrink-0 text-muted">${chat.time}</span>
+            ${sessionStatus(chat, selected)}
+          </div>
         </div>
       `;
     }
@@ -106,29 +105,20 @@ export class ChatListItemElement extends DesignElement {
         tabindex="0"
         aria-haspopup="menu"
         data-chat-item
-        class="min-w-0 rounded-control px-2 py-2 ${selected
-          ? "bg-action/10"
-          : "hover:bg-canvas"}"
+        class="min-w-0 rounded-control px-2 py-2 ${selected ? "bg-action/10" : "hover:bg-canvas"}"
         aria-current=${selected ? "true" : nothing}
       >
         <div class="flex items-center justify-between gap-1.5 text-micro text-muted">
-          ${projectIdentity(project.name)}<span class="shrink-0">${chat
-            .time}</span>
+          ${projectIdentity(project.name)}<span class="shrink-0">${chat.time}</span>
         </div>
         <p
-          class="mt-1 truncate text-dense ${selected
-            ? "text-action"
-            : "text-ink"}"
+          class="mt-1 truncate text-dense ${selected ? "text-action" : "text-ink"}"
           title="${chat.title}"
         >
           ${chat.title}
         </p>
-        <div
-          class="mt-1 flex min-w-0 items-center justify-between gap-1.5 text-micro text-muted">
-          ${chat.branch ? branchIdentity(chat.branch) : nothing}${sessionStatus(
-            chat,
-            selected,
-          )}
+        <div class="mt-1 flex min-w-0 items-center justify-between gap-1.5 text-micro text-muted">
+          ${chat.branch ? branchIdentity(chat.branch) : nothing}${sessionStatus(chat, selected)}
         </div>
       </div>
     `;

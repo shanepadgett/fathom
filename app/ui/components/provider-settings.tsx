@@ -1,10 +1,12 @@
-import type { Transport } from "../transport.ts";
 import type { LoginFlow } from "../../sdk/auth.ts";
+import type { Transport } from "../transport.ts";
+
 import { createResource, createSignal, For, onCleanup, Show } from "solid-js";
+
 import { ActionMenu } from "./action-menu.tsx";
+import { ConnectionRow } from "./connection-row.tsx";
 import { Button, Modal } from "./primitives.tsx";
 import { ProviderLogin } from "./provider-login.tsx";
-import { ConnectionRow } from "./connection-row.tsx";
 
 interface Provider {
   id: string;
@@ -17,10 +19,10 @@ interface Provider {
 export function ProviderSettings(props: { transport: Transport }) {
   const projectId = props.transport.projectId;
   const [providers, { refetch }] = createResource(() =>
-    props.transport.request<Provider[]>("providers.list", { projectId })
+    props.transport.request<Provider[]>("providers.list", { projectId }),
   );
   const [flows, { refetch: refreshFlows }] = createResource(() =>
-    props.transport.request<LoginFlow[]>("provider.flows", { projectId })
+    props.transport.request<LoginFlow[]>("provider.flows", { projectId }),
   );
   const [disconnecting, setDisconnecting] = createSignal<Provider>();
   const [failure, setFailure] = createSignal("");
@@ -32,22 +34,21 @@ export function ProviderSettings(props: { transport: Transport }) {
     try {
       await Promise.all([refetch(), refreshFlows()]);
     } catch {
-      setFailure(
-        "Could not refresh provider status. Check the connection and try again.",
-      );
+      setFailure("Could not refresh provider status. Check the connection and try again.");
     } finally {
       setBusy(false);
     }
   };
-  onCleanup(props.transport.onEvent((event) => {
-    if (
-      event.type === "connected" ||
-      (event.projectId === projectId &&
-        ["providers", "environment"].includes(event.type))
-    ) {
-      void Promise.allSettled([refetch(), refreshFlows()]);
-    }
-  }));
+  onCleanup(
+    props.transport.onEvent((event) => {
+      if (
+        event.type === "connected" ||
+        (event.projectId === projectId && ["providers", "environment"].includes(event.type))
+      ) {
+        void Promise.allSettled([refetch(), refreshFlows()]);
+      }
+    }),
+  );
   const act = async (method: string, params: Record<string, unknown>) => {
     if (busy()) return false;
     setBusy(true);
@@ -72,7 +73,9 @@ export function ProviderSettings(props: { transport: Transport }) {
   return (
     <>
       <Show when={failure()}>
-        <p role="alert" class="mb-3 text-danger">{failure()}</p>
+        <p role="alert" class="mb-3 text-danger">
+          {failure()}
+        </p>
       </Show>
       <div class="flex items-center justify-between gap-3">
         <h3>Providers</h3>
@@ -85,36 +88,26 @@ export function ProviderSettings(props: { transport: Transport }) {
         </Button>
       </div>
       <p class="muted">
-        Connect an account or use an API key. Authentication is handled on this
-        machine.
+        Connect an account or use an API key. Authentication is handled on this machine.
       </p>
       <Show when={providers.error}>
         <p class="error">Could not load providers.</p>
       </Show>
-      <For
-        each={providers.error
-          ? []
-          : providers()?.map((provider) => provider.id)}
-      >
+      <For each={providers.error ? [] : providers()?.map((provider) => provider.id)}>
         {(providerId) => {
-          const provider = () =>
-            providers()!.find((item) => item.id === providerId)!;
+          const provider = () => providers()!.find((item) => item.id === providerId)!;
           return (
             <>
               <ConnectionRow
                 name={provider().name}
                 avatar={provider().name.slice(0, 1)}
-                status={provider().connected
-                  ? provider().source ?? "Connected"
-                  : "Not connected"}
+                status={provider().connected ? (provider().source ?? "Connected") : "Not connected"}
               >
                 <ActionMenu
                   label={`${provider().name} options`}
                   actions={[
                     ...provider().methods.map((method) => ({
-                      label: `${
-                        provider().connected ? "Reconnect" : "Connect"
-                      } · ${method.name}`,
+                      label: `${provider().connected ? "Reconnect" : "Connect"} · ${method.name}`,
                       icon: "plus" as const,
                       disabled: busy(),
                       run: () =>
@@ -124,24 +117,29 @@ export function ProviderSettings(props: { transport: Transport }) {
                         }),
                     })),
                     ...(provider().connected
-                      ? [{
-                        label: "Disconnect",
-                        icon: "x" as const,
-                        disabled: busy(),
-                        run: () => setDisconnecting(provider()),
-                      }]
+                      ? [
+                          {
+                            label: "Disconnect",
+                            icon: "x" as const,
+                            disabled: busy(),
+                            run: () => setDisconnecting(provider()),
+                          },
+                        ]
                       : []),
                   ]}
                 />
               </ConnectionRow>
               <For
-                each={flows.error
-                  ? []
-                  : flows()?.filter((flow) => flow.status !== "cancelled" &&
-                    flow.providerId === provider().id
-                  ).map((
-                    flow,
-                  ) => flow.id)}
+                each={
+                  flows.error
+                    ? []
+                    : flows()
+                        ?.filter(
+                          (flow) =>
+                            flow.status !== "cancelled" && flow.providerId === provider().id,
+                        )
+                        .map((flow) => flow.id)
+                }
               >
                 {(id) => (
                   <ProviderLogin
@@ -170,26 +168,24 @@ export function ProviderSettings(props: { transport: Transport }) {
             }}
           >
             <p>
-              This removes the saved credential. When Fathom shares Pi's auth
-              file, Pi will also be signed out of this provider.
+              This removes the saved credential. When Fathom shares Pi's auth file, Pi will also be
+              signed out of this provider.
             </p>
             <Show when={failure()}>
-              <p role="alert" class="mt-3 text-danger">{failure()}</p>
+              <p role="alert" class="mt-3 text-danger">
+                {failure()}
+              </p>
             </Show>
             <div class="mt-4 flex justify-end gap-3">
-              <Button
-                disabled={busy()}
-                onClick={() => setDisconnecting(undefined)}
-              >
+              <Button disabled={busy()} onClick={() => setDisconnecting(undefined)}>
                 Keep connection
               </Button>
               <Button
                 variant="danger"
                 disabled={busy()}
                 onClick={async () => {
-                  if (
-                    await act("provider.logout", { providerId: provider().id })
-                  ) setDisconnecting(undefined);
+                  if (await act("provider.logout", { providerId: provider().id }))
+                    setDisconnecting(undefined);
                 }}
               >
                 Disconnect

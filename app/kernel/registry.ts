@@ -24,10 +24,7 @@ export class ProjectRegistry {
   }
 
   async initialize() {
-    const trust = await readJson<unknown>(
-      join(this.home, "trusted_roots.json"),
-      [],
-    );
+    const trust = await readJson<unknown>(join(this.home, "trusted_roots.json"), []);
     if (!Array.isArray(trust) || !trust.every((v) => typeof v === "string")) {
       throw new Error("Invalid trusted_roots.json");
     }
@@ -35,17 +32,19 @@ export class ProjectRegistry {
   }
 
   list(): Project[] {
-    return this.db.prepare(
-      "SELECT projects.*, trust_reviews.project_id AS reviewed FROM projects LEFT JOIN trust_reviews ON trust_reviews.project_id = projects.id ORDER BY last_opened_at DESC",
-    ).all().map((row) => ({
-      id: String(row.id),
-      path: String(row.path),
-      name: String(row.name),
-      trusted: this.trust.includes(String(row.path)),
-      trustReviewed: row.reviewed !== null ||
-        this.trust.includes(String(row.path)),
-      lastOpenedAt: Number(row.last_opened_at),
-    }));
+    return this.db
+      .prepare(
+        "SELECT projects.*, trust_reviews.project_id AS reviewed FROM projects LEFT JOIN trust_reviews ON trust_reviews.project_id = projects.id ORDER BY last_opened_at DESC",
+      )
+      .all()
+      .map((row) => ({
+        id: String(row.id),
+        path: String(row.path),
+        name: String(row.name),
+        trusted: this.trust.includes(String(row.path)),
+        trustReviewed: row.reviewed !== null || this.trust.includes(String(row.path)),
+        lastOpenedAt: Number(row.last_opened_at),
+      }));
   }
 
   async open(path: string) {
@@ -53,13 +52,12 @@ export class ProjectRegistry {
     if (!(await Deno.stat(canonical)).isDirectory) {
       throw new Error("Project must be a directory");
     }
-    const id = createHash("sha256").update(canonical).digest("hex").slice(
-      0,
-      24,
-    );
-    this.db.prepare(
-      "INSERT INTO projects (id,path,name,last_opened_at) VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET last_opened_at=excluded.last_opened_at",
-    ).run(id, canonical, basename(canonical), Date.now());
+    const id = createHash("sha256").update(canonical).digest("hex").slice(0, 24);
+    this.db
+      .prepare(
+        "INSERT INTO projects (id,path,name,last_opened_at) VALUES (?,?,?,?) ON CONFLICT(id) DO UPDATE SET last_opened_at=excluded.last_opened_at",
+      )
+      .run(id, canonical, basename(canonical), Date.now());
     return this.list().find((p) => p.id === id)!;
   }
 
@@ -75,15 +73,10 @@ export class ProjectRegistry {
     if (project.trusted !== trusted) {
       const next = this.trust.filter((root) => root !== project.path);
       if (trusted) next.push(project.path);
-      await atomicWrite(
-        join(this.home, "trusted_roots.json"),
-        JSON.stringify(next, null, 2),
-      );
+      await atomicWrite(join(this.home, "trusted_roots.json"), JSON.stringify(next, null, 2));
       this.trust = next;
     }
-    this.db.prepare(
-      "INSERT OR IGNORE INTO trust_reviews (project_id) VALUES (?)",
-    ).run(id);
+    this.db.prepare("INSERT OR IGNORE INTO trust_reviews (project_id) VALUES (?)").run(id);
   }
 
   async close() {

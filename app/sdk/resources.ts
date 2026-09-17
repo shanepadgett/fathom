@@ -1,9 +1,4 @@
-export type ResourceKind =
-  | "snapshots"
-  | "artifacts"
-  | "media"
-  | "databases"
-  | "other";
+export type ResourceKind = "snapshots" | "artifacts" | "media" | "databases" | "other";
 
 export interface ResourceUsage {
   kind: ResourceKind;

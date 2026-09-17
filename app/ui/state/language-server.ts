@@ -1,9 +1,8 @@
 import type { Accessor } from "solid-js";
-import type {
-  LanguageServerStatus,
-  RegisteredLanguageServerStatus,
-} from "../../sdk/editor.ts";
+
+import type { LanguageServerStatus, RegisteredLanguageServerStatus } from "../../sdk/editor.ts";
 import type { Transport } from "../transport.ts";
+
 import { createEffect, createSignal, onCleanup } from "solid-js";
 
 function createStatus<T>(
@@ -28,9 +27,7 @@ function createStatus<T>(
         projectId: id,
       });
     } catch (error) {
-      next = unavailable(
-        error instanceof Error ? error.message : String(error),
-      );
+      next = unavailable(error instanceof Error ? error.message : String(error));
     }
     if (!disposed && version === requestVersion && projectId() === id) {
       setStatus(() => next);
@@ -47,11 +44,8 @@ function createStatus<T>(
     if (event.type === "disconnected") {
       ++version;
       setStatus(() => unavailable("Disconnected from Fathom"));
-    } else if (
-      ["diagnostics", "language-server", "environment", "connected"].includes(
-        event.type,
-      )
-    ) void refresh();
+    } else if (["diagnostics", "language-server", "environment", "connected"].includes(event.type))
+      void refresh();
   });
   onCleanup(() => {
     disposed = true;
@@ -76,12 +70,8 @@ export function createLanguageServer(
   projectId: Accessor<string | undefined>,
   path?: Accessor<string | undefined>,
 ) {
-  return createStatus(
-    transport,
-    projectId,
-    "lsp.status",
-    unavailable,
-    () => path?.() ? { path: path() } : {},
+  return createStatus(transport, projectId, "lsp.status", unavailable, () =>
+    path?.() ? { path: path() } : {},
   );
 }
 
@@ -93,12 +83,14 @@ export function createLanguageServers(
     transport,
     projectId,
     "lsp.servers",
-    (message) => [{
-      ...unavailable(message),
-      id: "connection",
-      priority: 0,
-      languages: {},
-      state: "unavailable",
-    }],
+    (message) => [
+      {
+        ...unavailable(message),
+        id: "connection",
+        priority: 0,
+        languages: {},
+        state: "unavailable",
+      },
+    ],
   );
 }

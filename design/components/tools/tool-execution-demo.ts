@@ -45,9 +45,9 @@ export class ToolExecutionDemoElement extends DesignElement {
 
   override render() {
     return this.frames.length
-      ? html`<tool-execution .batch=${
-        this.frames[this.frame % this.frames.length]
-      }></tool-execution>`
+      ? html`<tool-execution
+          .batch=${this.frames[this.frame % this.frames.length]}
+        ></tool-execution>`
       : nothing;
   }
 }

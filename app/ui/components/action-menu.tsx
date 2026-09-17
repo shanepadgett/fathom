@@ -1,15 +1,9 @@
 import type { IconName } from "./icon.tsx";
 
-import {
-  createSignal,
-  createUniqueId,
-  For,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { createSignal, createUniqueId, For, onCleanup, onMount } from "solid-js";
 
-import { Icon } from "./icon.tsx";
 import { occludeNativeSurfaces } from "../state/native-surfaces.ts";
+import { Icon } from "./icon.tsx";
 
 export interface MenuAction {
   label: string;
@@ -25,9 +19,7 @@ export function ActionMenu(props: { label: string; actions: MenuAction[] }) {
   let trigger!: HTMLButtonElement;
   let menu!: HTMLDivElement;
   const isOpen = () => menu.matches(":popover-open");
-  const buttons = () => [
-    ...menu.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"),
-  ];
+  const buttons = () => [...menu.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")];
   const close = (focus = false) => {
     if (isOpen()) menu.hidePopover();
     if (focus) trigger.focus();
@@ -43,9 +35,10 @@ export function ActionMenu(props: { label: string; actions: MenuAction[] }) {
       Math.min(anchor.right - bounds.width, innerWidth - bounds.width - inset),
     );
     const below = anchor.bottom + gap;
-    const top = below + bounds.height <= innerHeight - inset
-      ? below
-      : Math.max(inset, anchor.top - gap - bounds.height);
+    const top =
+      below + bounds.height <= innerHeight - inset
+        ? below
+        : Math.max(inset, anchor.top - gap - bounds.height);
     menu.style.left = `${left}px`;
     menu.style.top = `${top}px`;
   }
@@ -54,8 +47,7 @@ export function ActionMenu(props: { label: string; actions: MenuAction[] }) {
     position();
   };
   onMount(() => {
-    const toggle = (event: Event) =>
-      setMenuOpen((event as ToggleEvent).newState === "open");
+    const toggle = (event: Event) => setMenuOpen((event as ToggleEvent).newState === "open");
     menu.addEventListener("beforetoggle", toggle);
     window.addEventListener("resize", position);
     document.addEventListener("scroll", position, true);
@@ -81,14 +73,16 @@ export function ActionMenu(props: { label: string; actions: MenuAction[] }) {
     open();
     const items = buttons();
     const index = items.indexOf(document.activeElement as HTMLButtonElement);
-    const next = event.key === "Home"
-      ? 0
-      : event.key === "End"
-      ? items.length - 1
-      : index < 0
-      ? event.key === "ArrowUp" ? items.length - 1 : 0
-      : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) %
-        items.length;
+    const next =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? items.length - 1
+          : index < 0
+            ? event.key === "ArrowUp"
+              ? items.length - 1
+              : 0
+            : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
     items[next]?.focus();
   }
   return (

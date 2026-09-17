@@ -23,7 +23,7 @@ export function browserPairing(
     viewId: view?.id,
     sessionId: view?.sessionId,
     ready,
-    url: view ? choices.get(view.sessionId)?.url ?? "" : "",
+    url: view ? (choices.get(view.sessionId)?.url ?? "") : "",
   });
   const publish = () =>
     ctx.get("events").publish({
@@ -34,14 +34,11 @@ export function browserPairing(
   const reconcile = (force = false): Promise<void> => {
     if (!view || disposed) return Promise.resolve();
     const current = view;
-    const servers = discovery.snapshot().servers.filter((server) =>
-      server.sessionId === current.sessionId
-    );
+    const servers = discovery
+      .snapshot()
+      .servers.filter((server) => server.sessionId === current.sessionId);
     let choice = choices.get(current.sessionId);
-    if (
-      choice?.serverId &&
-      !servers.some((server) => server.id === choice!.serverId)
-    ) {
+    if (choice?.serverId && !servers.some((server) => server.id === choice!.serverId)) {
       choices.delete(current.sessionId);
       choice = undefined;
     }
@@ -89,10 +86,8 @@ export function browserPairing(
   };
   const open = async (value: string, sessionId: string) => {
     const url = new URL(value);
-    if (
-      !["http:", "https:"].includes(url.protocol) || url.username ||
-      url.password
-    ) throw new Error("Use an HTTP(S) address without credentials");
+    if (!["http:", "https:"].includes(url.protocol) || url.username || url.password)
+      throw new Error("Use an HTTP(S) address without credentials");
     ctx.get("storage").getSession(sessionId);
     choices.set(sessionId, { url: url.href });
     if (!view || view.sessionId !== sessionId) {
@@ -126,9 +121,9 @@ export function browserPairing(
       if (!view || view.id !== params.viewId) {
         throw new Error("Browser view changed");
       }
-      const server = discovery.snapshot().servers.find((server) =>
-        server.id === params.id && server.sessionId === view!.sessionId
-      );
+      const server = discovery
+        .snapshot()
+        .servers.find((server) => server.id === params.id && server.sessionId === view!.sessionId);
       if (!server) throw new Error("Development server exited");
       choices.set(view.sessionId, { url: server.url, serverId: server.id });
       await reconcile(true);
@@ -138,9 +133,7 @@ export function browserPairing(
       if (params.viewId !== undefined && view?.id !== params.viewId) {
         throw new Error("Browser view changed");
       }
-      const sessionId = params.sessionId === undefined
-        ? view?.sessionId
-        : String(params.sessionId);
+      const sessionId = params.sessionId === undefined ? view?.sessionId : String(params.sessionId);
       if (!sessionId) throw new Error("Supply a browser sessionId");
       return open(String(params.url), sessionId);
     }),
@@ -163,9 +156,12 @@ export function browserPairing(
       const page = pageRevision;
       const assert = () => {
         if (
-          disposed || !ready || generation !== revision ||
+          disposed ||
+          !ready ||
+          generation !== revision ||
           pageRevision !== page ||
-          view?.id !== id || view?.sessionId !== sessionId
+          view?.id !== id ||
+          view?.sessionId !== sessionId
         ) {
           throw new Error("The browser page changed. Select the page again.");
         }
@@ -179,8 +175,8 @@ export function browserPairing(
       targetKey = "";
       publish();
     },
-    sessionId: () => ready ? view?.sessionId : undefined,
-    viewId: () => ready ? view?.id : undefined,
+    sessionId: () => (ready ? view?.sessionId : undefined),
+    viewId: () => (ready ? view?.id : undefined),
     remember(url: string) {
       pageRevision++;
       if (!ready || !view) return;

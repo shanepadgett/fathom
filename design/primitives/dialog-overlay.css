@@ -10,8 +10,7 @@
       transition-discrete;
     width: min(var(--spacing-dialog), calc(100% - 2 * var(--spacing-4)));
     max-height: calc(100dvh - 2 * var(--spacing-4));
-    transform: translateY(var(--motion-distance-small))
-      scale(var(--motion-scale-enter));
+    transform: translateY(var(--motion-distance-small)) scale(var(--motion-scale-enter));
     transition-property: opacity, transform, display, overlay;
   }
 
@@ -32,8 +31,7 @@
   @starting-style {
     ds-modal > dialog[open] {
       @apply opacity-0;
-      transform: translateY(var(--motion-distance-small))
-        scale(var(--motion-scale-enter));
+      transform: translateY(var(--motion-distance-small)) scale(var(--motion-scale-enter));
     }
   }
 

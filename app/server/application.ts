@@ -1,17 +1,17 @@
-import type { ModelChoice } from "../sdk/models.ts";
-import type { WorkspaceLayout } from "../sdk/layout.ts";
-import { savedSessions } from "../plugins/storage/catalog.ts";
-import type { AppEvent } from "../sdk/mod.ts";
 import type { BrowserFactory } from "../plugins/browser/connection.ts";
+import type { WorkspaceLayout } from "../sdk/layout.ts";
+import type { AppEvent } from "../sdk/mod.ts";
+import type { ModelChoice } from "../sdk/models.ts";
 
-import { basename } from "node:path";
 import { access } from "node:fs/promises";
+import { basename } from "node:path";
 import { dirname, join } from "node:path";
 
 import { getSupportedThinkingLevels } from "@earendil-works/pi-ai";
 
-import { ProjectRegistry } from "../kernel/registry.ts";
 import { atomicWrite, readJson } from "../kernel/files.ts";
+import { ProjectRegistry } from "../kernel/registry.ts";
+import { savedSessions } from "../plugins/storage/catalog.ts";
 import { Environment } from "./environment.ts";
 
 export class Application {
@@ -24,7 +24,10 @@ export class Application {
   private disposal?: Promise<void>;
   readonly listeners = new Set<(event: AppEvent) => void>();
 
-  constructor(readonly home: string, readonly authPath: string) {
+  constructor(
+    readonly home: string,
+    readonly authPath: string,
+  ) {
     this.projects = new ProjectRegistry(home);
   }
 
@@ -64,7 +67,10 @@ export class Application {
       }
       return project;
     });
-    this.opening = pending.then(() => {}, () => {});
+    this.opening = pending.then(
+      () => {},
+      () => {},
+    );
     return pending;
   }
 
@@ -80,12 +86,12 @@ export class Application {
       }
       const theme = params.theme;
       const writing = this.appearanceWriting.then(() =>
-        atomicWrite(
-          join(this.home, "appearance.json"),
-          JSON.stringify({ theme }),
-        )
+        atomicWrite(join(this.home, "appearance.json"), JSON.stringify({ theme })),
       );
-      this.appearanceWriting = writing.then(() => {}, () => {});
+      this.appearanceWriting = writing.then(
+        () => {},
+        () => {},
+      );
       await writing;
       return {};
     }
@@ -152,16 +158,14 @@ export class Application {
         if (typeof values.archived === "boolean") {
           changes.archived = values.archived;
         }
-        if (
-          ["default", "read-only", "no-terminal"].includes(
-            String(values.toolPolicy),
-          )
-        ) changes.toolPolicy = values.toolPolicy;
+        if (["default", "read-only", "no-terminal"].includes(String(values.toolPolicy)))
+          changes.toolPolicy = values.toolPolicy;
         if (
           ["off", "minimal", "low", "medium", "high", "xhigh", "max"].includes(
             String(values.thinking),
           )
-        ) changes.thinking = values.thinking;
+        )
+          changes.thinking = values.thinking;
         const updated = storage.updateSession(id, changes);
         this.publish({ type: "session", projectId: project.id, sessionId: id });
         return updated;
@@ -169,12 +173,12 @@ export class Application {
       case "session.submit": {
         const mediaIds = params.media ?? [];
         if (
-          !Array.isArray(mediaIds) || mediaIds.length > 4 ||
+          !Array.isArray(mediaIds) ||
+          mediaIds.length > 4 ||
           mediaIds.some((value) => typeof value !== "string")
-        ) throw new Error("Provide up to four draft media IDs");
-        const media = mediaIds.length
-          ? environment.host.get("media")
-          : undefined;
+        )
+          throw new Error("Provide up to four draft media IDs");
+        const media = mediaIds.length ? environment.host.get("media") : undefined;
         const attachments = mediaIds.map((assetId) => {
           const asset = media!.draft(id).find((asset) => asset.id === assetId);
           if (!asset) {
@@ -210,18 +214,14 @@ export class Application {
       case "providers.list":
         return await Promise.all(
           models.getProviders().map(async (provider) => {
-            const auth = await models.checkAuth(provider.id).catch(() =>
-              undefined
-            );
+            const auth = await models.checkAuth(provider.id).catch(() => undefined);
             return {
               id: provider.id,
               name: provider.name,
               connected: !!auth,
               source: auth?.source,
               methods: [
-                ...(provider.auth.oauth
-                  ? [{ id: "oauth", name: provider.auth.oauth.name }]
-                  : []),
+                ...(provider.auth.oauth ? [{ id: "oauth", name: provider.auth.oauth.name }] : []),
                 ...(provider.auth.apiKey?.login
                   ? [{ id: "api_key", name: provider.auth.apiKey.name }]
                   : []),
@@ -230,14 +230,17 @@ export class Application {
           }),
         );
       case "models.list":
-        return (await models.getAvailable()).map((model) => ({
-          id: model.id,
-          provider: model.provider,
-          name: model.name,
-          contextWindow: model.contextWindow,
-          thinkingLevels: getSupportedThinkingLevels(model),
-          reasoning: model.reasoning,
-        } satisfies ModelChoice));
+        return (await models.getAvailable()).map(
+          (model) =>
+            ({
+              id: model.id,
+              provider: model.provider,
+              name: model.name,
+              contextWindow: model.contextWindow,
+              thinkingLevels: getSupportedThinkingLevels(model),
+              reasoning: model.reasoning,
+            }) satisfies ModelChoice,
+        );
       case "credentials.info":
         return {
           path: this.authPath,
@@ -251,11 +254,7 @@ export class Application {
       case "provider.flows":
         return environment.login.list();
       case "provider.answer":
-        environment.login.answer(
-          String(params.id),
-          String(params.promptId),
-          String(params.answer),
-        );
+        environment.login.answer(String(params.id), String(params.promptId), String(params.answer));
         return {};
       case "provider.cancel":
         environment.login.cancel(String(params.id));
@@ -265,7 +264,8 @@ export class Application {
         await models.logout(String(params.providerId));
         return {};
       case "model.select": {
-        const provider = String(params.provider), model = String(params.model);
+        const provider = String(params.provider),
+          model = String(params.model);
         if (!models.getModel(provider, model)) {
           throw new Error("Model not found");
         }
@@ -273,10 +273,8 @@ export class Application {
         if (["running", "retry_waiting", "approval"].includes(session.status)) {
           throw new Error("Stop the current run before changing its model");
         }
-        if (
-          session.activeLeafId && session.provider &&
-          session.provider !== provider
-        ) throw new Error("Fork the session before switching providers");
+        if (session.activeLeafId && session.provider && session.provider !== provider)
+          throw new Error("Fork the session before switching providers");
         storage.updateSession(id, { provider, model });
         storage.setSetting("provider", provider);
         storage.setSetting("model", model);
@@ -305,10 +303,7 @@ export class Application {
       case "approvals.list":
         return host.get("approvals").list();
       case "approval.resolve":
-        host.get("approvals").resolve(
-          String(params.id),
-          params.approved === true,
-        );
+        host.get("approvals").resolve(String(params.id), params.approved === true);
         return {};
       case "usage.list":
         return storage.usage();
@@ -319,7 +314,9 @@ export class Application {
       case "settings.layout.set": {
         const value = params.value as Partial<WorkspaceLayout> | undefined;
         if (
-          !value || typeof value !== "object" || Array.isArray(value) ||
+          !value ||
+          typeof value !== "object" ||
+          Array.isArray(value) ||
           typeof value.browserBeside !== "boolean" ||
           (value.editorBrowserWidth !== undefined &&
             (!Number.isFinite(value.editorBrowserWidth) ||
@@ -363,15 +360,14 @@ export class Application {
           volume: storage.setting("volume", 0.25),
         };
       case "settings.runtime.set": {
+        if (["adaptive", "sequential", "parallel"].includes(String(params.toolExecution)))
+          storage.setSetting("toolExecution", params.toolExecution);
         if (
-          ["adaptive", "sequential", "parallel"].includes(
-            String(params.toolExecution),
-          )
-        ) storage.setSetting("toolExecution", params.toolExecution);
-        if (
-          Number.isInteger(params.maxSteps) && Number(params.maxSteps) >= 1 &&
+          Number.isInteger(params.maxSteps) &&
+          Number(params.maxSteps) >= 1 &&
           Number(params.maxSteps) <= 10_000
-        ) storage.setSetting("maxSteps", params.maxSteps);
+        )
+          storage.setSetting("maxSteps", params.maxSteps);
         for (const key of ["expertProvider", "expertModel"]) {
           if (typeof params[key] === "string") {
             storage.setSetting(key, params[key]);
@@ -380,27 +376,20 @@ export class Application {
         if (["steer", "follow_up"].includes(String(params.defaultInput))) {
           storage.setSetting("defaultInput", params.defaultInput);
         }
-        if (
-          ["background_only", "always", "muted"].includes(
-            String(params.notifications),
-          )
-        ) storage.setSetting("notifications", params.notifications);
+        if (["background_only", "always", "muted"].includes(String(params.notifications)))
+          storage.setSetting("notifications", params.notifications);
         if (params.audioCues && typeof params.audioCues === "object") {
           const values = params.audioCues as Record<string, unknown>;
           const cues = Object.fromEntries(
-            ["success", "approval", "error"].map((
-              key,
-            ) => [key, values[key] !== false]),
+            ["success", "approval", "error"].map((key) => [key, values[key] !== false]),
           );
           storage.setSetting("audioCues", cues);
         }
         if (typeof params.audio === "boolean") {
           storage.setSetting("audio", params.audio);
         }
-        if (
-          typeof params.volume === "number" && params.volume >= 0 &&
-          params.volume <= 1
-        ) storage.setSetting("volume", params.volume);
+        if (typeof params.volume === "number" && params.volume >= 0 && params.volume <= 1)
+          storage.setSetting("volume", params.volume);
         return {};
       }
       default:
@@ -419,15 +408,13 @@ export class Application {
     await this.opening;
     await this.appearanceWriting;
     const results = await Promise.allSettled(
-      [...this.environments.values()].map((environment) =>
-        environment.dispose()
-      ),
+      [...this.environments.values()].map((environment) => environment.dispose()),
     );
     this.environments.clear();
     await this.projects.close();
-    const errors = results.filter((result) => result.status === "rejected").map(
-      (result) => result.reason,
-    );
+    const errors = results
+      .filter((result) => result.status === "rejected")
+      .map((result) => result.reason);
     if (errors.length) {
       throw new AggregateError(errors, "Workspace cleanup failed");
     }

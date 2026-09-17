@@ -4,9 +4,7 @@ import { onCleanup, onMount } from "solid-js";
 
 import { occludeNativeSurfaces } from "../state/native-surfaces.ts";
 
-export function SearchDialog(
-  props: { label: string; close(): void; children: JSX.Element },
-) {
+export function SearchDialog(props: { label: string; close(): void; children: JSX.Element }) {
   let dialog!: HTMLDialogElement;
   occludeNativeSurfaces();
   onMount(() => dialog.showModal());

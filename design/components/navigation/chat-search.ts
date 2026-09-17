@@ -29,25 +29,20 @@ export class ChatSearchElement extends DesignElement {
       <search-surface
         .label=${"Search sessions"}
         .heading=${"Recent sessions"}
-        .field=${searchFieldPreview(
-          "Search sessions\u2026",
-          true,
-          "All projects",
-        )}
-        .results=${chats.length
-          ? chats.map(
-            (chat, index) =>
-              html`
-                <chat-search-result
-                  .chat=${chat}
-                  .project=${projects.find((project) =>
-                    project.id === chat.projectId
-                  )!}
-                  .selected=${index === 0}
-                ></chat-search-result>
-              `,
-          )
-          : emptyState("No sessions found")}
+        .field=${searchFieldPreview("Search sessions\u2026", true, "All projects")}
+        .results=${
+          chats.length
+            ? chats.map(
+                (chat, index) => html`
+                  <chat-search-result
+                    .chat=${chat}
+                    .project=${projects.find((project) => project.id === chat.projectId)!}
+                    .selected=${index === 0}
+                  ></chat-search-result>
+                `,
+              )
+            : emptyState("No sessions found")
+        }
         .action=${"Open session"}
       ></search-surface>
     `;

@@ -1,4 +1,3 @@
-import { Icon } from "./icon.tsx";
 import type { JSX } from "solid-js";
 
 import {
@@ -10,6 +9,8 @@ import {
   onCleanup,
   Show,
 } from "solid-js";
+
+import { Icon } from "./icon.tsx";
 
 export function SearchList<T>(props: {
   items: T[];
@@ -33,10 +34,8 @@ export function SearchList<T>(props: {
   let input!: HTMLInputElement;
   const matches = createMemo(() =>
     props.items.filter((item) =>
-      props.searchText(item).toLowerCase().includes(
-        query().trim().toLowerCase(),
-      )
-    )
+      props.searchText(item).toLowerCase().includes(query().trim().toLowerCase()),
+    ),
   );
   const active = () => Math.min(selected(), Math.max(0, matches().length - 1));
   let frame = 0;
@@ -45,7 +44,7 @@ export function SearchList<T>(props: {
     matches();
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(() =>
-      document.getElementById(option)?.scrollIntoView({ block: "nearest" })
+      document.getElementById(option)?.scrollIntoView({ block: "nearest" }),
     );
   });
   onCleanup(() => cancelAnimationFrame(frame));
@@ -74,9 +73,7 @@ export function SearchList<T>(props: {
           aria-expanded="true"
           aria-controls={id}
           aria-autocomplete="list"
-          aria-activedescendant={matches().length
-            ? `${id}-${active()}`
-            : undefined}
+          aria-activedescendant={matches().length ? `${id}-${active()}` : undefined}
           aria-label={props.label}
           placeholder={props.placeholder}
           value={query()}
@@ -91,10 +88,7 @@ export function SearchList<T>(props: {
               event.preventDefault();
               const count = matches().length;
               if (count) {
-                setSelected(
-                  (active() + (event.key === "ArrowDown" ? 1 : count - 1)) %
-                    count,
-                );
+                setSelected((active() + (event.key === "ArrowDown" ? 1 : count - 1)) % count);
               }
             } else if (event.key === "Enter") {
               event.preventDefault();
@@ -108,9 +102,7 @@ export function SearchList<T>(props: {
         </Show>
       </div>
       <div class="px-2 pb-2">
-        <h3 class="px-3 py-2 text-xs font-normal text-muted">
-          {props.heading ?? props.label}
-        </h3>
+        <h3 class="px-3 py-2 text-xs font-normal text-muted">{props.heading ?? props.label}</h3>
         <div
           id={id}
           role="listbox"
@@ -126,12 +118,12 @@ export function SearchList<T>(props: {
                 role="option"
                 aria-selected={index() === active()}
                 disabled={busy() || props.disabled}
-                class={props.rowClass?.(index() === active()) ??
+                class={
+                  props.rowClass?.(index() === active()) ??
                   `flex w-full items-center gap-3 rounded-control px-3 py-2.5 text-left text-sm ${
-                    index() === active()
-                      ? "bg-surface text-ink"
-                      : "text-ink hover:bg-surface"
-                  }`}
+                    index() === active() ? "bg-surface text-ink" : "text-ink hover:bg-surface"
+                  }`
+                }
                 onPointerMove={() => setSelected(index())}
                 onClick={() => void choose(item)}
               >
@@ -145,7 +137,9 @@ export function SearchList<T>(props: {
         </div>
       </div>
       <Show when={error()}>
-        <p role="alert" class="mt-3 text-sm text-danger">{error()}</p>
+        <p role="alert" class="mt-3 text-sm text-danger">
+          {error()}
+        </p>
       </Show>
       <footer class="flex h-9 items-center gap-4 border-t border-line bg-surface px-4 text-micro text-muted">
         <span class="flex items-center gap-1">
@@ -153,8 +147,7 @@ export function SearchList<T>(props: {
           <kbd class="rounded-sm bg-line px-1">↓</kbd> Navigate
         </span>
         <span class="flex items-center gap-1">
-          <kbd class="rounded-sm bg-line px-1">Enter</kbd>{" "}
-          {props.action ?? "Select"}
+          <kbd class="rounded-sm bg-line px-1">Enter</kbd> {props.action ?? "Select"}
         </span>
         <span class="flex items-center gap-1">
           <kbd class="rounded-sm bg-line px-1">Esc</kbd> Close

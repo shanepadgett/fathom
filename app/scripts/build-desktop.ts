@@ -32,12 +32,7 @@ async function sign(path: string, identity: string, entitlements?: string) {
       identity,
       "--timestamp",
       ...(entitlements
-        ? [
-          "--options",
-          "runtime",
-          "--entitlements",
-          `${root}scripts/${entitlements}`,
-        ]
+        ? ["--options", "runtime", "--entitlements", `${root}scripts/${entitlements}`]
         : []),
       path,
     ],
@@ -52,9 +47,7 @@ async function signingIdentity(): Promise<string> {
   if (override === "-") return override;
   let saved: string | undefined;
   try {
-    const previous: DesktopConfig = JSON.parse(
-      await Deno.readTextFile(localConfig),
-    );
+    const previous: DesktopConfig = JSON.parse(await Deno.readTextFile(localConfig));
     saved = previous.desktop?.macos?.codesignIdentity;
   } catch (error) {
     if (!(error instanceof Deno.errors.NotFound)) throw error;
@@ -66,15 +59,11 @@ async function signingIdentity(): Promise<string> {
     throw new Error("Unable to inspect macOS signing identities");
   }
   const identities = [
-    ...new TextDecoder().decode(result.stdout).matchAll(
-      /^\s*\d+\) ([A-Fa-f0-9]{40}) "([^"]+)"/gm,
-    ),
+    ...new TextDecoder().decode(result.stdout).matchAll(/^\s*\d+\) ([A-Fa-f0-9]{40}) "([^"]+)"/gm),
   ].map((match) => ({ hash: match[1], name: match[2] }));
   const requested = override || (saved !== "-" ? saved : undefined);
   if (requested) {
-    const identity = identities.find((item) =>
-      item.hash === requested || item.name === requested
-    );
+    const identity = identities.find((item) => item.hash === requested || item.name === requested);
     if (!identity) {
       throw new Error(
         "The saved signing identity is unavailable. Set FATHOM_CODESIGN_IDENTITY to an installed identity; refusing to change the app identity silently.",
@@ -93,20 +82,14 @@ async function signingIdentity(): Promise<string> {
 const config: DesktopConfig = JSON.parse(
   await Deno.readTextFile(new URL("../deno.json", import.meta.url)),
 );
-const identity = Deno.build.os === "darwin"
-  ? await signingIdentity()
-  : undefined;
+const identity = Deno.build.os === "darwin" ? await signingIdentity() : undefined;
 if (identity) {
   config.desktop = {
     ...config.desktop,
     macos: { ...config.desktop?.macos, codesignIdentity: identity },
   };
   // Keep the config beside deno.json so relative imports and lockfile discovery agree.
-  await Deno.writeTextFile(
-    localConfig,
-    `${JSON.stringify(config, null, 2)}\n`,
-    { mode: 0o600 },
-  );
+  await Deno.writeTextFile(localConfig, `${JSON.stringify(config, null, 2)}\n`, { mode: 0o600 });
   console.log(
     identity === "-"
       ? "Explicit disposable ad-hoc signing"
@@ -124,10 +107,7 @@ if (identity && identity !== "-") {
   }
 }
 if (Deno.build.os === "darwin") {
-  const pattern = `${bundle}/Contents/MacOS/laufey`.replace(
-    /[.*+?^${}()|[\]\\]/g,
-    "\\$&",
-  );
+  const pattern = `${bundle}/Contents/MacOS/laufey`.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const stopped = await new Deno.Command("/usr/bin/pkill", {
     args: ["-f", `${pattern}$`],
   }).output();
@@ -144,9 +124,7 @@ await run([
   "public",
   "--include",
   "native",
-  ...(Deno.build.os === "darwin"
-    ? ["--config", fileURLToPath(localConfig)]
-    : []),
+  ...(Deno.build.os === "darwin" ? ["--config", fileURLToPath(localConfig)] : []),
   ...Deno.args,
   "--output",
   `${root}dist/Fathom`,

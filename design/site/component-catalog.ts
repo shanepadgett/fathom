@@ -1,21 +1,13 @@
-import { metricListExamples } from "../primitives/metric-list.examples.ts";
-import { diffPreviewExamples } from "../components/editor/diff-preview.examples.ts";
-import { codePreviewExamples } from "../components/editor/code-preview.examples.ts";
-import { chipExamples } from "../primitives/chip.examples.ts";
-import { messageAttachmentsExamples } from "../components/messages/message-attachments.examples.ts";
 import type { DesignEntry } from "./design-entry.ts";
 
-import { componentCategories } from "./design-entry.ts";
-
+import { messageComposerExamples } from "../components/composer/message-composer.examples.ts";
+import { changeStatusExamples } from "../components/editor/change-status.examples.ts";
 import { changeSummaryExamples } from "../components/editor/change-summary.examples.ts";
-import { toolExecutionExamples } from "../components/tools/tool-execution.examples.ts";
-import { accordionExamples } from "../primitives/accordion.examples.ts";
-import { buttonExamples } from "../primitives/button.examples.ts";
-import { contextMenuExamples } from "../primitives/context-menu.examples.ts";
-import { drawerExamples } from "../primitives/drawer.examples.ts";
-import { modalExamples } from "../primitives/modal.examples.ts";
 import { changedFilesListExamples } from "../components/editor/changed-files-list.examples.ts";
-import { chatListItemExamples } from "../components/navigation/chat-list-item.examples.ts";
+import { codePreviewExamples } from "../components/editor/code-preview.examples.ts";
+import { diffPaneExamples } from "../components/editor/diff-pane.examples.ts";
+import { diffPreviewExamples } from "../components/editor/diff-preview.examples.ts";
+import { editorPaneExamples } from "../components/editor/editor-pane.examples.ts";
 import {
   agentMessageExamples,
   chatMessageExamples,
@@ -25,30 +17,37 @@ import {
   userMessageExamples,
 } from "../components/messages/chat-message.examples.ts";
 import { messageActionsExamples } from "../components/messages/message-actions.examples.ts";
+import { messageAttachmentsExamples } from "../components/messages/message-attachments.examples.ts";
 import { messageHeaderExamples } from "../components/messages/message-header.examples.ts";
 import {
   messageBoundaryExamples,
   turnGroupingExamples,
 } from "../components/messages/message-transcript.examples.ts";
+import { chatListItemExamples } from "../components/navigation/chat-list-item.examples.ts";
 import { chatSearchExamples } from "../components/navigation/chat-search.examples.ts";
-import { contextUsageExamples } from "../components/workspace/context-usage.examples.ts";
-import { diffPaneExamples } from "../components/editor/diff-pane.examples.ts";
-import { editorPaneExamples } from "../components/editor/editor-pane.examples.ts";
 import { fileTreeExamples } from "../components/navigation/file-tree.examples.ts";
-import { messageComposerExamples } from "../components/composer/message-composer.examples.ts";
 import { projectPickerExamples } from "../components/navigation/project-picker.examples.ts";
-import { sessionInspectorExamples } from "../components/workspace/session-inspector.examples.ts";
 import { sessionSidebarExamples } from "../components/navigation/session-sidebar.examples.ts";
-import { toolSummaryExamples } from "../components/tools/tool-summary.examples.ts";
 import { toolActivityExamples } from "../components/tools/tool-activity.examples.ts";
+import { toolExecutionExamples } from "../components/tools/tool-execution.examples.ts";
+import { toolSummaryExamples } from "../components/tools/tool-summary.examples.ts";
+import { contextUsageExamples } from "../components/workspace/context-usage.examples.ts";
+import { wordmarkExamples } from "../components/workspace/fathom-wordmark.examples.ts";
+import { sessionInspectorExamples } from "../components/workspace/session-inspector.examples.ts";
 import { workspaceHeaderExamples } from "../components/workspace/workspace-header.examples.ts";
 import { workspaceStatusBarExamples } from "../components/workspace/workspace-status-bar.examples.ts";
+import { accordionExamples } from "../primitives/accordion.examples.ts";
+import { buttonExamples } from "../primitives/button.examples.ts";
+import { chipExamples } from "../primitives/chip.examples.ts";
 import { buttonExamples as compactButtonExamples } from "../primitives/compact-controls.examples.ts";
-import { changeStatusExamples } from "../components/editor/change-status.examples.ts";
-import { wordmarkExamples } from "../components/workspace/fathom-wordmark.examples.ts";
+import { contextMenuExamples } from "../primitives/context-menu.examples.ts";
+import { drawerExamples } from "../primitives/drawer.examples.ts";
 import { meterExamples } from "../primitives/meter.examples.ts";
+import { metricListExamples } from "../primitives/metric-list.examples.ts";
+import { modalExamples } from "../primitives/modal.examples.ts";
 import { shortcutHintExamples } from "../primitives/shortcut-hint.examples.ts";
 import { tabStripExamples } from "../primitives/tab-strip.examples.ts";
+import { componentCategories } from "./design-entry.ts";
 
 const entries: DesignEntry[] = [
   {
@@ -97,8 +96,7 @@ const entries: DesignEntry[] = [
     id: "message-attachments",
     name: "Message attachments",
     category: "Messages",
-    description:
-      "Image previews, file chips, and annotation counts shared by message surfaces.",
+    description: "Image previews, file chips, and annotation counts shared by message surfaces.",
     examples: messageAttachmentsExamples,
   },
   {
@@ -134,8 +132,7 @@ const entries: DesignEntry[] = [
   {
     id: "wordmark",
     name: "Wordmark",
-    description:
-      "Shared Fathom identity with bold lettering and an accent period.",
+    description: "Shared Fathom identity with bold lettering and an accent period.",
     category: "Workspace",
     examples: wordmarkExamples,
   },
@@ -157,8 +154,7 @@ const entries: DesignEntry[] = [
   {
     id: "chat-navigation",
     name: "Chat navigation",
-    description:
-      "Shared project and branch identities with compact, single-line chat titles.",
+    description: "Shared project and branch identities with compact, single-line chat titles.",
     category: "Navigation",
     examples: [...sessionSidebarExamples, ...chatListItemExamples],
   },
@@ -268,24 +264,21 @@ const entries: DesignEntry[] = [
   {
     id: "composer",
     name: "Composer",
-    description:
-      "Floating composer surface with shared compact controls; no application actions.",
+    description: "Floating composer surface with shared compact controls; no application actions.",
     category: "Composer",
     examples: [...messageComposerExamples],
   },
   {
     id: "editor-pane",
     name: "Editor pane",
-    description:
-      "File tabs, compact breadcrumbs, static code, and editor status.",
+    description: "File tabs, compact breadcrumbs, static code, and editor status.",
     category: "Editor and review",
     examples: [...editorPaneExamples],
   },
   {
     id: "diff-pane",
     name: "Diff pane",
-    description:
-      "Shared breadcrumb and change statistics with static diff lines.",
+    description: "Shared breadcrumb and change statistics with static diff lines.",
     category: "Editor and review",
     examples: [...diffPaneExamples],
   },
@@ -301,11 +294,7 @@ const entries: DesignEntry[] = [
     name: "Workspace chrome",
     description: "Header and footer shared across both workspace layouts.",
     category: "Workspace",
-    examples: [
-      ...workspaceHeaderExamples,
-      ...workspaceStatusBarExamples,
-      ...contextUsageExamples,
-    ],
+    examples: [...workspaceHeaderExamples, ...workspaceStatusBarExamples, ...contextUsageExamples],
   },
   {
     id: "modal",
@@ -325,8 +314,7 @@ const entries: DesignEntry[] = [
     id: "accordion",
     category: "Primitives",
     name: "Accordion",
-    description:
-      "Expandable sections. Allow one or multiple sections to stay open.",
+    description: "Expandable sections. Allow one or multiple sections to stay open.",
     examples: accordionExamples,
   },
   {
@@ -340,7 +328,5 @@ const entries: DesignEntry[] = [
 
 export const components = componentCategories.flatMap((category) => {
   const group = entries.filter((entry) => entry.category === category);
-  return category === "Primitives"
-    ? group.sort((a, b) => a.name.localeCompare(b.name))
-    : group;
+  return category === "Primitives" ? group.sort((a, b) => a.name.localeCompare(b.name)) : group;
 });

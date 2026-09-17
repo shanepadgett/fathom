@@ -13,11 +13,7 @@ export default {
           avatar: "E",
           actions,
         });
-        const row = host.ui.getComponent("fathom.connection-row")(
-          element,
-          host,
-          rowProps(),
-        );
+        const row = host.ui.getComponent("fathom.connection-row")(element, host, rowProps());
         const buttonProps = () => ({
           name: enabled ? "check" : "plus",
           label: "Toggle connection preview",
@@ -28,11 +24,7 @@ export default {
             button.update(buttonProps());
           },
         });
-        const button = host.ui.getComponent("fathom.icon-button")(
-          actions,
-          host,
-          buttonProps(),
-        );
+        const button = host.ui.getComponent("fathom.icon-button")(actions, host, buttonProps());
         return async () => {
           await button.dispose();
           await row.dispose();

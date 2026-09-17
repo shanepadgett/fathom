@@ -4,22 +4,18 @@ import type { ToolExecution } from "../../sdk/session.ts";
 import { For, Show } from "solid-js";
 
 import { Disclosure } from "./disclosure.tsx";
-import { toolSummary } from "./tool-presentation.ts";
 import { ToolCard } from "./tool-card.tsx";
+import { toolSummary } from "./tool-presentation.ts";
 
-export function ToolGroup(
-  props: {
-    executions: ToolExecution[];
-    detailed: boolean;
-    grouped?: boolean;
-    openFile(path: string, range?: FileRange): void;
-    openDiff(path: string): void;
-  },
-) {
+export function ToolGroup(props: {
+  executions: ToolExecution[];
+  detailed: boolean;
+  grouped?: boolean;
+  openFile(path: string, range?: FileRange): void;
+  openDiff(path: string): void;
+}) {
   const running = () =>
-    props.executions.some((run) =>
-      run.status === "running" || run.status === "pending"
-    );
+    props.executions.some((run) => run.status === "running" || run.status === "pending");
   const cards = () => (
     <For each={props.executions.map((run) => run.id)}>
       {(id) => (

@@ -10,9 +10,7 @@ export function setupViewerTheme(host: HTMLElement, signal: AbortSignal) {
   button.addEventListener(
     "click",
     () => {
-      const theme = document.documentElement.dataset.theme === "dark"
-        ? "light"
-        : "dark";
+      const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
       document.documentElement.dataset.theme = theme;
       try {
         localStorage.setItem("fathom-design-theme", theme);

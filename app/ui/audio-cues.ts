@@ -8,10 +8,7 @@ const sequences: Record<AudioCue, readonly number[]> = {
 
 let active: (() => void) | undefined;
 
-export async function playAudioCue(
-  cue: AudioCue,
-  volume: number,
-): Promise<void> {
+export async function playAudioCue(cue: AudioCue, volume: number): Promise<void> {
   if (!Number.isFinite(volume)) return;
   const level = Math.min(1, Math.max(0, volume));
   if (level === 0 || typeof AudioContext === "undefined") return;

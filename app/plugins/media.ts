@@ -1,6 +1,7 @@
 import type { MediaAsset, MediaService } from "../sdk/media.ts";
 
 import { basename, extname, join } from "node:path";
+
 import { Type } from "typebox";
 
 import { assertNewFile, atomicCreate, atomicWrite } from "../kernel/files.ts";
@@ -70,23 +71,23 @@ export const media = definePlugin({
           throw new Error("Unsupported media format");
         }
         if (
-          !(input.data instanceof Uint8Array) || !input.data.byteLength ||
+          !(input.data instanceof Uint8Array) ||
+          !input.data.byteLength ||
           input.data.byteLength > maxBytes
         ) {
           throw new Error("Media must contain between 1 byte and 64 MiB");
         }
         if (
-          mode !== "entry" && input.mime.startsWith("image/") &&
+          mode !== "entry" &&
+          input.mime.startsWith("image/") &&
           input.data.byteLength > 8 * 1024 * 1024
         ) {
-          throw new Error(
-            "Chat image attachments must be no larger than 8 MiB",
-          );
+          throw new Error("Chat image attachments must be no larger than 8 MiB");
         }
-        const name = basename(input.name).replace(
-          /[\u0000-\u001f\u007f]/g,
-          "",
-        ).trim().slice(0, 200);
+        const name = basename(input.name)
+          .replace(/[\u0000-\u001f\u007f]/g, "")
+          .trim()
+          .slice(0, 200);
         if (!name) throw new Error("Media needs a filename");
         const asset: MediaAsset = {
           id: crypto.randomUUID(),
@@ -106,11 +107,13 @@ export const media = definePlugin({
                 throw new Error("Attach at most four media files per draft");
               }
               storage.setSetting(`media.draft:${sessionId}`, [...draft, asset]);
-            } else {storage.append(sessionId, {
+            } else {
+              storage.append(sessionId, {
                 kind: "custom",
                 status: "completed",
                 custom: { type: "media", data: asset },
-              });}
+              });
+            }
           });
         } catch (error) {
           await Deno.remove(path(asset));
@@ -125,14 +128,14 @@ export const media = definePlugin({
       const service: MediaService = {
         list(sessionId) {
           storage.getSession(sessionId);
-          return storage.entries(sessionId).flatMap((entry) => [
-            ...(entry.custom?.type === "media"
-              ? [entry.custom.data as MediaAsset]
-              : []),
-            ...(entry.attachments ?? []).filter((attachment) =>
-              attachment.type === "media"
-            ).map((attachment) => attachment.data as MediaAsset),
-          ]);
+          return storage
+            .entries(sessionId)
+            .flatMap((entry) => [
+              ...(entry.custom?.type === "media" ? [entry.custom.data as MediaAsset] : []),
+              ...(entry.attachments ?? [])
+                .filter((attachment) => attachment.type === "media")
+                .map((attachment) => attachment.data as MediaAsset),
+            ]);
         },
         cache: (sessionId, input) => persist(sessionId, input, "cache"),
         save: (sessionId, input) => persist(sessionId, input, "entry"),
@@ -149,16 +152,12 @@ export const media = definePlugin({
           ctx.get("events").publish({ type: "media-draft", sessionId });
         },
         async readDraft(sessionId, id) {
-          const asset = service.draft(sessionId).find((asset) =>
-            asset.id === id
-          );
+          const asset = service.draft(sessionId).find((asset) => asset.id === id);
           if (!asset) throw new Error("Draft attachment not found");
           return { asset, data: await readMedia(path(asset)) };
         },
         async read(sessionId, id) {
-          const asset = service.list(sessionId).find((asset) =>
-            asset.id === id
-          );
+          const asset = service.list(sessionId).find((asset) => asset.id === id);
           if (!asset) throw new Error("Media not found on this branch");
           return { asset, data: await readMedia(path(asset)) };
         },
@@ -172,10 +171,7 @@ export const media = definePlugin({
       };
       ctx.provide("media", service);
       const disposers = [
-        ctx.get("rpc").register(
-          "media.draft",
-          (params) => service.draft(String(params.sessionId)),
-        ),
+        ctx.get("rpc").register("media.draft", (params) => service.draft(String(params.sessionId))),
         ctx.get("rpc").register("media.draft.remove", (params) => {
           service.releaseDraft(String(params.sessionId), [String(params.id)]);
           return {};
@@ -189,23 +185,15 @@ export const media = definePlugin({
           async execute(args, input) {
             input.signal.throwIfAborted();
             return JSON.stringify(
-              await service.materialize(
-                input.sessionId,
-                String(args.id),
-                String(args.path),
-              ),
+              await service.materialize(input.sessionId, String(args.id), String(args.path)),
             );
           },
         }),
-        ctx.get("rpc").register(
-          "media.materialize",
-          (params) =>
-            service.materialize(
-              String(params.sessionId),
-              String(params.id),
-              String(params.path),
-            ),
-        ),
+        ctx
+          .get("rpc")
+          .register("media.materialize", (params) =>
+            service.materialize(String(params.sessionId), String(params.id), String(params.path)),
+          ),
         ctx.get("tools").register({
           name: "import_media",
           description:
@@ -214,12 +202,10 @@ export const media = definePlugin({
           parameters: Type.Object({ path: Type.String() }),
           async execute(args, input) {
             const source = await workspace.resolve(String(args.path));
-            const extension = extname(source).toLowerCase().replace(
-              /^\.jpeg$/,
-              ".jpg",
-            );
-            const mime = [...formats].find(([, value]) => value === extension)
-              ?.[0];
+            const extension = extname(source)
+              .toLowerCase()
+              .replace(/^\.jpeg$/, ".jpg");
+            const mime = [...formats].find(([, value]) => value === extension)?.[0];
             if (!mime) throw new Error("Unsupported media filename extension");
             const stat = await Deno.stat(source);
             if (!stat.isFile || stat.size > maxBytes) {
@@ -237,10 +223,7 @@ export const media = definePlugin({
             );
           },
         }),
-        ctx.get("rpc").register(
-          "media.list",
-          (params) => service.list(String(params.sessionId)),
-        ),
+        ctx.get("rpc").register("media.list", (params) => service.list(String(params.sessionId))),
         ctx.get("context").registerProjector("media", (value) => {
           const asset = value as MediaAsset;
           return {

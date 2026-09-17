@@ -34,14 +34,9 @@ export function ChangedFileList(props: {
   open(path: string): void;
 }) {
   return (
-    <div
-      data-component="changed-files"
-      class="p-2 text-dense"
-      aria-label="Changed files"
-    >
+    <div data-component="changed-files" class="p-2 text-dense" aria-label="Changed files">
       <p class="flex flex-wrap items-center gap-2 px-2 pb-2 text-muted">
-        {props.files.length} {props.files.length === 1 ? "file" : "files"}{" "}
-        changed
+        {props.files.length} {props.files.length === 1 ? "file" : "files"} changed
       </p>
       <For each={props.files}>
         {(file) => (

@@ -1,50 +1,42 @@
 /// <reference types="vite/client" />
 
-import { SessionPicker } from "./components/session-picker.tsx";
-import { WorkspaceChanges } from "./components/workspace-changes.tsx";
-import { WorkspaceDrawer } from "./components/workspace-drawer.tsx";
-import { WorkspaceSurfaces } from "./components/workspace-surfaces.tsx";
-
-import { CommandPalette } from "./components/command-palette.tsx";
-import { OpenMessage } from "./components/open-message.tsx";
-import { BranchDialog } from "./components/branch-dialog.tsx";
-import { BranchPicker } from "./components/branch-picker.tsx";
-import { ArchivedSessions } from "./components/archived-sessions.tsx";
-import { ConversationHeader } from "./components/conversation-header.tsx";
-import { WorkspaceStatus } from "./components/workspace-status.tsx";
-import { WorkspaceHeader } from "./components/workspace-header.tsx";
-import { Inspector } from "./components/inspector.tsx";
-import { Sidebar } from "./components/sidebar.tsx";
 import type { AssistantMessage } from "@earendil-works/pi-ai";
 
-import type {
-  Entry,
-  Project,
-  Session,
-  SessionState,
-  UsageRecord,
-} from "../sdk/session.ts";
 import type { ModelChoice } from "../sdk/models.ts";
+import type { Entry, Project, Session, SessionState, UsageRecord } from "../sdk/session.ts";
 
 import { createEffect, createSignal, For, on, Show } from "solid-js";
 import { render } from "solid-js/web";
 
+import { ArchivedSessions } from "./components/archived-sessions.tsx";
+import { Artifacts } from "./components/artifacts.tsx";
+import { BranchDialog } from "./components/branch-dialog.tsx";
+import { BranchPicker } from "./components/branch-picker.tsx";
+import { BrowserPanel } from "./components/browser.tsx";
+import { CommandPalette } from "./components/command-palette.tsx";
+import { Composer } from "./components/composer.tsx";
+import { ConversationHeader } from "./components/conversation-header.tsx";
 import { EditorWorkspace } from "./components/editor.tsx";
 import { GitStudio } from "./components/git-studio.tsx";
-import { BrowserPanel } from "./components/browser.tsx";
-import { Artifacts } from "./components/artifacts.tsx";
-import { ProjectDialog } from "./components/project-dialog.tsx";
-import { Composer } from "./components/composer.tsx";
+import { Inspector } from "./components/inspector.tsx";
+import { OpenMessage } from "./components/open-message.tsx";
+import { PluginSlot, Surface } from "./components/plugin-slot.tsx";
 import { Button, Metric, Modal } from "./components/primitives.tsx";
+import { ProjectDialog } from "./components/project-dialog.tsx";
+import { SessionPicker } from "./components/session-picker.tsx";
 import { Settings } from "./components/settings.tsx";
+import { Sidebar } from "./components/sidebar.tsx";
 import { TerminalPanel } from "./components/terminal.tsx";
 import { Transcript } from "./components/transcript.tsx";
+import { WorkspaceChanges } from "./components/workspace-changes.tsx";
+import { WorkspaceDrawer } from "./components/workspace-drawer.tsx";
+import { WorkspaceHeader } from "./components/workspace-header.tsx";
+import { WorkspaceStatus } from "./components/workspace-status.tsx";
+import { WorkspaceSurfaces } from "./components/workspace-surfaces.tsx";
 import { UIHost } from "./host.ts";
-import { PluginSlot, Surface } from "./components/plugin-slot.tsx";
-import { Transport } from "./transport.ts";
-import "./design.css";
-
 import { createWorkspace } from "./state/workspace.ts";
+import "./design.css";
+import { Transport } from "./transport.ts";
 function App() {
   let workspaceContent!: HTMLDivElement;
   const [composerHeight, setComposerHeight] = createSignal(224);
@@ -131,16 +123,14 @@ function App() {
                   await transport.request("plugins.reload");
                   setReload(false);
                   await refresh();
-                })}
+                })
+              }
             >
               Reload environment
             </Button>
           </div>
         </Show>
-        <div
-          ref={workspaceContent}
-          class="relative flex min-h-0 min-w-0 flex-1"
-        >
+        <div ref={workspaceContent} class="relative flex min-h-0 min-w-0 flex-1">
           <Show when={app.sidebarOpen() && mode() !== "editor"}>
             <Sidebar app={app} />
           </Show>
@@ -191,11 +181,7 @@ function App() {
                     }}
                   />
                 </Surface>
-                <For
-                  each={approvals().filter((item) =>
-                    item.sessionId === sessionId()
-                  )}
-                >
+                <For each={approvals().filter((item) => item.sessionId === sessionId())}>
                   {(approval) => (
                     <section class="approval-card">
                       <strong>Approval needed</strong>
@@ -208,8 +194,9 @@ function App() {
                               transport.request("approval.resolve", {
                                 id: approval.id,
                                 approved: false,
-                              })
-                            )}
+                              }),
+                            )
+                          }
                         >
                           Decline
                         </Button>
@@ -220,8 +207,9 @@ function App() {
                               transport.request("approval.resolve", {
                                 id: approval.id,
                                 approved: true,
-                              })
-                            )}
+                              }),
+                            )
+                          }
                         >
                           Approve once
                         </Button>
@@ -258,14 +246,16 @@ function App() {
                     void act(() =>
                       transport.request("session.stop", {
                         sessionId: sessionId(),
-                      })
-                    )}
+                      }),
+                    )
+                  }
                   resume={() =>
                     void act(() =>
                       transport.request("session.continue", {
                         sessionId: sessionId(),
-                      })
-                    )}
+                      }),
+                    )
+                  }
                   selectThinking={async (thinking) => {
                     const projectId = transport.projectId;
                     const id = sessionId();
@@ -274,9 +264,7 @@ function App() {
                       sessionId: id,
                       changes: { thinking },
                     });
-                    if (
-                      transport.projectId === projectId && sessionId() === id
-                    ) await refresh();
+                    if (transport.projectId === projectId && sessionId() === id) await refresh();
                   }}
                   selectModel={async (value) => {
                     const slash = value.indexOf("/");
@@ -296,8 +284,7 @@ function App() {
             <Show keyed when={project()?.id}>
               <WorkspaceSurfaces
                 width={app.layout.value().editorBrowserWidth}
-                resize={(editorBrowserWidth) =>
-                  app.layout.update({ editorBrowserWidth })}
+                resize={(editorBrowserWidth) => app.layout.update({ editorBrowserWidth })}
                 editorVisible={mode() === "editor"}
                 browserVisible={app.browserVisible()}
                 editor={
@@ -307,9 +294,9 @@ function App() {
                         drawerMount={workspaceContent}
                         sessionId={sessionId()}
                         focused={app.fileFocused}
-                        focus={app.fileFocus()?.projectId === project()?.id
-                          ? app.fileFocus()
-                          : undefined}
+                        focus={
+                          app.fileFocus()?.projectId === project()?.id ? app.fileFocus() : undefined
+                        }
                         sidebarOpen={app.sidebarOpen()}
                         transport={transport}
                         theme={theme()}
@@ -375,11 +362,7 @@ function App() {
         <WorkspaceStatus app={app} />
         <Show when={app.sessionPicker()}>
           {(kind) => (
-            <SessionPicker
-              app={app}
-              kind={kind()}
-              close={() => app.setSessionPicker(undefined)}
-            />
+            <SessionPicker app={app} kind={kind()} close={() => app.setSessionPicker(undefined)} />
           )}
         </Show>
         <Show when={app.gitOpen() && sessionId()}>
@@ -411,25 +394,18 @@ function App() {
           />
         </Show>
         <Show when={trustDialog()}>
-          <Modal
-            title="Do you trust this workspace?"
-            close={() => setTrustDialog(false)}
-          >
+          <Modal title="Do you trust this workspace?" close={() => setTrustDialog(false)}>
             <p class="mono path-label">{project()?.path}</p>
             <p>
-              Project plugins, skills, and custom prompts can execute code on
-              your machine. Enable them only for repositories whose authors you
-              trust.
+              Project plugins, skills, and custom prompts can execute code on your machine. Enable
+              them only for repositories whose authors you trust.
             </p>
             <p class="muted">
-              Restricted mode keeps project plugins disabled and asks before
-              file changes and commands.
+              Restricted mode keeps project plugins disabled and asks before file changes and
+              commands.
             </p>
             <div class="actions">
-              <Button
-                disabled={app.trustBusy()}
-                onClick={() => void act(() => trust(false))}
-              >
+              <Button disabled={app.trustBusy()} onClick={() => void act(() => trust(false))}>
                 Enter Restricted Mode
               </Button>
               <Button
@@ -510,14 +486,9 @@ function App() {
           />
         </Show>
         <Show when={app.messageLinkOpen()}>
-          <OpenMessage
-            open={app.openMessageLink}
-            close={() => app.setMessageLinkOpen(false)}
-          />
+          <OpenMessage open={app.openMessageLink} close={() => app.setMessageLinkOpen(false)} />
         </Show>
-        <Show when={rewind()}>
-          {(entry) => <BranchDialog app={app} entry={entry()} />}
-        </Show>
+        <Show when={rewind()}>{(entry) => <BranchDialog app={app} entry={entry()} />}</Show>
       </div>
     </Surface>
   );

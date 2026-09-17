@@ -1,8 +1,4 @@
-import type {
-  ImagesApi,
-  ImagesModel,
-  ImagesOptions,
-} from "@earendil-works/pi-ai";
+import type { ImagesApi, ImagesModel, ImagesOptions } from "@earendil-works/pi-ai";
 
 export async function imageRequest<T>(
   model: ImagesModel<ImagesApi>,
@@ -25,7 +21,7 @@ export async function imageRequest<T>(
     AbortSignal.timeout(options.timeoutMs ?? 300_000),
   ]);
   signal.throwIfAborted();
-  const body = await options.onPayload?.(payload, model) ?? payload;
+  const body = (await options.onPayload?.(payload, model)) ?? payload;
   // Fetch supplies the multipart boundary for image-edit uploads.
   if (body instanceof FormData) requestHeaders.delete("content-type");
   const response = await (options.fetch ?? fetch)(
@@ -38,16 +34,17 @@ export async function imageRequest<T>(
       redirect: "error",
     },
   );
-  await options.onResponse?.({
-    status: response.status,
-    headers: Object.fromEntries(response.headers),
-  }, model);
+  await options.onResponse?.(
+    {
+      status: response.status,
+      headers: Object.fromEntries(response.headers),
+    },
+    model,
+  );
   const limit = response.ok ? 90_000_000 : 16_384;
   if (Number(response.headers.get("content-length")) > limit) {
     await response.body?.cancel();
-    throw new Error(
-      `Image provider response exceeds the size limit (HTTP ${response.status})`,
-    );
+    throw new Error(`Image provider response exceeds the size limit (HTTP ${response.status})`);
   }
   const chunks: string[] = [];
   const decoder = new TextDecoder();
@@ -56,9 +53,7 @@ export async function imageRequest<T>(
     for await (const chunk of response.body) {
       bytes += chunk.byteLength;
       if (bytes > limit) {
-        throw new Error(
-          `Image provider response exceeds the size limit (HTTP ${response.status})`,
-        );
+        throw new Error(`Image provider response exceeds the size limit (HTTP ${response.status})`);
       }
       chunks.push(decoder.decode(chunk, { stream: true }));
     }
@@ -68,9 +63,7 @@ export async function imageRequest<T>(
   try {
     parsed = JSON.parse(chunks.join(""));
   } catch {
-    throw new Error(
-      `Image provider returned an invalid response (HTTP ${response.status})`,
-    );
+    throw new Error(`Image provider returned an invalid response (HTTP ${response.status})`);
   }
   if (!response.ok) {
     const error = parsed as {

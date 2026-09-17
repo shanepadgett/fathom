@@ -3,8 +3,8 @@ import type { Changes, FileNode } from "../../models/files.ts";
 import { html, nothing } from "lit";
 
 import { DesignElement } from "../../foundation/design-element.ts";
-import { diffStat } from "./diff-stat.ts";
 import { emptyState } from "../../primitives/empty-state.ts";
+import { diffStat } from "./diff-stat.ts";
 import "../navigation/file-item.ts";
 
 export class ChangedFilesListElement extends DesignElement {
@@ -30,22 +30,18 @@ export class ChangedFilesListElement extends DesignElement {
     }
     const { files, selected, changes } = this;
     return html`
-      <div data-component="changed-files" class="p-2 text-dense"
-        aria-label="Changed files">
+      <div data-component="changed-files" class="p-2 text-dense" aria-label="Changed files">
         <p class="flex flex-wrap items-center gap-2 px-2 pb-2 text-muted">
-          ${files.length} files changed ${diffStat(
-            changes.added,
-            changes.removed,
-          )}
+          ${files.length} files changed ${diffStat(changes.added, changes.removed)}
         </p>
-        ${files.length
-          ? files.map(
-            (file) =>
-              html`<file-item .file=${file} .selected=${
-                file.id === selected
-              }></file-item>`,
-          )
-          : emptyState("No changed files")}
+        ${
+          files.length
+            ? files.map(
+                (file) =>
+                  html`<file-item .file=${file} .selected=${file.id === selected}></file-item>`,
+              )
+            : emptyState("No changed files")
+        }
       </div>
     `;
   }

@@ -42,8 +42,7 @@ const messages: Message[] = [
     blocks: [
       {
         kind: "prose",
-        text:
-          "How do people start a community garden? Look for practical guides and help me figure out what to ask at our first neighborhood meeting.",
+        text: "How do people start a community garden? Look for practical guides and help me figure out what to ask at our first neighborhood meeting.",
       },
     ],
   },
@@ -54,15 +53,13 @@ const messages: Message[] = [
     blocks: [
       {
         kind: "prose",
-        text:
-          "I’ll look for community garden guides, then ask a web research subagent to compare how they handle land access, shared costs, and ongoing upkeep.",
+        text: "I’ll look for community garden guides, then ask a web research subagent to compare how they handle land access, shared costs, and ongoing upkeep.",
       },
       {
         kind: "research",
         label: "Searched the web",
         duration: "1.4s",
-        detail:
-          "Community garden startup guides · land access · organizing volunteers",
+        detail: "Community garden startup guides · land access · organizing volunteers",
       },
       {
         kind: "research",
@@ -73,13 +70,11 @@ const messages: Message[] = [
       },
       {
         kind: "prose",
-        text:
-          "For the first meeting, focus on who wants to participate, what space might be available, and who can help maintain it. A shared garden needs an agreement about the work as much as an agreement about the space.",
+        text: "For the first meeting, focus on who wants to participate, what space might be available, and who can help maintain it. A shared garden needs an agreement about the work as much as an agreement about the space.",
       },
       {
         kind: "prose",
-        text:
-          "Useful questions to bring: Who can help each week? Who can contact the landowner? Is water available? Would people prefer individual plots or shared beds? What costs can the group cover?",
+        text: "Useful questions to bring: Who can help each week? Who can contact the landowner? Is water available? Would people prefer individual plots or shared beds? What costs can the group cover?",
       },
     ],
   },
@@ -89,8 +84,7 @@ const messages: Message[] = [
     blocks: [
       {
         kind: "prose",
-        text:
-          "We don’t have a site yet. Can you look more closely at what to ask a potential landowner before we commit?",
+        text: "We don’t have a site yet. Can you look more closely at what to ask a potential landowner before we commit?",
       },
     ],
   },
@@ -101,8 +95,7 @@ const messages: Message[] = [
     blocks: [
       {
         kind: "prose",
-        text:
-          "I’ll research site agreements and access requirements next, especially permission to use the land, water access, soil history, and how long the site would be available.",
+        text: "I’ll research site agreements and access requirements next, especially permission to use the land, water access, soil history, and how long the site would be available.",
       },
       {
         kind: "status",

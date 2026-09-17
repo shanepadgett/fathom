@@ -114,11 +114,7 @@ export interface LspService {
   update(path: string, text: string): Promise<void>;
   /** Forget a document and clear its diagnostics; does not change files or saved drafts. */
   close(path: string): Promise<void>;
-  completion(
-    path: string,
-    text: string,
-    position: CompletionPosition,
-  ): Promise<CompletionResult>;
+  completion(path: string, text: string, position: CompletionPosition): Promise<CompletionResult>;
   /** Latest push diagnostics, not a compiler barrier. Opens untracked files from disk. */
   getDiagnostics(paths: readonly string[]): Promise<DocumentDiagnostics[]>;
   /** Legacy Deno status without a path; selected server status with a path. */

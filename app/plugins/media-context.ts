@@ -12,16 +12,14 @@ export const mediaContext = definePlugin({
     activate(ctx) {
       ctx.cordis.on("step:model", async (input) => {
         const session = ctx.get("storage").getSession(input.sessionId);
-        const model = ctx.get("model").models.getModel(
-          session.provider,
-          session.model,
-        );
+        const model = ctx.get("model").models.getModel(session.provider, session.model);
         if (!model?.input.includes("image")) return;
         const media = ctx.get("media");
         const assets = new Map(
-          media.list(input.sessionId).filter((asset) =>
-            asset.mime.startsWith("image/")
-          ).map((asset) => [mediaReference(asset), asset]),
+          media
+            .list(input.sessionId)
+            .filter((asset) => asset.mime.startsWith("image/"))
+            .map((asset) => [mediaReference(asset), asset]),
         );
         const messages = input.context.messages.slice();
         let count = 0;
@@ -35,8 +33,7 @@ export const mediaContext = definePlugin({
           if (!asset) continue;
           let omission = "";
           if (count >= 4) {
-            omission =
-              "Only the four most recent referenced images are included in this request.";
+            omission = "Only the four most recent referenced images are included in this request.";
           } else if (asset.bytes > 8 * 1024 * 1024) {
             omission = "This image exceeds the 8 MiB chat-image limit.";
           } else {

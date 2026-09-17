@@ -11,16 +11,12 @@ export default {
         const messageElement = document.createElement("div");
         element.append(fieldElement, buttonElement, messageElement);
         const createdAt = Date.now();
-        const message = host.ui.getComponent("fathom.message-card")(
-          messageElement,
-          host,
-          {
-            author: "UI kit",
-            agent: true,
-            createdAt,
-            text: "Enter a name to update this **shared message card**.",
-          },
-        );
+        const message = host.ui.getComponent("fathom.message-card")(messageElement, host, {
+          author: "UI kit",
+          agent: true,
+          createdAt,
+          text: "Enter a name to update this **shared message card**.",
+        });
         let name = "";
         const buttonProps = () => ({
           label: name.trim() ? `Greet ${name.trim()}` : "Enter a name",
@@ -34,24 +30,16 @@ export default {
               text: `Hello, ${name.trim()}.`,
             }),
         });
-        const button = host.ui.getComponent("fathom.button")(
-          buttonElement,
-          host,
-          buttonProps(),
-        );
-        const field = host.ui.getComponent("fathom.text-field")(
-          fieldElement,
-          host,
-          {
-            label: "Name",
-            value: name,
-            hint: "This plugin uses Fathom's shared field and button.",
-            onInput(value) {
-              name = value;
-              button.update(buttonProps());
-            },
+        const button = host.ui.getComponent("fathom.button")(buttonElement, host, buttonProps());
+        const field = host.ui.getComponent("fathom.text-field")(fieldElement, host, {
+          label: "Name",
+          value: name,
+          hint: "This plugin uses Fathom's shared field and button.",
+          onInput(value) {
+            name = value;
+            button.update(buttonProps());
           },
-        );
+        });
         return async () => {
           await field.dispose();
           await button.dispose();

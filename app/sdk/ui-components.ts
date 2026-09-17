@@ -73,10 +73,7 @@ export interface BuiltinComponentProps {
 }
 
 export interface UIComponentRegistry {
-  registerComponent<Props>(
-    name: string,
-    component: UIComponent<Props>,
-  ): Dispose;
+  registerComponent<Props>(name: string, component: UIComponent<Props>): Dispose;
   getComponent<Name extends keyof BuiltinComponentProps>(
     name: Name,
   ): UIComponent<BuiltinComponentProps[Name]>;

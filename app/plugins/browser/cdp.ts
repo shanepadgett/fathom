@@ -15,7 +15,10 @@ export class BrowserConnection implements BrowserTransport {
     return this.disposed || this.protocol.closed;
   }
 
-  constructor(private home: string, event: BrowserEvent) {
+  constructor(
+    private home: string,
+    event: BrowserEvent,
+  ) {
     this.protocol = new BrowserProtocol((message) => {
       if (this.socket?.readyState !== WebSocket.OPEN) {
         throw new Error("Browser is not connected");
@@ -39,7 +42,9 @@ export class BrowserConnection implements BrowserTransport {
         await Deno.stat(candidate);
         executable = candidate;
         break;
-      } catch { /* Try next installed browser. */ }
+      } catch {
+        /* Try next installed browser. */
+      }
     }
     if (!executable) {
       throw new Error(
@@ -66,9 +71,7 @@ export class BrowserConnection implements BrowserTransport {
     for (let attempt = 0; attempt < 100; attempt++) {
       if (this.disposed) throw new Error("Browser is closed");
       try {
-        port =
-          (await Deno.readTextFile(join(this.profile, "DevToolsActivePort")))
-            .split("\n")[0];
+        port = (await Deno.readTextFile(join(this.profile, "DevToolsActivePort"))).split("\n")[0];
         break;
       } catch {
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -78,20 +81,18 @@ export class BrowserConnection implements BrowserTransport {
       await this.dispose();
       throw new Error("Browser startup timed out");
     }
-    const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`, {
-      signal: AbortSignal.timeout(10_000),
-    }))
-      .json() as { type: string; webSocketDebuggerUrl: string }[];
+    const targets = (await (
+      await fetch(`http://127.0.0.1:${port}/json/list`, {
+        signal: AbortSignal.timeout(10_000),
+      })
+    ).json()) as { type: string; webSocketDebuggerUrl: string }[];
     const target = targets.find((target) => target.type === "page");
     if (!target) throw new Error("Browser did not create a page");
     if (this.disposed) throw new Error("Browser is closed");
     const socket = new WebSocket(target.webSocketDebuggerUrl);
     this.socket = socket;
     await new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(
-        () => reject(new Error("Browser connection timed out")),
-        10_000,
-      );
+      const timer = setTimeout(() => reject(new Error("Browser connection timed out")), 10_000);
       socket.onopen = () => {
         clearTimeout(timer);
         resolve();
@@ -105,9 +106,7 @@ export class BrowserConnection implements BrowserTransport {
           this.protocol.receive(String(event.data));
         } catch (error) {
           this.protocol.close(
-            error instanceof Error
-              ? error
-              : new Error("Invalid browser message"),
+            error instanceof Error ? error : new Error("Invalid browser message"),
           );
           socket.close();
         }
@@ -146,7 +145,9 @@ export class BrowserConnection implements BrowserTransport {
       const timer = setTimeout(() => {
         try {
           process.kill("SIGKILL");
-        } catch { /* Already closed. */ }
+        } catch {
+          /* Already closed. */
+        }
       }, 3000);
       try {
         process.kill("SIGTERM");

@@ -1,10 +1,4 @@
-import type {
-  Entry,
-  Session,
-  StorageService,
-  ToolExecution,
-  UsageRecord,
-} from "../../sdk/mod.ts";
+import type { Entry, Session, StorageService, ToolExecution, UsageRecord } from "../../sdk/mod.ts";
 
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -37,11 +31,8 @@ export default definePlugin({
       const workspace = ctx.get("workspace");
       mkdirSync(workspace.dataDir, { recursive: true, mode: 0o700 });
       const sqlite = new DatabaseSync(join(workspace.dataDir, "sessions.db"));
-      sqlite.exec(
-        "PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;",
-      );
-      const version = sqlite.prepare("PRAGMA user_version").get()
-        ?.user_version as number;
+      sqlite.exec("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;");
+      const version = sqlite.prepare("PRAGMA user_version").get()?.user_version as number;
       if (version > 1) {
         sqlite.close();
         throw new Error("Database belongs to a newer version of Fathom");
@@ -61,9 +52,12 @@ export default definePlugin({
       let transactionDepth = 0;
       const storage: StorageService = {
         listSessions: () =>
-          db.select().from(schema.sessions).orderBy(
-            desc(schema.sessions.updatedAt),
-          ).all().map((row) => JSON.parse(row.data)),
+          db
+            .select()
+            .from(schema.sessions)
+            .orderBy(desc(schema.sessions.updatedAt))
+            .all()
+            .map((row) => JSON.parse(row.data)),
         createSession(input = {}) {
           const now = Date.now();
           const session: Session = {
@@ -82,17 +76,17 @@ export default definePlugin({
             updatedAt: now,
             ...input,
           };
-          db.insert(schema.sessions).values({
-            id: session.id,
-            data: JSON.stringify(session),
-            updatedAt: now,
-          }).run();
+          db.insert(schema.sessions)
+            .values({
+              id: session.id,
+              data: JSON.stringify(session),
+              updatedAt: now,
+            })
+            .run();
           return session;
         },
         getSession(id) {
-          const row = db.select().from(schema.sessions).where(
-            eq(schema.sessions.id, id),
-          ).get();
+          const row = db.select().from(schema.sessions).where(eq(schema.sessions.id, id)).get();
           if (!row) throw new Error("Session not found");
           return JSON.parse(row.data);
         },
@@ -103,29 +97,35 @@ export default definePlugin({
             id,
             updatedAt: Date.now(),
           };
-          db.update(schema.sessions).set({
-            data: JSON.stringify(session),
-            updatedAt: session.updatedAt,
-          }).where(eq(schema.sessions.id, id)).run();
+          db.update(schema.sessions)
+            .set({
+              data: JSON.stringify(session),
+              updatedAt: session.updatedAt,
+            })
+            .where(eq(schema.sessions.id, id))
+            .run();
           return session;
         },
         entries(sessionId, leafId) {
-          const leaf = leafId === undefined
-            ? storage.getSession(sessionId).activeLeafId
-            : leafId;
+          const leaf = leafId === undefined ? storage.getSession(sessionId).activeLeafId : leafId;
           if (!leaf) return [];
-          const rows = sqlite.prepare(
-            `WITH RECURSIVE branch(id, parent_id, data, depth) AS (
+          const rows = sqlite
+            .prepare(
+              `WITH RECURSIVE branch(id, parent_id, data, depth) AS (
             SELECT id, parent_id, data, 0 FROM entries WHERE id=? AND session_id=?
             UNION ALL SELECT e.id, e.parent_id, e.data, b.depth+1 FROM entries e JOIN branch b ON e.id=b.parent_id WHERE e.session_id=?
           ) SELECT data FROM branch ORDER BY depth DESC`,
-          ).all(leaf, sessionId, sessionId);
+            )
+            .all(leaf, sessionId, sessionId);
           return rows.map((row) => JSON.parse(row.data as string));
         },
         allEntries: (sessionId) =>
-          db.select().from(schema.entries).where(
-            eq(schema.entries.sessionId, sessionId),
-          ).all().map((row) => JSON.parse(row.data)),
+          db
+            .select()
+            .from(schema.entries)
+            .where(eq(schema.entries.sessionId, sessionId))
+            .all()
+            .map((row) => JSON.parse(row.data)),
         append(sessionId, input) {
           return storage.transaction(() => {
             const entry: Entry = {
@@ -135,25 +135,28 @@ export default definePlugin({
               parentId: storage.getSession(sessionId).activeLeafId,
               createdAt: Date.now(),
             };
-            db.insert(schema.entries).values({
-              id: entry.id,
-              sessionId,
-              parentId: entry.parentId,
-              data: JSON.stringify(entry),
-              createdAt: entry.createdAt,
-            }).run();
+            db.insert(schema.entries)
+              .values({
+                id: entry.id,
+                sessionId,
+                parentId: entry.parentId,
+                data: JSON.stringify(entry),
+                createdAt: entry.createdAt,
+              })
+              .run();
             storage.updateSession(sessionId, { activeLeafId: entry.id });
             return entry;
           });
         },
         updateEntry(id, changes) {
-          const row = db.select().from(schema.entries).where(
-            eq(schema.entries.id, id),
-          ).get();
+          const row = db.select().from(schema.entries).where(eq(schema.entries.id, id)).get();
           if (!row) throw new Error("Entry not found");
-          db.update(schema.entries).set({
-            data: JSON.stringify({ ...JSON.parse(row.data), ...changes }),
-          }).where(eq(schema.entries.id, id)).run();
+          db.update(schema.entries)
+            .set({
+              data: JSON.stringify({ ...JSON.parse(row.data), ...changes }),
+            })
+            .where(eq(schema.entries.id, id))
+            .run();
         },
         saveExecution(execution) {
           const value = {
@@ -161,41 +164,52 @@ export default definePlugin({
             sessionId: execution.sessionId,
             data: JSON.stringify(execution),
           };
-          db.insert(schema.executions).values(value).onConflictDoUpdate({
-            target: schema.executions.id,
-            set: { data: value.data },
-          }).run();
+          db.insert(schema.executions)
+            .values(value)
+            .onConflictDoUpdate({
+              target: schema.executions.id,
+              set: { data: value.data },
+            })
+            .run();
         },
         executions: (sessionId) =>
-          db.select().from(schema.executions).where(
-            eq(schema.executions.sessionId, sessionId),
-          ).all().map((row) => JSON.parse(row.data) as ToolExecution),
+          db
+            .select()
+            .from(schema.executions)
+            .where(eq(schema.executions.sessionId, sessionId))
+            .all()
+            .map((row) => JSON.parse(row.data) as ToolExecution),
         recordUsage: (record) => {
-          db.insert(schema.usage).values({
-            id: record.id,
-            data: JSON.stringify(record),
-          }).run();
+          db.insert(schema.usage)
+            .values({
+              id: record.id,
+              data: JSON.stringify(record),
+            })
+            .run();
           ctx.get("events").publish({
             type: "usage",
             sessionId: record.sessionId,
           });
         },
         usage: () =>
-          db.select().from(schema.usage).all().map((row) =>
-            JSON.parse(row.data) as UsageRecord
-          ),
+          db
+            .select()
+            .from(schema.usage)
+            .all()
+            .map((row) => JSON.parse(row.data) as UsageRecord),
         setting(key, fallback) {
-          const row = db.select().from(schema.settings).where(
-            eq(schema.settings.key, key),
-          ).get();
+          const row = db.select().from(schema.settings).where(eq(schema.settings.key, key)).get();
           return row ? JSON.parse(row.data) : fallback;
         },
         setSetting(key, value) {
           const data = JSON.stringify(value);
-          db.insert(schema.settings).values({ key, data }).onConflictDoUpdate({
-            target: schema.settings.key,
-            set: { data },
-          }).run();
+          db.insert(schema.settings)
+            .values({ key, data })
+            .onConflictDoUpdate({
+              target: schema.settings.key,
+              set: { data },
+            })
+            .run();
         },
         transaction(action) {
           if (transactionDepth) return action();

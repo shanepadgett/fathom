@@ -1,8 +1,6 @@
 import { For } from "solid-js";
 
-export function MetricList(
-  props: { metrics: readonly (readonly [string, string | number])[] },
-) {
+export function MetricList(props: { metrics: readonly (readonly [string, string | number])[] }) {
   return (
     <dl class="flex flex-col gap-3">
       <For each={props.metrics}>

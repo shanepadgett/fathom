@@ -1,14 +1,16 @@
-import { copyImage } from "../image-clipboard.ts";
 import type { MediaAsset } from "../../sdk/media.ts";
 
 import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
 
-import { Button, LinkButton, Modal } from "./primitives.tsx";
+import { copyImage } from "../image-clipboard.ts";
 import { ExportFile } from "./export-file.tsx";
+import { Button, LinkButton, Modal } from "./primitives.tsx";
 
-export function MediaPreview(
-  props: { asset: MediaAsset; url: string; save?(path: string): Promise<void> },
-) {
+export function MediaPreview(props: {
+  asset: MediaAsset;
+  url: string;
+  save?(path: string): Promise<void>;
+}) {
   const identity = createMemo(() => JSON.stringify([props.asset, props.url]));
 
   return (
@@ -29,9 +31,7 @@ export function MediaPreview(
             await copyImage(props.url);
             setCopied(true);
           } catch (error) {
-            setCopyError(
-              error instanceof Error ? error.message : String(error),
-            );
+            setCopyError(error instanceof Error ? error.message : String(error));
           } finally {
             setCopying(false);
           }
@@ -73,9 +73,7 @@ export function MediaPreview(
               aria-label="Media actions"
             >
               <LinkButton
-                href={`${props.url}${
-                  props.url.includes("?") ? "&" : "?"
-                }download=1`}
+                href={`${props.url}${props.url.includes("?") ? "&" : "?"}download=1`}
                 download={props.asset.name}
               >
                 Download
@@ -86,24 +84,22 @@ export function MediaPreview(
                   onClick={() => void copy()}
                   title="Copy as PNG; animated images copy a still frame"
                 >
-                  {copying()
-                    ? "Copying…"
-                    : copied()
-                    ? "Copied image"
-                    : "Copy image"}
+                  {copying() ? "Copying…" : copied() ? "Copied image" : "Copy image"}
                 </Button>
               </Show>
               <Show when={props.save}>
-                <Button onClick={() => setExporting(true)}>
-                  Save to workspace
-                </Button>
+                <Button onClick={() => setExporting(true)}>Save to workspace</Button>
               </Show>
             </div>
             <Show when={copyError()}>
-              <p role="alert" class="text-sm text-danger">{copyError()}</p>
+              <p role="alert" class="text-sm text-danger">
+                {copyError()}
+              </p>
             </Show>
             <Show when={saved()}>
-              <p role="status" class="text-sm text-muted">Saved to {saved()}</p>
+              <p role="status" class="text-sm text-muted">
+                Saved to {saved()}
+              </p>
             </Show>
             <Show when={exporting()}>
               <ExportFile
@@ -141,22 +137,15 @@ export function ImageThumbnail(props: { name: string; url: string }) {
         title={props.name}
         onClick={() => setPreview(true)}
       >
-        <img
-          class="h-full w-full object-cover"
-          src={props.url}
-          alt={props.name}
-          onError={failed}
-        />
+        <img class="h-full w-full object-cover" src={props.url} alt={props.name} onError={failed} />
       </button>
       <Show when={error()}>
-        <p role="alert" class="text-sm text-danger">Could not load image.</p>
+        <p role="alert" class="text-sm text-danger">
+          Could not load image.
+        </p>
       </Show>
       <Show when={preview()}>
-        <Modal
-          title={props.name}
-          close={() => setPreview(false)}
-          wide
-        >
+        <Modal title={props.name} close={() => setPreview(false)} wide>
           <img
             class="max-h-[calc(70dvh-6rem)] w-full object-contain"
             src={props.url}

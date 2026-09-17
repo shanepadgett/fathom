@@ -3,24 +3,27 @@ import type { Transport } from "../transport.ts";
 import { createEffect, createSignal, on, Show } from "solid-js";
 
 import { artifactFeedback } from "../state/artifact-feedback.ts";
+import { ComposerBrowserFeedback } from "./composer-browser-feedback.tsx";
+import { FeedbackTray } from "./feedback-tray.tsx";
 import { Button } from "./primitives.tsx";
 import { StagedFeedbackList } from "./staged-feedback-list.tsx";
-import { FeedbackTray } from "./feedback-tray.tsx";
-import { ComposerBrowserFeedback } from "./composer-browser-feedback.tsx";
 
-export function ComposerFeedback(
-  props: {
-    transport: Transport;
-    sessionId: string;
-    openArtifact(id: string): void;
-  },
-) {
+export function ComposerFeedback(props: {
+  transport: Transport;
+  sessionId: string;
+  openArtifact(id: string): void;
+}) {
   const feedback = artifactFeedback(props.transport, () => props.sessionId);
   const [editing, setEditing] = createSignal(false);
   const [browserEditing, setBrowserEditing] = createSignal(false);
   const [sending, setSending] = createSignal(false);
   const [error, setError] = createSignal("");
-  createEffect(on(() => props.sessionId, () => setError("")));
+  createEffect(
+    on(
+      () => props.sessionId,
+      () => setError(""),
+    ),
+  );
   async function sendAll() {
     if (sending() || editing() || browserEditing()) return;
     const sessionId = props.sessionId;
@@ -46,15 +49,14 @@ export function ComposerFeedback(
         working={setBrowserEditing}
       />
       <Show when={error()}>
-        <p role="alert" class="mb-3 text-sm text-danger">{error()}</p>
+        <p role="alert" class="mb-3 text-sm text-danger">
+          {error()}
+        </p>
       </Show>
       <Show when={feedback.draft.error}>
         <p role="alert" class="mb-3 text-sm text-danger">
           Could not load staged feedback.{" "}
-          <Button
-            onClick={() =>
-              void Promise.resolve(feedback.refetch()).catch(() => {})}
-          >
+          <Button onClick={() => void Promise.resolve(feedback.refetch()).catch(() => {})}>
             Retry
           </Button>
         </p>
@@ -64,9 +66,10 @@ export function ComposerFeedback(
           <StagedFeedbackList
             sessionId={props.sessionId}
             source="artifact"
-            items={(feedback.draft.error ? [] : feedback.draft() ?? []).map((
-              item,
-            ) => ({ ...item, label: item.name }))}
+            items={(feedback.draft.error ? [] : (feedback.draft() ?? [])).map((item) => ({
+              ...item,
+              label: item.name,
+            }))}
             disabled={sending() || browserEditing()}
             working={setEditing}
             save={async (sessionId, item) => {

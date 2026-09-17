@@ -27,21 +27,22 @@ async function withSnapshotLock<T>(
   const controller = new AbortController();
   const signal = AbortSignal.any([controller.signal, lifetime]);
   signal.throwIfAborted();
-  const release = await lockfile.lock(dataDir, {
-    lockfilePath: join(dataDir, "snapshots.lock"),
-    stale: 30_000,
-    update: 10_000,
-    retries: { retries: 10, minTimeout: 100, maxTimeout: 1000 },
-    onCompromised: (error) => controller.abort(error),
-  }).catch((error: unknown) => {
-    if (error instanceof Error && "code" in error && error.code === "ELOCKED") {
-      throw new Error(
-        "Another process is using workspace snapshots. Try again shortly.",
-        { cause: error },
-      );
-    }
-    throw error;
-  });
+  const release = await lockfile
+    .lock(dataDir, {
+      lockfilePath: join(dataDir, "snapshots.lock"),
+      stale: 30_000,
+      update: 10_000,
+      retries: { retries: 10, minTimeout: 100, maxTimeout: 1000 },
+      onCompromised: (error) => controller.abort(error),
+    })
+    .catch((error: unknown) => {
+      if (error instanceof Error && "code" in error && error.code === "ELOCKED") {
+        throw new Error("Another process is using workspace snapshots. Try again shortly.", {
+          cause: error,
+        });
+      }
+      throw error;
+    });
   try {
     signal.throwIfAborted();
     const result = await operation(signal);
@@ -110,17 +111,12 @@ export default definePlugin({
         action: (signal: AbortSignal) => Promise<T>,
         requested?: AbortSignal,
       ) => {
-        const signal = requested
-          ? AbortSignal.any([lifetime.signal, requested])
-          : lifetime.signal;
-        const next = lock.then(() =>
-          withSnapshotLock(
-            dataDir,
-            action,
-            signal,
-          )
+        const signal = requested ? AbortSignal.any([lifetime.signal, requested]) : lifetime.signal;
+        const next = lock.then(() => withSnapshotLock(dataDir, action, signal));
+        lock = next.then(
+          () => {},
+          () => {},
         );
-        lock = next.then(() => {}, () => {});
         return waitForSnapshot(next, signal);
       };
       const planPrune = async (signal: AbortSignal) => {
@@ -143,9 +139,7 @@ export default definePlugin({
           const tree = match[1];
           let used: number;
           try {
-            used = Number(
-              await Deno.readTextFile(join(gitDir, "fathom-retention", tree)),
-            );
+            used = Number(await Deno.readTextFile(join(gitDir, "fathom-retention", tree)));
           } catch (error) {
             if (!(error instanceof Deno.errors.NotFound)) throw error;
             // Legacy snapshots receive a full retention period when first inspected.
@@ -196,18 +190,14 @@ export default definePlugin({
               throw new Error("Could not inspect snapshot changes");
             }
             // NUL-delimited output preserves spaces and newlines in file names.
-            return new TextDecoder().decode(result.stdout).split("\0").filter(
-              Boolean,
-            );
+            return new TextDecoder().decode(result.stdout).split("\0").filter(Boolean);
           }, requested),
         planPrune: () => serialize(planPrune),
         prune: (requested: string[]) =>
           serialize(async (signal) => {
             if (
               !Array.isArray(requested) ||
-              requested.some((tree) =>
-                typeof tree !== "string" || !/^[a-f0-9]{40,64}$/.test(tree)
-              )
+              requested.some((tree) => typeof tree !== "string" || !/^[a-f0-9]{40,64}$/.test(tree))
             ) {
               throw new Error("Invalid snapshot cleanup selection");
             }
@@ -216,13 +206,7 @@ export default definePlugin({
             let removed = 0;
             for (const tree of plan.trees) {
               if (!selected.has(tree)) continue;
-              await git(
-                signal,
-                "update-ref",
-                "-d",
-                `refs/snapshots/${tree}`,
-                tree,
-              );
+              await git(signal, "update-ref", "-d", `refs/snapshots/${tree}`, tree);
               removed++;
             }
             // Hold ownership through collection, including retries after a prior GC failure.
@@ -267,10 +251,7 @@ export default definePlugin({
       const rpc = ctx.get("rpc");
       const unregister = [
         rpc.register("snapshots.planPrune", () => service.planPrune()),
-        rpc.register(
-          "snapshots.prune",
-          (params) => service.prune(params.trees as string[]),
-        ),
+        rpc.register("snapshots.prune", (params) => service.prune(params.trees as string[])),
       ];
       ctx.cordis.on("run:admit", async (input) => {
         input.snapshotTreeId = await service.capture();

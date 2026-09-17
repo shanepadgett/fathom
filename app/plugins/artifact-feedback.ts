@@ -1,18 +1,18 @@
-import type { Artifact } from "../sdk/artifacts.ts";
 import type { ArtifactFeedback } from "../sdk/artifact-feedback.ts";
+import type { Artifact } from "../sdk/artifacts.ts";
 import type { PluginContext } from "../sdk/mod.ts";
 
 import { submittedFeedbackIds } from "./submitted-feedback.ts";
 
 function feedbackText(params: Record<string, unknown>) {
   if (
-    typeof params.comment !== "string" || !params.comment.trim() ||
-    params.comment.length > 4000 || typeof params.quote !== "string" ||
+    typeof params.comment !== "string" ||
+    !params.comment.trim() ||
+    params.comment.length > 4000 ||
+    typeof params.quote !== "string" ||
     params.quote.length > 4000
   ) {
-    throw new Error(
-      "Add a comment and keep each passage and comment under 4,000 characters",
-    );
+    throw new Error("Add a comment and keep each passage and comment under 4,000 characters");
   }
   return { quote: params.quote, comment: params.comment.trim() };
 }
@@ -36,13 +36,9 @@ export function registerArtifactFeedback(
     }
     return draft;
   };
-  const emit = (sessionId: string) =>
-    ctx.get("events").publish({ type: "session", sessionId });
+  const emit = (sessionId: string) => ctx.get("events").publish({ type: "session", sessionId });
   const disposers = [
-    rpc.register(
-      "artifact.feedback.list",
-      (params) => list(String(params.sessionId)),
-    ),
+    rpc.register("artifact.feedback.list", (params) => list(String(params.sessionId))),
     rpc.register("artifact.feedback.stage", (params) => {
       const sessionId = String(params.sessionId);
       const artifact = get(sessionId, String(params.artifactId));
@@ -50,9 +46,7 @@ export function registerArtifactFeedback(
       return storage.transaction(() => {
         const draft = list(sessionId);
         if (draft.length >= 20) {
-          throw new Error(
-            "Send or remove feedback before staging more than 20 comments",
-          );
+          throw new Error("Send or remove feedback before staging more than 20 comments");
         }
         const item: ArtifactFeedback = {
           id: crypto.randomUUID(),
@@ -79,7 +73,7 @@ export function registerArtifactFeedback(
         const updated = { ...previous, ...text };
         storage.setSetting(
           key(sessionId),
-          draft.map((item) => item.id === previous.id ? updated : item),
+          draft.map((item) => (item.id === previous.id ? updated : item)),
         );
         emit(sessionId);
         return updated;
@@ -96,9 +90,8 @@ export function registerArtifactFeedback(
       );
       emit(sessionId);
     }),
-    rpc.register(
-      "artifact.feedback.send",
-      (params) => feedback.send(String(params.sessionId), ["artifacts"]),
+    rpc.register("artifact.feedback.send", (params) =>
+      feedback.send(String(params.sessionId), ["artifacts"]),
     ),
     feedback.register({
       id: "artifacts",
@@ -107,20 +100,23 @@ export function registerArtifactFeedback(
         for (const item of draft) get(sessionId, item.artifactId);
         const text =
           "Please revise the referenced artifacts using this feedback. Create revisions with the artifact tool's supersedes field; preserve the earlier versions.\n\n" +
-          draft.map((item, index) =>
-            `${
-              index + 1
-            }. ${item.name} (artifact ${item.artifactId})\nPassage: ${
-              item.quote || "Whole artifact"
-            }\nFeedback: ${item.comment}`
-          ).join("\n\n");
+          draft
+            .map(
+              (item, index) =>
+                `${index + 1}. ${item.name} (artifact ${item.artifactId})\nPassage: ${
+                  item.quote || "Whole artifact"
+                }\nFeedback: ${item.comment}`,
+            )
+            .join("\n\n");
         return {
           count: draft.length,
           text,
-          attachments: [{
-            type: "artifact-feedback",
-            data: { ids: draft.map((item) => item.id) },
-          }],
+          attachments: [
+            {
+              type: "artifact-feedback",
+              data: { ids: draft.map((item) => item.id) },
+            },
+          ],
         };
       },
       reconcile: list,

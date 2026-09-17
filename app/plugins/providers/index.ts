@@ -22,30 +22,26 @@ export function providersPlugin(authPath: string) {
       activate(ctx) {
         const storage = ctx.get("storage");
         const models = createModels({ credentials: new Credentials(authPath) });
-        for (
-          const factory of [
-            openaiCodexProvider,
-            anthropicProvider,
-            openaiProvider,
-            googleProvider,
-            openrouterProvider,
-            xaiProvider,
-          ]
-        ) models.setProvider(factory());
+        for (const factory of [
+          openaiCodexProvider,
+          anthropicProvider,
+          openaiProvider,
+          googleProvider,
+          openrouterProvider,
+          xaiProvider,
+        ])
+          models.setProvider(factory());
         const service: ModelService = {
           models,
           async select(sessionId) {
-            const session = sessionId
-              ? storage.getSession(sessionId)
-              : undefined;
-            const provider = session?.provider ||
-              storage.setting("provider", "");
+            const session = sessionId ? storage.getSession(sessionId) : undefined;
+            const provider = session?.provider || storage.setting("provider", "");
             const id = session?.model || storage.setting("model", "");
             const available = await models.getAvailable(provider || undefined);
-            const model = available.find((model) => model.id === id) ??
+            const model =
+              available.find((model) => model.id === id) ??
               (!id
-                ? available.find((model) => model.id === "gpt-6-astra") ??
-                  available[0]
+                ? (available.find((model) => model.id === "gpt-6-astra") ?? available[0])
                 : undefined);
             if (!model) {
               throw new Error(
@@ -55,8 +51,7 @@ export function providersPlugin(authPath: string) {
             return model;
           },
           async complete(input) {
-            const model = input.model ??
-              await service.select(input.attribution.sessionId);
+            const model = input.model ?? (await service.select(input.attribution.sessionId));
             const start = Date.now();
             const context = {
               systemPrompt: input.systemPrompt,
@@ -64,17 +59,15 @@ export function providersPlugin(authPath: string) {
               tools: input.tools,
             };
             if (input.schema) {
-              context.tools = [{
-                name: "structured_result",
-                description: "Return the requested structured result",
-                parameters: input.schema,
-              }];
+              context.tools = [
+                {
+                  name: "structured_result",
+                  description: "Return the requested structured result",
+                  parameters: input.schema,
+                },
+              ];
             }
-            const result = await models.completeSimple(
-              model,
-              context,
-              input.options,
-            );
+            const result = await models.completeSimple(model, context, input.options);
             calculateCost(model, result.usage);
             storage.recordUsage({
               ...input.attribution,
@@ -85,20 +78,14 @@ export function providersPlugin(authPath: string) {
               durationMs: Date.now() - start,
               createdAt: Date.now(),
             });
-            if (
-              result.stopReason === "error" || result.stopReason === "aborted"
-            ) throw new Error(result.errorMessage ?? "Provider request failed");
+            if (result.stopReason === "error" || result.stopReason === "aborted")
+              throw new Error(result.errorMessage ?? "Provider request failed");
             if (input.schema) {
-              const call = result.content.find((block) =>
-                block.type === "toolCall" && block.name === "structured_result"
+              const call = result.content.find(
+                (block) => block.type === "toolCall" && block.name === "structured_result",
               );
-              if (
-                !call || call.type !== "toolCall" ||
-                !Value.Check(input.schema, call.arguments)
-              ) {
-                throw new Error(
-                  "Provider did not return a valid structured result",
-                );
+              if (!call || call.type !== "toolCall" || !Value.Check(input.schema, call.arguments)) {
+                throw new Error("Provider did not return a valid structured result");
               }
             }
             return result;

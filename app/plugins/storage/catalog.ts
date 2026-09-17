@@ -14,15 +14,11 @@ export function savedSessions(home: string, projects: Project[]) {
     let database: DatabaseSync | undefined;
     try {
       database = new DatabaseSync(path, { readOnly: true });
-      const version = Number(
-        database.prepare("PRAGMA user_version").get()?.user_version,
-      );
+      const version = Number(database.prepare("PRAGMA user_version").get()?.user_version);
       if (version !== 1) {
         throw new Error("Unsupported session database version");
       }
-      const rows = database.prepare(
-        "SELECT data FROM sessions ORDER BY updated_at DESC",
-      ).all();
+      const rows = database.prepare("SELECT data FROM sessions ORDER BY updated_at DESC").all();
       for (const row of rows) {
         const session = JSON.parse(String(row.data)) as Session;
         if (!session.archived) items.push({ project, session });

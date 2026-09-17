@@ -18,16 +18,12 @@ export function SplitPane(props: {
   let container!: HTMLDivElement;
   let first!: HTMLDivElement;
   let preferredWidth: number | undefined;
-  const split = () =>
-    props.firstVisible !== false && props.secondVisible !== false;
+  const split = () => props.firstVisible !== false && props.secondVisible !== false;
   const minimum = (value: number | undefined) =>
     Number.isFinite(value) ? Math.max(0, value!) : 120;
   const bounds = () => {
     const available = container.clientWidth;
-    const max = Math.max(
-      0,
-      available - Math.min(available, minimum(props.minSecond)),
-    );
+    const max = Math.max(0, available - Math.min(available, minimum(props.minSecond)));
     return { min: Math.min(minimum(props.minFirst), max), max };
   };
   const clamp = (width: number) => {
@@ -80,7 +76,7 @@ export function SplitPane(props: {
         aria-label={props.label}
         class="relative min-h-0 min-w-0"
         classList={{
-          "hidden": props.firstVisible === false,
+          hidden: props.firstVisible === false,
           "w-1/2 shrink-0 border-r border-line": split(),
           "flex-1": !split(),
         }}

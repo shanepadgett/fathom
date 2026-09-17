@@ -50,11 +50,7 @@ export function BrowserToolbar(props: {
           disabled={!props.address.trim()}
         />
       </form>
-      <div
-        class="flex shrink-0 items-center gap-2"
-        role="group"
-        aria-label="Browser actions"
-      >
+      <div class="flex shrink-0 items-center gap-2" role="group" aria-label="Browser actions">
         <IconButton
           name="note-pencil"
           label="Annotate a point"
@@ -78,9 +74,7 @@ export function BrowserToolbar(props: {
         <Show when={props.switchSurface}>
           <IconButton
             name={props.docked ? "arrows-out" : "columns"}
-            label={props.docked
-              ? "Use browser as active surface"
-              : "Dock browser beside editor"}
+            label={props.docked ? "Use browser as active surface" : "Dock browser beside editor"}
             onClick={() => props.switchSurface?.()}
           />
         </Show>

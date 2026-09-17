@@ -41,10 +41,7 @@ export class BrowserProtocol {
     }
   }
 
-  call(
-    method: string,
-    params: Record<string, unknown> = {},
-  ): Promise<Record<string, unknown>> {
+  call(method: string, params: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
     if (this.failure) return Promise.reject(this.failure);
     const id = ++this.sequence;
     return new Promise((resolve, reject) => {
@@ -90,10 +87,7 @@ export class BrowserProtocol {
         ready,
         new Promise<never>((_, reject) => {
           timer = setTimeout(
-            () =>
-              reject(
-                new Error("Page did not finish loading within 15 seconds"),
-              ),
+            () => reject(new Error("Page did not finish loading within 15 seconds")),
             15_000,
           );
         }),

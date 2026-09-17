@@ -6,9 +6,7 @@ async function pngImage(url: string): Promise<Blob> {
   const bitmap = await createImageBitmap(source);
   try {
     if (bitmap.width * bitmap.height > 32_000_000) {
-      throw new Error(
-        "This image is too large to copy. Download the original instead.",
-      );
+      throw new Error("This image is too large to copy. Download the original instead.");
     }
     const canvas = document.createElement("canvas");
     canvas.width = bitmap.width;
@@ -19,9 +17,7 @@ async function pngImage(url: string): Promise<Blob> {
     return await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
         (blob) =>
-          blob
-            ? resolve(blob)
-            : reject(new Error("Could not prepare the image to copy.")),
+          blob ? resolve(blob) : reject(new Error("Could not prepare the image to copy.")),
         "image/png",
       );
     });
@@ -32,9 +28,7 @@ async function pngImage(url: string): Promise<Blob> {
 
 export async function copyImage(url: string): Promise<void> {
   if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
-    throw new Error(
-      "Image copying is unavailable. Download the image instead.",
-    );
+    throw new Error("Image copying is unavailable. Download the image instead.");
   }
   const image = pngImage(url);
   // Keep the write inside the click's activation while the image is prepared.

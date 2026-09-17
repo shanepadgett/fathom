@@ -10,11 +10,7 @@ export const nativeImages = definePlugin({
     requires: ["images"],
     activate(ctx) {
       const models = ctx.get("images").models;
-      const providers = [
-        xaiImagesProvider(),
-        googleImagesProvider(),
-        openaiImagesProvider(),
-      ];
+      const providers = [xaiImagesProvider(), googleImagesProvider(), openaiImagesProvider()];
       for (const provider of providers) models.setProvider(provider);
       ctx.effect(() => () => {
         for (const provider of providers) {

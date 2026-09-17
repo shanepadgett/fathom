@@ -25,10 +25,15 @@ export function StagedFeedbackList(props: {
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
   let input!: HTMLTextAreaElement;
-  createEffect(on(() => props.sessionId, () => {
-    setEditing(undefined);
-    setError("");
-  }));
+  createEffect(
+    on(
+      () => props.sessionId,
+      () => {
+        setEditing(undefined);
+        setError("");
+      },
+    ),
+  );
   createEffect(() => props.working(busy() || !!editing()));
   onCleanup(() => props.working(false));
   async function act(action: () => Promise<unknown>) {
@@ -69,15 +74,12 @@ export function StagedFeedbackList(props: {
                 </Button>
                 <Button
                   disabled={busy() || props.disabled || !!editing()}
-                  onClick={() =>
-                    void act(() => props.remove(props.sessionId, item.id))}
+                  onClick={() => void act(() => props.remove(props.sessionId, item.id))}
                 >
                   Remove
                 </Button>
                 <Show when={props.review}>
-                  <Button onClick={() => props.review?.(item.id)}>
-                    Open artifact
-                  </Button>
+                  <Button onClick={() => props.review?.(item.id)}>Open artifact</Button>
                 </Show>
               </div>
             </li>
@@ -95,18 +97,16 @@ export function StagedFeedbackList(props: {
                 disabled={busy() || props.disabled}
                 value={editing()?.quote ?? ""}
                 onInput={(event) =>
-                  setEditing((item) =>
-                    item && ({ ...item, quote: event.currentTarget.value })
-                  )}
+                  setEditing((item) => item && { ...item, quote: event.currentTarget.value })
+                }
               />
             </Field>
           </Show>
           <CommentField
-            input={(element) => input = element}
+            input={(element) => (input = element)}
             value={editing()?.comment ?? ""}
             disabled={busy() || props.disabled}
-            change={(comment) =>
-              setEditing((item) => item && ({ ...item, comment }))}
+            change={(comment) => setEditing((item) => item && { ...item, comment })}
           />
           <div class="flex gap-3">
             <Button
@@ -132,7 +132,9 @@ export function StagedFeedbackList(props: {
         </div>
       </Show>
       <Show when={error()}>
-        <p role="alert" class="text-sm text-danger">{error()}</p>
+        <p role="alert" class="text-sm text-danger">
+          {error()}
+        </p>
       </Show>
     </div>
   );

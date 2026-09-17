@@ -3,26 +3,26 @@ import type { Transport } from "../transport.ts";
 import { createEffect, createSignal, on, onCleanup, Show } from "solid-js";
 
 import { browserFeedback } from "../state/browser-feedback.ts";
-import { StagedFeedbackList } from "./staged-feedback-list.tsx";
 import { FeedbackTray } from "./feedback-tray.tsx";
 import { Button } from "./primitives.tsx";
+import { StagedFeedbackList } from "./staged-feedback-list.tsx";
 
-export function ComposerBrowserFeedback(
-  props: {
-    transport: Transport;
-    sessionId: string;
-    disabled?: boolean;
-    working(value: boolean): void;
-  },
-) {
-  const { draft, refetch } = browserFeedback(
-    props.transport,
-    () => props.sessionId,
-  );
+export function ComposerBrowserFeedback(props: {
+  transport: Transport;
+  sessionId: string;
+  disabled?: boolean;
+  working(value: boolean): void;
+}) {
+  const { draft, refetch } = browserFeedback(props.transport, () => props.sessionId);
   const [editing, setEditing] = createSignal(false);
   const [busy, setBusy] = createSignal<"clear" | "submit">();
   const [error, setError] = createSignal("");
-  createEffect(on(() => props.sessionId, () => setError("")));
+  createEffect(
+    on(
+      () => props.sessionId,
+      () => setError(""),
+    ),
+  );
   createEffect(() => props.working(!!busy() || editing()));
   onCleanup(() => props.working(false));
   async function act(action: "clear" | "submit") {
@@ -47,11 +47,7 @@ export function ComposerBrowserFeedback(
         <p role="alert" class="mb-3 text-sm text-danger">
           {error() || "Could not load browser feedback."}
           <Show when={draft.error}>
-            <Button
-              onClick={() => void Promise.resolve(refetch()).catch(() => {})}
-            >
-              Retry
-            </Button>
+            <Button onClick={() => void Promise.resolve(refetch()).catch(() => {})}>Retry</Button>
           </Show>
         </p>
       </Show>
@@ -60,7 +56,7 @@ export function ComposerBrowserFeedback(
           <StagedFeedbackList
             sessionId={props.sessionId}
             source="browser"
-            items={(draft.error ? [] : draft() ?? []).map((item) => ({
+            items={(draft.error ? [] : (draft() ?? [])).map((item) => ({
               ...item,
               label: item.url,
             }))}

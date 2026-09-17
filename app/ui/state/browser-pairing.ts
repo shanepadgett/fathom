@@ -20,13 +20,9 @@ export function browserPairing(
   const refresh = async () => {
     const generation = ++refreshGeneration;
     try {
-      const result = await transport.request<DevServersSnapshot>(
-        "dev-servers.list",
-      );
-      if (
-        !disposed && generation === refreshGeneration &&
-        result.revision >= snapshot().revision
-      ) setSnapshot(result);
+      const result = await transport.request<DevServersSnapshot>("dev-servers.list");
+      if (!disposed && generation === refreshGeneration && result.revision >= snapshot().revision)
+        setSnapshot(result);
     } catch (failure) {
       if (!disposed && generation === refreshGeneration) error(failure);
     }
@@ -50,44 +46,43 @@ export function browserPairing(
     void refresh();
     void attach(id, session);
   };
-  onCleanup(transport.onEvent((event) => {
-    if (event.projectId && event.projectId !== transport.projectId) return;
-    if (event.type === "dev-servers") {
-      const next = event.data as DevServersSnapshot;
-      if (next.revision >= snapshot().revision) setSnapshot(next);
-    }
-    if (event.type === "connected" || event.type === "environment") {
-      reconnect(sessionId());
-    }
-    if (event.sessionId !== sessionId()) return;
-    if (event.type === "browser-pairing") {
-      const state = event.data as BrowserPairingState;
-      if (state.viewId === viewId()) change(state);
-    }
-    if (event.type === "browser-pairing-error") {
-      const failure = event.data as { viewId: string; message: string };
-      if (failure.viewId === viewId()) error(new Error(failure.message));
-    }
-  }));
-  createEffect(on(sessionId, (session) => {
-    reconnect(session);
-    onCleanup(() => {
-      void transport.request("browser.detach", { viewId: viewId() }).catch(
-        () => {},
-      );
-    });
-  }));
+  onCleanup(
+    transport.onEvent((event) => {
+      if (event.projectId && event.projectId !== transport.projectId) return;
+      if (event.type === "dev-servers") {
+        const next = event.data as DevServersSnapshot;
+        if (next.revision >= snapshot().revision) setSnapshot(next);
+      }
+      if (event.type === "connected" || event.type === "environment") {
+        reconnect(sessionId());
+      }
+      if (event.sessionId !== sessionId()) return;
+      if (event.type === "browser-pairing") {
+        const state = event.data as BrowserPairingState;
+        if (state.viewId === viewId()) change(state);
+      }
+      if (event.type === "browser-pairing-error") {
+        const failure = event.data as { viewId: string; message: string };
+        if (failure.viewId === viewId()) error(new Error(failure.message));
+      }
+    }),
+  );
+  createEffect(
+    on(sessionId, (session) => {
+      reconnect(session);
+      onCleanup(() => {
+        void transport.request("browser.detach", { viewId: viewId() }).catch(() => {});
+      });
+    }),
+  );
   onCleanup(() => {
     disposed = true;
     refreshGeneration++;
   });
   return {
     viewId,
-    servers: () =>
-      snapshot().servers.filter((server) => server.sessionId === sessionId()),
-    open: (url: string) =>
-      transport.request("browser.open", { url, viewId: viewId() }),
-    select: (id: string) =>
-      transport.request("browser.select-server", { id, viewId: viewId() }),
+    servers: () => snapshot().servers.filter((server) => server.sessionId === sessionId()),
+    open: (url: string) => transport.request("browser.open", { url, viewId: viewId() }),
+    select: (id: string) => transport.request("browser.select-server", { id, viewId: viewId() }),
   };
 }

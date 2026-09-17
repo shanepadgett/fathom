@@ -1,11 +1,6 @@
-import type {
-  Project,
-  Session,
-  SessionState,
-  UsageRecord,
-} from "../../sdk/session.ts";
-import type { ModelChoice } from "../../sdk/models.ts";
 import type { WorkspaceLayout } from "../../sdk/layout.ts";
+import type { ModelChoice } from "../../sdk/models.ts";
+import type { Project, Session, SessionState, UsageRecord } from "../../sdk/session.ts";
 import type { Transport } from "../transport.ts";
 
 export interface Approval {
@@ -36,10 +31,8 @@ export async function prepareProject(transport: Transport, path: string) {
     transport.request<string | null>("session.selection.get", { projectId }),
   ]);
   let session =
-    overview.sessions.find((item) =>
-      item.id === remembered && !item.archived
-    ) ??
-      overview.sessions.find((item) => !item.archived);
+    overview.sessions.find((item) => item.id === remembered && !item.archived) ??
+    overview.sessions.find((item) => !item.archived);
   if (!session) {
     session = await transport.request<Session>("session.create", { projectId });
     overview.sessions = [session, ...overview.sessions];

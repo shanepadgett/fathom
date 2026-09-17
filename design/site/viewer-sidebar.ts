@@ -31,19 +31,13 @@ export class ViewerSidebar {
     this.host.addEventListener(
       "edge-resize",
       (event) => {
-        if (
-          !(event.target instanceof Element) ||
-          !event.target.matches("[data-drawer-resizer]")
-        ) {
+        if (!(event.target instanceof Element) || !event.target.matches("[data-drawer-resizer]")) {
           return;
         }
         this.sidebarWidth = (event as CustomEvent<number>).detail;
         this.updateLayout();
         try {
-          localStorage.setItem(
-            "fathom-design-sidebar-width",
-            String(this.sidebarWidth),
-          );
+          localStorage.setItem("fathom-design-sidebar-width", String(this.sidebarWidth));
         } catch {
           /* Optional persistence. */
         }
@@ -57,8 +51,7 @@ export class ViewerSidebar {
         const target = event.target;
         if (!(target instanceof Element)) return;
         if (target.closest("[data-drawer-toggle]")) {
-          const collapsed =
-            this.host.querySelector<HTMLElement>("[data-drawer]")!.hidden;
+          const collapsed = this.host.querySelector<HTMLElement>("[data-drawer]")!.hidden;
           this.setDrawer(!collapsed, true, (event as MouseEvent).detail === 0);
         }
       },
@@ -70,9 +63,7 @@ export class ViewerSidebar {
       (event) => {
         if (
           event.key === "Escape" &&
-          this.host.querySelector("[data-drawer]")!.contains(
-            document.activeElement,
-          )
+          this.host.querySelector("[data-drawer]")!.contains(document.activeElement)
         ) {
           this.setDrawer(true, true);
         }
@@ -92,9 +83,7 @@ export class ViewerSidebar {
           // Pointer-derived placement is clamped to the viewport. This runtime
           // coordinate is intentionally not a fixed design dimension.
           const half = tab.offsetHeight / 2;
-          tab.style.top = `${
-            Math.max(half, Math.min(innerHeight - half, event.clientY))
-          }px`;
+          tab.style.top = `${Math.max(half, Math.min(innerHeight - half, event.clientY))}px`;
         }
         if (entering) {
           // Commit the arrival position without vertical motion before revealing.
@@ -107,9 +96,7 @@ export class ViewerSidebar {
     );
 
     const hideEdgeTab = () => {
-      this.host.querySelector("[data-drawer-open]")?.removeAttribute(
-        "data-revealed",
-      );
+      this.host.querySelector("[data-drawer-open]")?.removeAttribute("data-revealed");
     };
 
     document.documentElement.addEventListener("pointerleave", hideEdgeTab, {
@@ -140,9 +127,7 @@ export class ViewerSidebar {
       drawer.style.width = `${this.sidebarWidth}px`;
     }
     if (main) {
-      main.style.marginLeft = !this.isCollapsed && isDesktop
-        ? `${this.sidebarWidth}px`
-        : "";
+      main.style.marginLeft = !this.isCollapsed && isDesktop ? `${this.sidebarWidth}px` : "";
     }
   }
 
@@ -150,9 +135,7 @@ export class ViewerSidebar {
     this.isCollapsed = collapsed;
     const drawer = this.host.querySelector<HTMLElement>("[data-drawer]")!;
     const main = this.host.querySelector<HTMLElement>("[data-main]")!;
-    const openToggle = this.host.querySelector<HTMLElement>(
-      "[data-drawer-open]",
-    )!;
+    const openToggle = this.host.querySelector<HTMLElement>("[data-drawer-open]")!;
     drawer.hidden = collapsed;
     openToggle.hidden = !collapsed;
     openToggle.removeAttribute("data-revealed");
@@ -165,9 +148,7 @@ export class ViewerSidebar {
     if (focus) {
       this.host
         .querySelector<HTMLElement>(
-          collapsed
-            ? (keyboard ? "[data-drawer-open] button" : "main")
-            : "[data-brand] button",
+          collapsed ? (keyboard ? "[data-drawer-open] button" : "main") : "[data-brand] button",
         )!
         .focus({ preventScroll: true });
     }

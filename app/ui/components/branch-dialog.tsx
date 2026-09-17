@@ -5,9 +5,7 @@ import { createResource, createSignal, Show } from "solid-js";
 
 import { Button, Field, Modal } from "./primitives.tsx";
 
-export function BranchDialog(
-  props: { app: ReturnType<typeof createWorkspace>; entry: Entry },
-) {
+export function BranchDialog(props: { app: ReturnType<typeof createWorkspace>; entry: Entry }) {
   const app = props.app;
   const sessionId = app.sessionId();
   const projectId = app.transport.projectId;
@@ -16,7 +14,7 @@ export function BranchDialog(
       projectId,
       sessionId,
       entryId: props.entry.id,
-    })
+    }),
   );
   const [mode, setMode] = createSignal("standard");
   const [focus, setFocus] = createSignal("");
@@ -60,8 +58,7 @@ export function BranchDialog(
         }}
       >
         <p class="mb-4">
-          Continue from this message. The previous conversation branch remains
-          saved.
+          Continue from this message. The previous conversation branch remains saved.
         </p>
         <Field label="Carry forward">
           <select
@@ -92,12 +89,10 @@ export function BranchDialog(
             onChange={(event) => setRestore(event.currentTarget.checked)}
           />
           <span>
-            Restore workspace files to this message<Show
-              when={!preview.loading && !preview()?.canRestore}
-            >
+            Restore workspace files to this message
+            <Show when={!preview.loading && !preview()?.canRestore}>
               <span class="block text-muted">
-                The snapshot is unavailable. Conversation branching is still
-                available.
+                The snapshot is unavailable. Conversation branching is still available.
               </span>
             </Show>
           </span>
@@ -128,18 +123,14 @@ export function BranchDialog(
           }}
         >
           <p>
-            Reverting to this point will undo all workspace file changes made
-            since this turn. Continue?
+            Reverting to this point will undo all workspace file changes made since this turn.
+            Continue?
           </p>
           <div class="mt-4 flex justify-end gap-3">
             <Button disabled={busy()} onClick={() => setConfirm(false)}>
               Cancel
             </Button>
-            <Button
-              variant="danger"
-              disabled={busy()}
-              onClick={() => void create(true)}
-            >
+            <Button variant="danger" disabled={busy()} onClick={() => void create(true)}>
               Restore files and branch
             </Button>
           </div>

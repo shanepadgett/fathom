@@ -2,19 +2,12 @@ import type { FileDiff } from "../../sdk/git.ts";
 
 import * as monaco from "monaco-editor/editor/editor.api.js";
 
-import { editorLanguage } from "./editor-runtime.ts";
 import { bindEditorLanguage } from "./editor-languages.ts";
+import { editorLanguage } from "./editor-runtime.ts";
 import { editorTheme } from "./editor-theme.ts";
 
-export function mountDiff(
-  element: HTMLElement,
-  document: FileDiff,
-  theme: string,
-  projectId = "",
-) {
-  const language = editorLanguage(
-    document.path.slice(document.path.lastIndexOf(".")),
-  );
+export function mountDiff(element: HTMLElement, document: FileDiff, theme: string, projectId = "") {
+  const language = editorLanguage(document.path.slice(document.path.lastIndexOf(".")));
   const original = monaco.editor.createModel(document.original, language);
   const modified = monaco.editor.createModel(document.modified, language);
   bindEditorLanguage(original, projectId, document.path, language);

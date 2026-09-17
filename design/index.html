@@ -12,16 +12,14 @@
       rel="stylesheet"
     />
     <script>
-    let theme = matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-    try {
-      const saved = localStorage.getItem("fathom-design-theme");
-      if (saved === "light" || saved === "dark") theme = saved;
-    } catch {
-      /* Theme still works without storage. */
-    }
-    document.documentElement.dataset.theme = theme;
+      let theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      try {
+        const saved = localStorage.getItem("fathom-design-theme");
+        if (saved === "light" || saved === "dark") theme = saved;
+      } catch {
+        /* Theme still works without storage. */
+      }
+      document.documentElement.dataset.theme = theme;
     </script>
     <link rel="stylesheet" href="/styles.css" />
     <script type="module" src="/main.ts"></script>

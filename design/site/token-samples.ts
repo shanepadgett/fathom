@@ -15,14 +15,13 @@ function colorRow(name: string, value: string, palette: boolean) {
       const c = parseInt(channel, 16) / 255;
       return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
     });
-  const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 +
-    channels[2] * 0.0722;
+  const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
 
   return html`
     <div
-      class="flex min-h-11 items-center justify-between gap-2 border-0 px-3 py-2 ${palette
-        ? ""
-        : "rounded-sm"}"
+      class="flex min-h-11 items-center justify-between gap-2 border-0 px-3 py-2 ${
+        palette ? "" : "rounded-sm"
+      }"
       style=${styleMap({
         background: `var(${name})`,
         color: luminance > 0.179 ? "#000000" : "#ffffff",
@@ -36,8 +35,7 @@ function colorRow(name: string, value: string, palette: boolean) {
         ${palette ? name.replace("--color-", "") : name}
       </dt>
       <dd class="m-0">
-        <code
-          class="whitespace-nowrap text-right text-base text-inherit">${hex}</code>
+        <code class="whitespace-nowrap text-right text-base text-inherit">${hex}</code>
       </dd>
     </div>
   `;
@@ -53,15 +51,15 @@ function sample(kind: string, name: string) {
   switch (kind) {
     case "motion":
       content = html`
-        <span class="block h-4 w-4 rounded-sm bg-action"
-          data-motion-token=${name}></span>
+        <span class="block h-4 w-4 rounded-sm bg-action" data-motion-token=${name}></span>
       `;
       break;
     case "family":
       styles.fontFamily = variable;
-      content = name === "--font-mono"
-        ? "const session = await agent.run();\n0O 1lI · {} [] => !=="
-        : "A clear view of the work.\nPlan, build, and review with Fathom.";
+      content =
+        name === "--font-mono"
+          ? "const session = await agent.run();\n0O 1lI · {} [] => !=="
+          : "A clear view of the work.\nPlan, build, and review with Fathom.";
       break;
     case "size":
       content = phrase;
@@ -93,9 +91,7 @@ function sample(kind: string, name: string) {
       break;
   }
   return html`
-    <span class=${classes} style=${styleMap(
-      styles,
-    )} aria-hidden="true">${content}</span>
+    <span class=${classes} style=${styleMap(styles)} aria-hidden="true">${content}</span>
   `;
 }
 
@@ -104,18 +100,21 @@ function tokenRow(definition: TokenSection, name: string, value: string) {
   const family = definition.kind === "family";
   return html`
     <div
-      class=${family
-        ? "grid grid-cols-1 items-center gap-2 border-t border-line py-4 md:grid-cols-token-row md:gap-4"
-        : "grid min-h-12 grid-cols-1 items-center gap-2 border-t border-line py-2 md:grid-cols-token-row md:gap-4"}
+      class=${
+        family
+          ? "grid grid-cols-1 items-center gap-2 border-t border-line py-4 md:grid-cols-token-row md:gap-4"
+          : "grid min-h-12 grid-cols-1 items-center gap-2 border-t border-line py-2 md:grid-cols-token-row md:gap-4"
+      }
     >
       <dt class="m-0 wrap-anywhere text-base">${name}</dt>
-      <dd
-        class="m-0 grid min-w-0 grid-cols-1 items-center gap-4 md:grid-cols-token-detail">
+      <dd class="m-0 grid min-w-0 grid-cols-1 items-center gap-4 md:grid-cols-token-detail">
         ${sample(definition.kind, name)}
         <code
-          class=${family
-            ? "max-w-viewer-token-value wrap-anywhere text-right font-sans text-base text-muted md:text-right max-md:text-left"
-            : "max-w-viewer-token-value wrap-anywhere text-right text-base text-muted"}
+          class=${
+            family
+              ? "max-w-viewer-token-value wrap-anywhere text-right font-sans text-base text-muted md:text-right max-md:text-left"
+              : "max-w-viewer-token-value wrap-anywhere text-right text-base text-muted"
+          }
         >
           ${family ? value.split(",")[0].replaceAll('"', "") : value}
         </code>
@@ -124,70 +123,62 @@ function tokenRow(definition: TokenSection, name: string, value: string) {
   `;
 }
 
-export function section(
-  definition: TokenSection,
-  names: string[],
-  styles: CSSStyleDeclaration,
-) {
-  const tokens = definition.tokens ??
+export function section(definition: TokenSection, names: string[], styles: CSSStyleDeclaration) {
+  const tokens =
+    definition.tokens ??
     names.filter(
       (name) =>
         name.startsWith(definition.prefix!) &&
         !(definition.kind === "family" && name.startsWith("--font-weight-")),
     );
   if (!tokens.length) return nothing;
-  const palettes = Map.groupBy(
-    tokens,
-    (name) => name.replace(/^--color-(.+)-\d+$/, "$1"),
-  );
+  const palettes = Map.groupBy(tokens, (name) => name.replace(/^--color-(.+)-\d+$/, "$1"));
 
   return html`
     <section class="mb-8 last:mb-0">
       <header class="mb-4">
-        <h2 class="m-0 text-2xl font-semibold leading-tight tracking-tight">${definition
-          .title}</h2>
-        ${definition.description
-          ? html`<p class="mt-2 text-muted">${definition.description}</p>`
-          : nothing}
+        <h2 class="m-0 text-2xl font-semibold leading-tight tracking-tight">${definition.title}</h2>
+        ${
+          definition.description
+            ? html`<p class="mt-2 text-muted">${definition.description}</p>`
+            : nothing
+        }
       </header>
-      ${definition.kind === "palette"
-        ? html`
-          <div
-            class="grid grid-cols-token-palette gap-2 overflow-x-auto pb-2"
-            tabindex="0"
-            role="region"
-            aria-label="Color scales, scroll horizontally to compare"
-          >
-            ${[...palettes].map(
-              ([family, colors]) =>
-                html`
-                  <div>
-                    <h3 class="mb-2 capitalize text-base font-medium">${family}</h3>
-                    <dl class="m-0 overflow-hidden rounded-md">
-                      ${colors.map((name) =>
-                        colorRow(
-                          name,
-                          styles.getPropertyValue(name).trim(),
-                          true,
-                        )
-                      )}
-                    </dl>
-                  </div>
-                `,
-            )}
-          </div>
-        `
-        : html`
-          <dl
-            class=${definition.kind === "roles"
-              ? "m-0 grid grid-cols-token-roles gap-2"
-              : "m-0"}
-          >
-            ${tokens.map((name) =>
-              tokenRow(definition, name, styles.getPropertyValue(name).trim())
-            )}
-          </dl>
-        `}
+      ${
+        definition.kind === "palette"
+          ? html`
+              <div
+                class="grid grid-cols-token-palette gap-2 overflow-x-auto pb-2"
+                tabindex="0"
+                role="region"
+                aria-label="Color scales, scroll horizontally to compare"
+              >
+                ${[...palettes].map(
+                  ([family, colors]) => html`
+                    <div>
+                      <h3 class="mb-2 capitalize text-base font-medium">${family}</h3>
+                      <dl class="m-0 overflow-hidden rounded-md">
+                        ${colors.map((name) =>
+                          colorRow(name, styles.getPropertyValue(name).trim(), true),
+                        )}
+                      </dl>
+                    </div>
+                  `,
+                )}
+              </div>
+            `
+          : html`
+              <dl
+                class=${
+                  definition.kind === "roles" ? "m-0 grid grid-cols-token-roles gap-2" : "m-0"
+                }
+              >
+                ${tokens.map((name) =>
+                  tokenRow(definition, name, styles.getPropertyValue(name).trim()),
+                )}
+              </dl>
+            `
+      }
     </section>
   `;
 }

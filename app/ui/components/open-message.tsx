@@ -2,9 +2,7 @@ import { createSignal, Show } from "solid-js";
 
 import { Button, Field, Modal } from "./primitives.tsx";
 
-export function OpenMessage(
-  props: { open(link: string): Promise<void>; close(): void },
-) {
+export function OpenMessage(props: { open(link: string): Promise<void>; close(): void }) {
   const [link, setLink] = createSignal("");
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
@@ -25,10 +23,7 @@ export function OpenMessage(
   return (
     <Modal title="Open message link" close={props.close}>
       <form class="space-y-4" onSubmit={(event) => void submit(event)}>
-        <Field
-          label="Message link"
-          hint="Open a message from a project stored on this machine."
-        >
+        <Field label="Message link" hint="Open a message from a project stored on this machine.">
           <input
             autofocus
             required
@@ -39,13 +34,11 @@ export function OpenMessage(
           />
         </Field>
         <Show when={error()}>
-          <p role="alert" class="text-sm text-danger">{error()}</p>
+          <p role="alert" class="text-sm text-danger">
+            {error()}
+          </p>
         </Show>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={busy() || !link().trim()}
-        >
+        <Button type="submit" variant="primary" disabled={busy() || !link().trim()}>
           {busy() ? "Opening…" : "Open message"}
         </Button>
       </form>

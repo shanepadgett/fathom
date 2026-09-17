@@ -9,7 +9,10 @@ export class NativeBrowserHost {
   private readonly children = new Set<bigint>();
   private closing = false;
 
-  constructor(private api: NativeApi, private parent: number) {}
+  constructor(
+    private api: NativeApi,
+    private parent: number,
+  ) {}
 
   async create() {
     if (this.closing) throw new Error("The desktop window is closing");
@@ -22,10 +25,7 @@ export class NativeBrowserHost {
       try {
         await this.dispose(handle);
       } catch (cleanup) {
-        throw new AggregateError(
-          [error, cleanup],
-          "Native browser creation and cleanup failed",
-        );
+        throw new AggregateError([error, cleanup], "Native browser creation and cleanup failed");
       }
       throw error;
     }
@@ -44,13 +44,7 @@ export class NativeBrowserHost {
         ready();
         return this.api.poll(handle, output, length);
       },
-      bounds: (
-        x: number,
-        y: number,
-        width: number,
-        height: number,
-        visible: boolean,
-      ) => {
+      bounds: (x: number, y: number, width: number, height: number, visible: boolean) => {
         ready();
         this.accept(this.api.bounds(handle, x, y, width, height, visible));
       },

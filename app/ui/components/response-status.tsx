@@ -8,9 +8,7 @@ export function ResponseStatus(props: { entry: Entry }) {
     if (message?.role !== "assistant" || props.entry.status === "pending") {
       return;
     }
-    if (
-      props.entry.status === "interrupted" || message.stopReason === "aborted"
-    ) {
+    if (props.entry.status === "interrupted" || message.stopReason === "aborted") {
       return {
         error: false,
         text: "Response interrupted. Partial output is preserved.",
@@ -19,8 +17,7 @@ export function ResponseStatus(props: { entry: Entry }) {
     if (props.entry.status === "error" || message.stopReason === "error") {
       return {
         error: true,
-        text: message.errorMessage ||
-          "The provider could not complete this response.",
+        text: message.errorMessage || "The provider could not complete this response.",
       };
     }
     if (message.stopReason === "length") {
@@ -33,10 +30,7 @@ export function ResponseStatus(props: { entry: Entry }) {
   return (
     <Show when={status()}>
       {(value) => (
-        <p
-          role="status"
-          class={`text-sm ${value().error ? "text-danger" : "text-muted"}`}
-        >
+        <p role="status" class={`text-sm ${value().error ? "text-danger" : "text-muted"}`}>
           {value().text}
         </p>
       )}

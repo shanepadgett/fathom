@@ -45,35 +45,33 @@ export class ContextUsageElement extends DesignElement {
         <span class="whitespace-nowrap">${value}k / ${maximum}k</span>
       </div>
       ${
-      this.open
-        ? html`
-          <div
-            class="context-usage-popover absolute bottom-full right-0 z-20 w-72 rounded-lg border border-line bg-surface p-4 text-dense text-ink shadow-menu"
-            role="region"
-            aria-label="Context breakdown"
-          >
-            <div class="mb-4 flex items-center justify-between gap-4">
-                          <strong class="font-medium">Context breakdown</strong
-                          ><span class="text-muted">${Math.round(
-                            (value / maximum) * 100,
-                          )}% used</span>
-                        </div>
-            <div class="flex flex-col gap-3">
-                          ${segments.map(
-                            (segment) =>
-                              html`<div class="flex items-center gap-2">
-                    <span class="flex-1">${segment.label}</span><span>${segment.value}k</span>
-                  </div>`,
-                          )}
-                        </div>
-            <div class="mt-4 flex justify-between border-t border-line pt-3">
-                          <span class="text-muted">Available</span
-                          ><span>${Math.max(0, maximum - value)}k</span>
-                        </div>
-          </div>
-        `
-        : nothing
-    }
+        this.open
+          ? html`
+              <div
+                class="context-usage-popover absolute bottom-full right-0 z-20 w-72 rounded-lg border border-line bg-surface p-4 text-dense text-ink shadow-menu"
+                role="region"
+                aria-label="Context breakdown"
+              >
+                <div class="mb-4 flex items-center justify-between gap-4">
+                  <strong class="font-medium">Context breakdown</strong
+                  ><span class="text-muted">${Math.round((value / maximum) * 100)}% used</span>
+                </div>
+                <div class="flex flex-col gap-3">
+                  ${segments.map(
+                    (segment) =>
+                      html`<div class="flex items-center gap-2">
+                        <span class="flex-1">${segment.label}</span><span>${segment.value}k</span>
+                      </div>`,
+                  )}
+                </div>
+                <div class="mt-4 flex justify-between border-t border-line pt-3">
+                  <span class="text-muted">Available</span
+                  ><span>${Math.max(0, maximum - value)}k</span>
+                </div>
+              </div>
+            `
+          : nothing
+      }
     </div>`;
   }
 }

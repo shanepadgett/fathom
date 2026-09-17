@@ -4,14 +4,7 @@ import type { EntryMount, ViewMount, ViewSlot } from "../../sdk/frontend.ts";
 import type { Entry } from "../../sdk/session.ts";
 import type { UIHost } from "../host.ts";
 
-import {
-  createSignal,
-  ErrorBoundary,
-  For,
-  onCleanup,
-  onMount,
-  Show,
-} from "solid-js";
+import { createSignal, ErrorBoundary, For, onCleanup, onMount, Show } from "solid-js";
 
 export function PluginView(props: { host: UIHost; mount: ViewMount }) {
   let element!: HTMLDivElement;
@@ -20,9 +13,9 @@ export function PluginView(props: { host: UIHost; mount: ViewMount }) {
     dispose = props.mount(element, props.host);
   });
   onCleanup(() => {
-    Promise.resolve().then(() => dispose?.()).catch((error) =>
-      props.host.toast(`Plugin view cleanup failed: ${String(error)}`)
-    );
+    Promise.resolve()
+      .then(() => dispose?.())
+      .catch((error) => props.host.toast(`Plugin view cleanup failed: ${String(error)}`));
   });
   return <div class="plugin-view" ref={element} />;
 }
@@ -32,18 +25,14 @@ export function PluginSlot(props: { host: UIHost; slot: ViewSlot }) {
   onCleanup(props.host.subscribe(() => setRevision((value) => value + 1)));
   const views = () => {
     revision();
-    return [...props.host.views.values()].filter((view) =>
-      view.slot === props.slot
-    );
+    return [...props.host.views.values()].filter((view) => view.slot === props.slot);
   };
   return (
     <For each={views()}>
       {(view) => (
         <section class="plugin-slot">
           <h3>{view.title}</h3>
-          <ErrorBoundary
-            fallback={<p role="alert">This plugin view could not render.</p>}
-          >
+          <ErrorBoundary fallback={<p role="alert">This plugin view could not render.</p>}>
             <PluginView host={props.host} mount={view.mount} />
           </ErrorBoundary>
         </section>
@@ -52,13 +41,11 @@ export function PluginSlot(props: { host: UIHost; slot: ViewSlot }) {
   );
 }
 
-export function Surface(
-  props: {
-    host: UIHost;
-    name: "shell" | "transcript" | "editor";
-    children: JSX.Element;
-  },
-) {
+export function Surface(props: {
+  host: UIHost;
+  name: "shell" | "transcript" | "editor";
+  children: JSX.Element;
+}) {
   const [revision, setRevision] = createSignal(0);
   onCleanup(props.host.subscribe(() => setRevision((value) => value + 1)));
   const mount = () => {
@@ -74,18 +61,16 @@ export function Surface(
   );
 }
 
-function MountedEntry(
-  props: { host: UIHost; entry: Entry; mount: EntryMount },
-) {
+function MountedEntry(props: { host: UIHost; entry: Entry; mount: EntryMount }) {
   let element!: HTMLDivElement;
   let dispose: (() => void | Promise<void>) | undefined;
   onMount(() => {
     dispose = props.mount(element, props.host, () => props.entry);
   });
   onCleanup(() => {
-    Promise.resolve().then(() => dispose?.()).catch((error) =>
-      props.host.toast(`Entry renderer cleanup failed: ${String(error)}`)
-    );
+    Promise.resolve()
+      .then(() => dispose?.())
+      .catch((error) => props.host.toast(`Entry renderer cleanup failed: ${String(error)}`));
   });
   return <div ref={element} />;
 }
@@ -94,14 +79,14 @@ export function matchingEntryRenderer(host: UIHost, entry: Entry) {
   for (const renderer of host.renderers.values()) {
     try {
       if (renderer.matches(entry)) return renderer;
-    } catch { /* A broken predicate must not hide the conversation. */ }
+    } catch {
+      /* A broken predicate must not hide the conversation. */
+    }
   }
   return undefined;
 }
 
-export function EntryContent(
-  props: { host: UIHost; entry: Entry; children: JSX.Element },
-) {
+export function EntryContent(props: { host: UIHost; entry: Entry; children: JSX.Element }) {
   const [revision, setRevision] = createSignal(0);
   onCleanup(props.host.subscribe(() => setRevision((value) => value + 1)));
   const renderer = () => {
@@ -112,11 +97,7 @@ export function EntryContent(
     <ErrorBoundary fallback={props.children}>
       <Show when={renderer()} fallback={props.children}>
         {(renderer) => (
-          <MountedEntry
-            host={props.host}
-            entry={props.entry}
-            mount={renderer().mount}
-          />
+          <MountedEntry host={props.host} entry={props.entry} mount={renderer().mount} />
         )}
       </Show>
     </ErrorBoundary>

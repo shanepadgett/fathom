@@ -16,24 +16,18 @@ const labels: Record<ResourceKind, string> = {
 };
 
 function size(bytes: number) {
-  const unit = bytes < 1024
-    ? 0
-    : Math.min(4, Math.floor(Math.log(bytes) / Math.log(1024)));
-  return `${
-    (bytes / 1024 ** unit).toLocaleString(undefined, {
-      maximumFractionDigits: unit ? 1 : 0,
-    })
-  } ${["B", "KiB", "MiB", "GiB", "TiB"][unit]}`;
+  const unit = bytes < 1024 ? 0 : Math.min(4, Math.floor(Math.log(bytes) / Math.log(1024)));
+  return `${(bytes / 1024 ** unit).toLocaleString(undefined, {
+    maximumFractionDigits: unit ? 1 : 0,
+  })} ${["B", "KiB", "MiB", "GiB", "TiB"][unit]}`;
 }
 
 export function StorageSettings(props: { transport: Transport }) {
   const projectId = props.transport.projectId;
   const [report, { refetch }] = createResource(() =>
-    props.transport.request<ResourceReport>("resources.scan", { projectId })
+    props.transport.request<ResourceReport>("resources.scan", { projectId }),
   );
-  const [failure, setFailure] = createSignal<
-    { kind: ResourceKind; message: string }
-  >();
+  const [failure, setFailure] = createSignal<{ kind: ResourceKind; message: string }>();
   const [opening, setOpening] = createSignal<ResourceKind>();
   async function open(kind: ResourceKind) {
     if (opening()) return;
@@ -62,7 +56,9 @@ export function StorageSettings(props: { transport: Transport }) {
         </p>
       </Show>
       <Show when={report.loading}>
-        <p role="status" class="text-sm text-muted">Scanning storage…</p>
+        <p role="status" class="text-sm text-muted">
+          Scanning storage…
+        </p>
       </Show>
       <Show when={!report.error && report()}>
         {(value) => (
@@ -83,20 +79,15 @@ export function StorageSettings(props: { transport: Transport }) {
                         max={value().totalBytes}
                         label={`${labels[item.kind]} share of storage`}
                       />
-                      <span class="text-sm text-muted">
-                        {item.files.toLocaleString()} files
-                      </span>
-                      <Button
-                        disabled={!!opening()}
-                        onClick={() => void open(item.kind)}
-                      >
+                      <span class="text-sm text-muted">{item.files.toLocaleString()} files</span>
+                      <Button disabled={!!opening()} onClick={() => void open(item.kind)}>
                         {opening() === item.kind
                           ? "Opening…"
                           : item.kind === "artifacts"
-                          ? "Open artifacts folder"
-                          : item.kind === "other"
-                          ? "Open Fathom folder"
-                          : "Open projects folder"}
+                            ? "Open artifacts folder"
+                            : item.kind === "other"
+                              ? "Open Fathom folder"
+                              : "Open projects folder"}
                       </Button>
                     </dd>
                     <Show when={failure()?.kind === item.kind}>
@@ -110,8 +101,7 @@ export function StorageSettings(props: { transport: Transport }) {
             </dl>
             <Show when={value().partial}>
               <p role="status" class="text-sm text-warning">
-                This scan is incomplete. It reached a scan limit or an
-                unreadable path.
+                This scan is incomplete. It reached a scan limit or an unreadable path.
               </p>
             </Show>
             <Show when={value().skipped}>
@@ -120,9 +110,8 @@ export function StorageSettings(props: { transport: Transport }) {
               </p>
             </Show>
             <p class="text-xs text-muted">
-              File sizes can differ from allocated disk space. Files may change
-              during scanning. Updated{" "}
-              {new Date(value().scannedAt).toLocaleTimeString()}.
+              File sizes can differ from allocated disk space. Files may change during scanning.
+              Updated {new Date(value().scannedAt).toLocaleTimeString()}.
             </p>
           </>
         )}

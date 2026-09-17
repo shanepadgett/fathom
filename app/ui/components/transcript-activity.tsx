@@ -1,4 +1,5 @@
 import type { JSX } from "solid-js";
+
 import type { Entry, ToolExecution } from "../../sdk/session.ts";
 
 import { Show } from "solid-js";
@@ -8,17 +9,14 @@ import { toolSummary } from "./tool-presentation.ts";
 
 export function activityOnly(entry: Entry) {
   const message = entry.message;
-  return message?.role === "assistant" &&
-    !message.content.some((block) =>
-      block.type === "text" && block.text.trim()
-    );
+  return (
+    message?.role === "assistant" &&
+    !message.content.some((block) => block.type === "text" && block.text.trim())
+  );
 }
 
 /** Agent prose is a boundary; model/tool round trips are not. */
-export function transcriptSegments(
-  entries: Entry[],
-  custom: (entry: Entry) => boolean,
-): Entry[][] {
+export function transcriptSegments(entries: Entry[], custom: (entry: Entry) => boolean): Entry[][] {
   const result: Entry[][] = [];
   const append = (entry: Entry) => {
     const previous = result.at(-1);
@@ -29,9 +27,11 @@ export function transcriptSegments(
   for (const entry of entries) {
     const message = entry.message;
     if (
-      message?.role === "assistant" && !custom(entry) && !activityOnly(entry) &&
-      message.content.some((block) =>
-        block.type === "thinking" && !block.redacted && block.thinking.trim()
+      message?.role === "assistant" &&
+      !custom(entry) &&
+      !activityOnly(entry) &&
+      message.content.some(
+        (block) => block.type === "thinking" && !block.redacted && block.thinking.trim(),
       )
     ) {
       append({
@@ -70,9 +70,7 @@ export function TranscriptActivity(props: {
         inset
         label={
           <span classList={{ "tool-execution-working": running() }}>
-            {props.executions.length
-              ? toolSummary(props.executions)
-              : "Thinking"}
+            {props.executions.length ? toolSummary(props.executions) : "Thinking"}
           </span>
         }
       >

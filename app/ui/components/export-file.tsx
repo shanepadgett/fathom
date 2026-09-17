@@ -2,9 +2,11 @@ import { createSignal, Show } from "solid-js";
 
 import { Button, Field, Modal } from "./primitives.tsx";
 
-export function ExportFile(
-  props: { name: string; save(path: string): Promise<void>; close(): void },
-) {
+export function ExportFile(props: {
+  name: string;
+  save(path: string): Promise<void>;
+  close(): void;
+}) {
   const [path, setPath] = createSignal(props.name);
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
@@ -38,13 +40,11 @@ export function ExportFile(
           />
         </Field>
         <Show when={error()}>
-          <p role="alert" class="text-sm text-danger">{error()}</p>
+          <p role="alert" class="text-sm text-danger">
+            {error()}
+          </p>
         </Show>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={busy() || !path().trim()}
-        >
+        <Button type="submit" variant="primary" disabled={busy() || !path().trim()}>
           {busy() ? "Saving…" : "Save"}
         </Button>
       </form>

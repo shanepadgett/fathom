@@ -1,7 +1,7 @@
 import { dirname, join, relative } from "node:path";
 
-import { Type } from "typebox";
 import { load } from "npm:js-yaml@4.1.0";
+import { Type } from "typebox";
 
 import { definePlugin } from "../sdk/mod.ts";
 import { runProcess } from "./tools/process.ts";
@@ -48,20 +48,17 @@ export function skillsPlugin(home: string) {
         const roots = [
           join(home, "skills"),
           ...(workspace.trusted()
-            ? [
-              join(workspace.root, ".fathom/skills"),
-              join(workspace.root, ".agents/skills"),
-            ]
+            ? [join(workspace.root, ".fathom/skills"), join(workspace.root, ".agents/skills")]
             : []),
         ];
         const skills = new Map<string, Skill>();
         const disposers: (() => void)[] = [];
         for (const root of roots) {
-          if (!await exists(root)) continue;
+          if (!(await exists(root))) continue;
           for await (const entry of Deno.readDir(root)) {
             if (!entry.isDirectory) continue;
             const path = join(root, entry.name, "SKILL.md");
-            if (!await exists(path)) continue;
+            if (!(await exists(path))) continue;
             const { metadata, body } = parse(await Deno.readTextFile(path));
             const name = String(metadata.name ?? entry.name);
             if (!/^[a-zA-Z0-9_-]+$/.test(name)) continue;
@@ -92,64 +89,49 @@ export function skillsPlugin(home: string) {
                   const available = new Set(
                     tools.list(input.sessionId, true).map((tool) => tool.name),
                   );
-                  if (
-                    skill.requiresTools.some((tool) => !available.has(tool))
-                  ) {
-                    throw new Error(
-                      "This skill requires tools disabled by the session policy",
-                    );
+                  if (skill.requiresTools.some((tool) => !available.has(tool))) {
+                    throw new Error("This skill requires tools disabled by the session policy");
                   }
-                  return `Skill ${skill.name}\nSource: ${skill.path}\nResolve references and scripts relative to ${
-                    dirname(skill.path)
-                  }.\n\n${skill.body}`;
+                  return `Skill ${skill.name}\nSource: ${skill.path}\nResolve references and scripts relative to ${dirname(
+                    skill.path,
+                  )}.\n\n${skill.body}`;
                 },
               }),
             );
           }
         }
         disposers.push(
-          rpc.register(
-            "skills.list",
-            () =>
-              [...skills.values()].map(({ body: _body, ...skill }) => skill),
+          rpc.register("skills.list", () =>
+            [...skills.values()].map(({ body: _body, ...skill }) => skill),
           ),
         );
         disposers.push(
           context.registerPromptSection(
             "skills",
-            [...skills.values()].filter((skill) => skill.agentInvocable).map(
-              (skill) =>
-                `${skill.name}: ${skill.description} (discover with search_tools)`,
-            ).join("\n"),
+            [...skills.values()]
+              .filter((skill) => skill.agentInvocable)
+              .map((skill) => `${skill.name}: ${skill.description} (discover with search_tools)`)
+              .join("\n"),
           ),
         );
         disposers.push(
-          context.registerProjector(
-            "directory-rules",
-            (data) => ({
-              role: "user",
-              content: `Instructions for the current directory:\n${
-                String(data)
-              }`,
-              timestamp: 0,
-            }),
-          ),
+          context.registerProjector("directory-rules", (data) => ({
+            role: "user",
+            content: `Instructions for the current directory:\n${String(data)}`,
+            timestamp: 0,
+          })),
         );
         const injected = new Map<string, Set<string>>();
         ctx.cordis.on("tool:before", async (input) => {
-          if (
-            !workspace.trusted() ||
-            !["read", "write", "edit"].includes(input.name)
-          ) return;
+          if (!workspace.trusted() || !["read", "write", "edit"].includes(input.name)) return;
           const path = await workspace.resolve(String(input.args.path), true);
-          const segments = relative(workspace.root, dirname(path)).split("/")
-            .filter(Boolean);
+          const segments = relative(workspace.root, dirname(path)).split("/").filter(Boolean);
           const seen = injected.get(input.sessionId) ?? new Set<string>();
           let current = workspace.root;
           for (const segment of segments) {
             current = join(current, segment);
             const rules = join(current, "AGENTS.md");
-            if (seen.has(rules) || !await exists(rules)) continue;
+            if (seen.has(rules) || !(await exists(rules))) continue;
             const text = await Deno.readTextFile(rules);
             if (text.length < 64_000) {
               storage.append(input.sessionId, {
@@ -168,21 +150,17 @@ export function skillsPlugin(home: string) {
           const [, name, args = ""] = match;
           const skill = skills.get(name);
           if (skill?.userInvocable) {
-            input.text =
-              `Use the ${name} skill.\n${skill.body}\n\nUser request: ${args}`;
+            input.text = `Use the ${name} skill.\n${skill.body}\n\nUser request: ${args}`;
             return;
           }
           const promptRoots = [
             join(home, "prompts"),
-            ...(workspace.trusted()
-              ? [join(workspace.root, ".fathom/prompts")]
-              : []),
+            ...(workspace.trusted() ? [join(workspace.root, ".fathom/prompts")] : []),
           ];
           let body: string | undefined;
           for (const root of promptRoots) {
             if (await exists(join(root, `${name}.md`))) {
-              body =
-                parse(await Deno.readTextFile(join(root, `${name}.md`))).body;
+              body = parse(await Deno.readTextFile(join(root, `${name}.md`))).body;
             }
           }
           if (body === undefined) return;

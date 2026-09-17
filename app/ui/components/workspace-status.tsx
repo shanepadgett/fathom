@@ -3,36 +3,40 @@ import type { createWorkspace } from "../state/workspace.ts";
 
 import { createSignal, Show } from "solid-js";
 
-import { PluginSlot } from "./plugin-slot.tsx";
 import { occludeNativeSurfaces } from "../state/native-surfaces.ts";
+import { PluginSlot } from "./plugin-slot.tsx";
 
-export function WorkspaceStatus(
-  props: { app: ReturnType<typeof createWorkspace> },
-) {
+export function WorkspaceStatus(props: { app: ReturnType<typeof createWorkspace> }) {
   const app = props.app;
   const [usageOpen, setUsageOpen] = createSignal(false);
   const running = () =>
-    app.sessions().filter((session) =>
-      ["running", "retry_waiting", "approval"].includes(session.status)
-    ).length;
+    app
+      .sessions()
+      .filter((session) => ["running", "retry_waiting", "approval"].includes(session.status))
+      .length;
   const maximum = () =>
-    app.models().find((model) =>
-      model.provider === app.state()?.session.provider &&
-      model.id === app.state()?.session.model
-    )?.contextWindow ?? 0;
+    app
+      .models()
+      .find(
+        (model) =>
+          model.provider === app.state()?.session.provider &&
+          model.id === app.state()?.session.model,
+      )?.contextWindow ?? 0;
   const latest = () =>
-    app.currentUsage().filter((record) =>
-      record.provider === app.state()?.session.provider &&
-      record.model === app.state()?.session.model
-    ).reduce<UsageRecord | undefined>(
-      (last, record) =>
-        !last || record.createdAt > last.createdAt ? record : last,
-      undefined,
-    );
+    app
+      .currentUsage()
+      .filter(
+        (record) =>
+          record.provider === app.state()?.session.provider &&
+          record.model === app.state()?.session.model,
+      )
+      .reduce<UsageRecord | undefined>(
+        (last, record) => (!last || record.createdAt > last.createdAt ? record : last),
+        undefined,
+      );
   const usage = () => latest()?.usage;
   const input = () =>
-    (usage()?.input ?? 0) + (usage()?.cacheRead ?? 0) +
-    (usage()?.cacheWrite ?? 0);
+    (usage()?.input ?? 0) + (usage()?.cacheRead ?? 0) + (usage()?.cacheWrite ?? 0);
   const value = () => input() + (usage()?.output ?? 0);
   const format = (tokens: number) => `${(tokens / 1000).toFixed(1)}k`;
   occludeNativeSurfaces(() => usageOpen() && maximum() > 0);
@@ -44,19 +48,15 @@ export function WorkspaceStatus(
       <span class="flex items-center gap-2" role="status">
         <span
           class={`h-2 w-2 shrink-0 rounded-full ${
-            !app.connected()
-              ? "bg-warning"
-              : running()
-              ? "bg-success"
-              : "bg-muted"
+            !app.connected() ? "bg-warning" : running() ? "bg-success" : "bg-muted"
           }`}
           aria-hidden="true"
         />
         {!app.connected()
           ? "Reconnecting…"
           : running()
-          ? `${running()} ${running() === 1 ? "agent" : "agents"} running`
-          : "All quiet"}
+            ? `${running()} ${running() === 1 ? "agent" : "agents"} running`
+            : "All quiet"}
       </span>
       <PluginSlot host={app.uiHost} slot="status" />
       <Show when={!app.project()?.trusted}>
@@ -64,18 +64,12 @@ export function WorkspaceStatus(
           Restricted mode
         </button>
       </Show>
-      <Show
-        when={maximum() > 0}
-        fallback={<span class="text-muted">Context unavailable</span>}
-      >
+      <Show when={maximum() > 0} fallback={<span class="text-muted">Context unavailable</span>}>
         <details
           class="context-usage relative ml-auto"
           onToggle={(event) => setUsageOpen(event.currentTarget.open)}
         >
-          <summary
-            class="flex items-center gap-3 py-2"
-            aria-label="Show context usage"
-          >
+          <summary class="flex items-center gap-3 py-2" aria-label="Show context usage">
             <span
               class="relative h-3 w-32 rounded-sm bg-line"
               role="meter"
@@ -88,7 +82,7 @@ export function WorkspaceStatus(
               <span
                 class="block h-full rounded-sm bg-action"
                 style={{
-                  width: `${Math.min(100, value() / maximum() * 100)}%`,
+                  width: `${Math.min(100, (value() / maximum()) * 100)}%`,
                 }}
               />
               <span
@@ -107,9 +101,7 @@ export function WorkspaceStatus(
           >
             <div class="mb-4 flex items-center justify-between gap-4">
               <strong class="font-medium">Context breakdown</strong>
-              <span class="text-muted">
-                {Math.round(value() / maximum() * 100)}% used
-              </span>
+              <span class="text-muted">{Math.round((value() / maximum()) * 100)}% used</span>
             </div>
             <p class="mb-3 text-sm text-muted">
               {latest()

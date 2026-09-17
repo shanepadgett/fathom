@@ -35,17 +35,17 @@ export function editorText(value: unknown): string {
   return value;
 }
 
-export function editorPosition(
-  value: unknown,
-  text: string,
-): CompletionPosition {
+export function editorPosition(value: unknown, text: string): CompletionPosition {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error("Invalid completion position");
   }
   const { line, character } = value as Record<string, unknown>;
   if (
-    typeof line !== "number" || !Number.isSafeInteger(line) || line < 0 ||
-    typeof character !== "number" || !Number.isSafeInteger(character) ||
+    typeof line !== "number" ||
+    !Number.isSafeInteger(line) ||
+    line < 0 ||
+    typeof character !== "number" ||
+    !Number.isSafeInteger(character) ||
     character < 0
   ) {
     throw new Error("Invalid completion position");
@@ -73,9 +73,7 @@ export async function readEditorText(path: string): Promise<string> {
     }
     // Small files need only a small buffer. Streaming decode preserves UTF-8
     // characters split between chunks without retaining copies of every byte.
-    const bytes = new Uint8Array(
-      Math.min(READ_CHUNK_BYTES, Math.max(1024, info.size + 1)),
-    );
+    const bytes = new Uint8Array(Math.min(READ_CHUNK_BYTES, Math.max(1024, info.size + 1)));
     const decoder = new TextDecoder();
     const parts: string[] = [];
     let size = 0;

@@ -1,9 +1,14 @@
 @layer components {
   .streaming-response-chunk {
-    animation: streaming-response-reveal var(--motion-duration-stream-preview)
-      infinite;
-    animation-timing-function: linear(0 0%, 0 var(--word-reveal), 1
-      calc(var(--word-reveal) + 5%), 1 80%, 0 92%, 0 100%);
+    animation: streaming-response-reveal var(--motion-duration-stream-preview) infinite;
+    animation-timing-function: linear(
+      0 0%,
+      0 var(--word-reveal),
+      1 calc(var(--word-reveal) + 5%),
+      1 80%,
+      0 92%,
+      0 100%
+    );
   }
 
   @keyframes streaming-response-reveal {

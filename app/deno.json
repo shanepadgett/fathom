@@ -31,11 +31,7 @@
     "@phosphor-icons/web": "npm:@phosphor-icons/web@2.1.2"
   },
   "compilerOptions": {
-    "lib": [
-      "deno.window",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["deno.window", "dom", "dom.iterable"],
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "solid-js"
@@ -47,10 +43,6 @@
     },
     "backend": "cef"
   },
-  "exclude": [
-    "dist",
-    "public",
-    "node_modules"
-  ],
+  "exclude": ["dist", "public", "node_modules"],
   "nodeModulesDir": "auto"
 }

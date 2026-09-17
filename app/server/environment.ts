@@ -1,42 +1,42 @@
-import type { AppEvent, FathomPlugin, Project } from "../sdk/mod.ts";
 import type { BrowserFactory } from "../plugins/browser/connection.ts";
+import type { AppEvent, FathomPlugin, Project } from "../sdk/mod.ts";
 
 import { join } from "node:path";
 
 import { discover } from "../kernel/discovery.ts";
+import { compileFrontend } from "../kernel/frontend.ts";
+import { orderPlugins, PluginHost } from "../kernel/host.ts";
 import { createPluginCache, prunePluginCache } from "../kernel/plugin-cache.ts";
 import { watchPlugins } from "../kernel/plugin-watcher.ts";
-import { orderPlugins, PluginHost } from "../kernel/host.ts";
-import { compileFrontend } from "../kernel/frontend.ts";
-import { feedback, feedbackIntegration } from "../plugins/feedback.ts";
+import approvals from "../plugins/approvals.ts";
 import { artifactIntegration } from "../plugins/artifact-integration.ts";
 import { artifactsPlugin } from "../plugins/artifacts.ts";
-import { media } from "../plugins/media.ts";
-import { mediaContext } from "../plugins/media-context.ts";
-import git from "../plugins/git.ts";
-import { browserPlugin } from "../plugins/browser/index.ts";
-import delegation from "../plugins/delegation.ts";
-import { skillsPlugin } from "../plugins/skills.ts";
-import compaction from "../plugins/compaction.ts";
-import approvals from "../plugins/approvals.ts";
 import branches from "../plugins/branches.ts";
-import editor from "../plugins/editor/index.ts";
-import diagnosticReview from "../plugins/diagnostic-review.ts";
-import terminal from "../plugins/terminal.ts";
-import devServers from "../plugins/dev-servers.ts";
-import mcp from "../plugins/mcp.ts";
-import rpc from "../plugins/rpc.ts";
-import snapshots from "../plugins/snapshots.ts";
+import { browserPlugin } from "../plugins/browser/index.ts";
+import compaction from "../plugins/compaction.ts";
 import { contextPlugin } from "../plugins/context.ts";
-import { providersPlugin } from "../plugins/providers/index.ts";
+import delegation from "../plugins/delegation.ts";
+import devServers from "../plugins/dev-servers.ts";
+import diagnosticReview from "../plugins/diagnostic-review.ts";
+import editor from "../plugins/editor/index.ts";
+import { feedback, feedbackIntegration } from "../plugins/feedback.ts";
+import git from "../plugins/git.ts";
+import mcp from "../plugins/mcp.ts";
+import { mediaContext } from "../plugins/media-context.ts";
+import { media } from "../plugins/media.ts";
 import { imagesPlugin } from "../plugins/providers/images.ts";
-import { nativeImages } from "../plugins/providers/native-images.ts";
+import { providersPlugin } from "../plugins/providers/index.ts";
 import { LoginManager } from "../plugins/providers/login.ts";
-import runtime from "../plugins/runtime/index.ts";
-import storage from "../plugins/storage/index.ts";
+import { nativeImages } from "../plugins/providers/native-images.ts";
 import { resourcesPlugin } from "../plugins/resources.ts";
-import files from "../plugins/tools/files.ts";
+import rpc from "../plugins/rpc.ts";
+import runtime from "../plugins/runtime/index.ts";
+import { skillsPlugin } from "../plugins/skills.ts";
+import snapshots from "../plugins/snapshots.ts";
+import storage from "../plugins/storage/index.ts";
+import terminal from "../plugins/terminal.ts";
 import commands from "../plugins/tools/commands.ts";
+import files from "../plugins/tools/files.ts";
 import registry from "../plugins/tools/registry.ts";
 import { workspacePlugin } from "../plugins/workspace.ts";
 import { definePlugin } from "../sdk/mod.ts";
@@ -71,19 +71,12 @@ export class Environment {
   ) {}
 
   async initialize() {
-    await prunePluginCache(
-      join(this.home, "cache", "plugins", this.project.id),
-    );
+    await prunePluginCache(join(this.home, "cache", "plugins", this.project.id));
     await this.activate(await this.prepare());
   }
 
   private async prepare(): Promise<PreparedEnvironment> {
-    const directory = await createPluginCache(join(
-      this.home,
-      "cache",
-      "plugins",
-      this.project.id,
-    ));
+    const directory = await createPluginCache(join(this.home, "cache", "plugins", this.project.id));
     this.cacheDirectories.add(directory);
     try {
       return await this.prepareIn(directory);
@@ -139,7 +132,7 @@ export class Environment {
       this.home,
       this.project.path,
       this.project.trusted,
-      this.generation = ++environmentGeneration,
+      (this.generation = ++environmentGeneration),
       join(directory, "backend"),
     );
     const builtin = [
@@ -178,16 +171,10 @@ export class Environment {
     ];
     const assets = extensions.assets;
     const plugins = orderPlugins(
-      [...builtin, ...extensions.plugins].filter((plugin) =>
-        !extensions.disables.has(plugin.id)
-      ),
+      [...builtin, ...extensions.plugins].filter((plugin) => !extensions.disables.has(plugin.id)),
     );
     for (const [id, entry] of assets) {
-      const frontendDirectory = join(
-        directory,
-        "frontend",
-        encodeURIComponent(id),
-      );
+      const frontendDirectory = join(directory, "frontend", encodeURIComponent(id));
       assets.set(id, await compileFrontend(entry, frontendDirectory));
     }
     return { directory, plugins, assets, watch: extensions.watch };
@@ -196,9 +183,8 @@ export class Environment {
   private async activate(prepared: PreparedEnvironment) {
     this.host = new PluginHost();
     await this.host.mount(prepared.plugins);
-    this.login = new LoginManager(
-      this.host.get("model").models,
-      () => this.publish({ type: "providers", projectId: this.project.id }),
+    this.login = new LoginManager(this.host.get("model").models, () =>
+      this.publish({ type: "providers", projectId: this.project.id }),
     );
     this.host.context.on("session:idle", () => {
       if (this.pendingReload) this.notifyReload();
@@ -209,13 +195,14 @@ export class Environment {
         clearTimeout(this.watchTimer);
         this.watchTimer = setTimeout(() => {
           const runtime = this.host.get("runtime");
-          const running = this.host.get("storage").listSessions().some((
-            session,
-          ) =>
-            ["running", "retry_waiting", "approval"].includes(
-              runtime.state(session.id).session.status,
-            )
-          );
+          const running = this.host
+            .get("storage")
+            .listSessions()
+            .some((session) =>
+              ["running", "retry_waiting", "approval"].includes(
+                runtime.state(session.id).session.status,
+              ),
+            );
           if (running) this.pendingReload = true;
           else this.notifyReload();
         }, 250);
@@ -253,9 +240,10 @@ export class Environment {
     const previous = this.prepared!;
     const runtime = this.host.get("runtime");
     await Promise.all(
-      this.host.get("storage").listSessions().map((session) =>
-        runtime.whenIdle(session.id)
-      ),
+      this.host
+        .get("storage")
+        .listSessions()
+        .map((session) => runtime.whenIdle(session.id)),
     );
     try {
       await this.stopHost();
@@ -285,11 +273,7 @@ export class Environment {
 
   async dispose() {
     await this.stopHost();
-    await Promise.all(
-      [...this.cacheDirectories].map((directory) =>
-        this.removeCache(directory)
-      ),
-    );
+    await Promise.all([...this.cacheDirectories].map((directory) => this.removeCache(directory)));
   }
 
   private async stopHost() {

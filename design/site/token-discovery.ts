@@ -4,10 +4,7 @@ export function tokenNames() {
     for (const rule of rules) {
       if (rule instanceof CSSStyleRule && rule.selectorText.includes(":root")) {
         for (const name of rule.style) {
-          if (
-            name.startsWith("--") && !name.startsWith("--tw-") &&
-            !name.includes("-viewer-")
-          ) {
+          if (name.startsWith("--") && !name.startsWith("--tw-") && !name.includes("-viewer-")) {
             names.add(name);
           }
         }

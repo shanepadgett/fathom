@@ -9,8 +9,7 @@ import { Type } from "typebox";
 import { atomicWrite } from "../../kernel/files.ts";
 import { definePlugin } from "../../sdk/mod.ts";
 
-const alphabet =
-  "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 function version(text: string) {
   return createHash("sha256").update(text).digest("hex");
@@ -27,14 +26,14 @@ function anchors(text: string) {
   const checksum = version(text);
   return lines.map((line, index) => {
     let value =
-      createHash("sha256").update(`${checksum}:${index}`).digest().readUInt32BE(
-        0,
-      ) % 238328;
+      createHash("sha256").update(`${checksum}:${index}`).digest().readUInt32BE(0) % 238328;
     while (used.has(value)) value = (value + 1) % 238328;
     used.add(value);
     return {
-      hash: alphabet[Math.floor(value / 3844)] +
-        alphabet[Math.floor(value / 62) % 62] + alphabet[value % 62],
+      hash:
+        alphabet[Math.floor(value / 3844)] +
+        alphabet[Math.floor(value / 62) % 62] +
+        alphabet[value % 62],
       line,
     };
   });
@@ -50,12 +49,7 @@ export default definePlugin({
         workspace = ctx.get("workspace"),
         events = ctx.get("events");
       const reads = new Map<string, string>();
-      const emit = (
-        path: string,
-        context: ToolContext,
-        changed: boolean,
-        range?: FileRange,
-      ) =>
+      const emit = (path: string, context: ToolContext, changed: boolean, range?: FileRange) =>
         events.publish({
           type: "file",
           sessionId: context.sessionId,
@@ -75,9 +69,7 @@ export default definePlugin({
           async execute(args, context) {
             const path = await workspace.resolve(String(args.path));
             if ((await Deno.stat(path)).size > 8_000_000) {
-              throw new Error(
-                "File exceeds 8 MB; use a bounded command to inspect it",
-              );
+              throw new Error("File exceeds 8 MB; use a bounded command to inspect it");
             }
             const text = await Deno.readTextFile(path);
             if (text.includes("\0")) {
@@ -92,11 +84,15 @@ export default definePlugin({
               startLine: offset + 1,
               endLine: Math.max(offset + 1, offset + selected.length),
             });
-            return selected.map(({ hash, line }) => `${hash}| ${line}`).join(
-              "\n",
-            ).slice(0, 100_000) + (offset + limit < lines.length
-              ? `\n[More lines: read offset=${offset + limit + 1}]`
-              : "");
+            return (
+              selected
+                .map(({ hash, line }) => `${hash}| ${line}`)
+                .join("\n")
+                .slice(0, 100_000) +
+              (offset + limit < lines.length
+                ? `\n[More lines: read offset=${offset + limit + 1}]`
+                : "")
+            );
           },
         }),
         registry.register({
@@ -113,9 +109,7 @@ export default definePlugin({
             try {
               const text = await Deno.readTextFile(path);
               if (reads.get(`${context.sessionId}:${path}`) !== version(text)) {
-                throw new Error(
-                  "File changed or has not been read; read it before overwriting",
-                );
+                throw new Error("File changed or has not been read; read it before overwriting");
               }
               mode = (await stat(path)).mode & 0o777;
             } catch (error) {
@@ -123,10 +117,7 @@ export default definePlugin({
             }
             context.signal.throwIfAborted();
             await atomicWrite(path, String(args.content), mode);
-            reads.set(
-              `${context.sessionId}:${path}`,
-              version(String(args.content)),
-            );
+            reads.set(`${context.sessionId}:${path}`, version(String(args.content)));
             emit(String(args.path), context, true, {
               startLine: 1,
               endLine: Math.max(1, String(args.content).split("\n").length),
@@ -157,34 +148,28 @@ export default definePlugin({
               throw new Error("File changed since last read; read it again");
             }
             const lines = anchors(text);
-            const start = lines.findIndex((line) =>
-                line.hash === args.start_hash
-              ),
-              end = args.end_hash
-                ? lines.findIndex((line) => line.hash === args.end_hash)
-                : start;
+            const start = lines.findIndex((line) => line.hash === args.start_hash),
+              end = args.end_hash ? lines.findIndex((line) => line.hash === args.end_hash) : start;
             if (start < 0 || end < start) {
               throw new Error("Invalid or stale anchors");
             }
             const values = lines.map((line) => line.line);
-            const added = args.content === undefined || args.content === ""
-              ? []
-              : String(args.content).split("\n");
+            const added =
+              args.content === undefined || args.content === ""
+                ? []
+                : String(args.content).split("\n");
             if (args.operation === "insert_before") {
               values.splice(start, 0, ...added);
             } else if (args.operation === "insert_after") {
               values.splice(start + 1, 0, ...added);
-            } else {values.splice(
-                start,
-                end - start + 1,
-                ...(args.operation === "delete" ? [] : added),
-              );}
+            } else {
+              values.splice(start, end - start + 1, ...(args.operation === "delete" ? [] : added));
+            }
             context.signal.throwIfAborted();
             const next = values.join("\n");
             await atomicWrite(path, next, (await stat(path)).mode & 0o777);
             reads.set(`${context.sessionId}:${path}`, version(next));
-            const firstLine = start +
-              (args.operation === "insert_after" ? 2 : 1);
+            const firstLine = start + (args.operation === "insert_after" ? 2 : 1);
             emit(String(args.path), context, true, {
               startLine: firstLine,
               endLine: firstLine + Math.max(0, added.length - 1),

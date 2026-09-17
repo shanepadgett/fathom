@@ -34,11 +34,7 @@ const emptyCompletion = (): CompletionResult => ({
   items: [],
 });
 
-async function bounded<T>(
-  work: Promise<T>,
-  milliseconds: number,
-  message: string,
-): Promise<T> {
+async function bounded<T>(work: Promise<T>, milliseconds: number, message: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
@@ -55,19 +51,27 @@ async function bounded<T>(
 function isPosition(value: unknown): value is CompletionPosition {
   if (!value || typeof value !== "object") return false;
   const position = value as CompletionPosition;
-  return Number.isSafeInteger(position.line) && position.line >= 0 &&
-    Number.isSafeInteger(position.character) && position.character >= 0;
+  return (
+    Number.isSafeInteger(position.line) &&
+    position.line >= 0 &&
+    Number.isSafeInteger(position.character) &&
+    position.character >= 0
+  );
 }
 
 function isDiagnostic(value: unknown): value is Diagnostic {
   if (!value || typeof value !== "object") return false;
   const item = value as Diagnostic;
-  return typeof item.message === "string" && !!item.range &&
-    isPosition(item.range.start) && isPosition(item.range.end) &&
+  return (
+    typeof item.message === "string" &&
+    !!item.range &&
+    isPosition(item.range.start) &&
+    isPosition(item.range.end) &&
     (item.range.end.line > item.range.start.line ||
       (item.range.end.line === item.range.start.line &&
         item.range.end.character >= item.range.start.character)) &&
-    (item.severity === undefined || [1, 2, 3, 4].includes(item.severity));
+    (item.severity === undefined || [1, 2, 3, 4].includes(item.severity))
+  );
 }
 
 /** One stdio transport per registration; the gateway owns document routing. */
@@ -126,55 +130,53 @@ export class LanguageServer {
         this.fail(new Error("Language server connection closed"));
       }
     });
-    this.rpc.onNotification("textDocument/publishDiagnostics", (
-      params: {
-        uri?: unknown;
-        version?: unknown;
-        diagnostics?: unknown;
-      } | null,
-    ) => {
-      if (this.disposed || typeof params?.uri !== "string") return;
-      const document = this.documents.get(params.uri);
-      // Never accept another server's documents, external URIs, or old versions.
-      if (
-        !document ||
-        (params.version !== undefined && params.version !== document.version)
-      ) return;
-      if (!Array.isArray(params.diagnostics)) return;
-      this.diagnostics.set(
-        params.uri,
-        params.diagnostics.filter(isDiagnostic).map((diagnostic) => ({
-          ...diagnostic,
-          // LSP leaves omitted severity to the client. Match Monaco's existing
-          // error default for status counts and agent review as well.
-          severity: diagnostic.severity ?? 1,
-        })),
-      );
-      this.changed(params.uri);
-      this.statusChanged();
-    });
-    // Only advertise capabilities implemented here. Unknown requests retain the
-    // JSON-RPC library's MethodNotFound response (no silent, hanging requests).
-    this.rpc.onRequest(
-      "workspace/configuration",
-      (params: { items?: { section?: string }[] }) => {
-        return (params?.items ?? []).map(({ section }) => {
-          let value: unknown = registration.initializationOptions ?? null;
-          if (!section || section === registration.id) return value;
-          for (const key of section.split(".")) {
-            if (
-              !value || typeof value !== "object" || !Object.hasOwn(value, key)
-            ) return null;
-            value = (value as Record<string, unknown>)[key];
-          }
-          return value;
-        });
+    this.rpc.onNotification(
+      "textDocument/publishDiagnostics",
+      (
+        params: {
+          uri?: unknown;
+          version?: unknown;
+          diagnostics?: unknown;
+        } | null,
+      ) => {
+        if (this.disposed || typeof params?.uri !== "string") return;
+        const document = this.documents.get(params.uri);
+        // Never accept another server's documents, external URIs, or old versions.
+        if (!document || (params.version !== undefined && params.version !== document.version))
+          return;
+        if (!Array.isArray(params.diagnostics)) return;
+        this.diagnostics.set(
+          params.uri,
+          params.diagnostics.filter(isDiagnostic).map((diagnostic) => ({
+            ...diagnostic,
+            // LSP leaves omitted severity to the client. Match Monaco's existing
+            // error default for status counts and agent review as well.
+            severity: diagnostic.severity ?? 1,
+          })),
+        );
+        this.changed(params.uri);
+        this.statusChanged();
       },
     );
-    this.rpc.onRequest("workspace/workspaceFolders", () => [{
-      uri: pathToFileURL(root + "/").href,
-      name: root.split(/[\\/]/).filter(Boolean).pop() ?? root,
-    }]);
+    // Only advertise capabilities implemented here. Unknown requests retain the
+    // JSON-RPC library's MethodNotFound response (no silent, hanging requests).
+    this.rpc.onRequest("workspace/configuration", (params: { items?: { section?: string }[] }) => {
+      return (params?.items ?? []).map(({ section }) => {
+        let value: unknown = registration.initializationOptions ?? null;
+        if (!section || section === registration.id) return value;
+        for (const key of section.split(".")) {
+          if (!value || typeof value !== "object" || !Object.hasOwn(value, key)) return null;
+          value = (value as Record<string, unknown>)[key];
+        }
+        return value;
+      });
+    });
+    this.rpc.onRequest("workspace/workspaceFolders", () => [
+      {
+        uri: pathToFileURL(root + "/").href,
+        name: root.split(/[\\/]/).filter(Boolean).pop() ?? root,
+      },
+    ]);
     this.rpc.listen();
   }
 
@@ -190,40 +192,34 @@ export class LanguageServer {
     try {
       // Missing executables emit error without spawn. Do not enqueue JSON-RPC
       // writes against the already-destroyed stdin of a failed child.
-      if (!await this.spawned || this.disposed) return;
+      if (!(await this.spawned) || this.disposed) return;
       await bounded(
         (async () => {
-          const result = await this.rpc.sendRequest<InitializeResult>(
-            "initialize",
-            {
-              processId: process.pid,
-              rootUri: pathToFileURL(root + "/").href,
-              capabilities: {
-                workspace: { configuration: true, workspaceFolders: true },
-                textDocument: {
-                  publishDiagnostics: { versionSupport: true },
-                  completion: {
-                    completionItem: {
-                      snippetSupport: true,
-                      documentationFormat: ["markdown", "plaintext"],
-                      insertReplaceSupport: true,
-                    },
+          const result = await this.rpc.sendRequest<InitializeResult>("initialize", {
+            processId: process.pid,
+            rootUri: pathToFileURL(root + "/").href,
+            capabilities: {
+              workspace: { configuration: true, workspaceFolders: true },
+              textDocument: {
+                publishDiagnostics: { versionSupport: true },
+                completion: {
+                  completionItem: {
+                    snippetSupport: true,
+                    documentationFormat: ["markdown", "plaintext"],
+                    insertReplaceSupport: true,
                   },
                 },
               },
-              initializationOptions: this.registration.initializationOptions ??
-                null,
             },
-          );
+            initializationOptions: this.registration.initializationOptions ?? null,
+          });
           if (this.disposed) return;
           const completion = result?.capabilities?.completionProvider;
-          this.supportsCompletion = !!completion &&
-            typeof completion === "object" && !Array.isArray(completion);
+          this.supportsCompletion =
+            !!completion && typeof completion === "object" && !Array.isArray(completion);
           const sync = result?.capabilities?.textDocumentSync;
-          this.syncKind = typeof sync === "number" ? sync : sync?.change ?? 0;
-          this.openClose = typeof sync === "number"
-            ? sync !== 0
-            : sync?.openClose ?? false;
+          this.syncKind = typeof sync === "number" ? sync : (sync?.change ?? 0);
+          this.openClose = typeof sync === "number" ? sync !== 0 : (sync?.openClose ?? false);
           await this.rpc.sendNotification("initialized", {});
           if (!this.disposed) this.ready = true;
         })(),
@@ -263,18 +259,19 @@ export class LanguageServer {
         const lines = previous.text.split(/\r\n|\r|\n/);
         // An incremental server can receive one edit replacing the entire old
         // document. All positions are UTF-16 (the protocol default).
-        const change = this.syncKind === 2
-          ? {
-            range: {
-              start: { line: 0, character: 0 },
-              end: {
-                line: lines.length - 1,
-                character: lines[lines.length - 1].length,
-              },
-            },
-            text,
-          }
-          : { text };
+        const change =
+          this.syncKind === 2
+            ? {
+                range: {
+                  start: { line: 0, character: 0 },
+                  end: {
+                    line: lines.length - 1,
+                    character: lines[lines.length - 1].length,
+                  },
+                },
+                text,
+              }
+            : { text };
         await bounded(
           this.rpc.sendNotification("textDocument/didChange", {
             textDocument: { uri, version },
@@ -309,10 +306,7 @@ export class LanguageServer {
     }
   }
 
-  async completion(
-    path: string,
-    position: CompletionPosition,
-  ): Promise<CompletionResult> {
+  async completion(path: string, position: CompletionPosition): Promise<CompletionResult> {
     if (!this.ready || !this.supportsCompletion) return emptyCompletion();
     const cancellation = new CancellationTokenSource();
     try {
@@ -330,7 +324,8 @@ export class LanguageServer {
       if (!Array.isArray(items)) return emptyCompletion();
       return {
         isIncomplete: Array.isArray(result) ? false : !!result.isIncomplete,
-        items: items.filter((item) => item && typeof item.label === "string")
+        items: items
+          .filter((item) => item && typeof item.label === "string")
           .map((item) => ({
             label: item.label,
             kind: item.kind,
@@ -362,11 +357,7 @@ export class LanguageServer {
       name: this.registration.name,
       priority: this.registration.priority ?? 0,
       languages: { ...this.registration.languages },
-      state: this.ready
-        ? "running"
-        : this.error || this.disposed
-        ? "unavailable"
-        : "starting",
+      state: this.ready ? "running" : this.error || this.disposed ? "unavailable" : "starting",
       running: this.ready,
       error: this.error,
       errors: diagnostics.filter((item) => item.severity === 1).length,
@@ -375,7 +366,7 @@ export class LanguageServer {
   }
 
   dispose(): Promise<void> {
-    return this.disposal ??= this.shutdown();
+    return (this.disposal ??= this.shutdown());
   }
 
   private signal(signal: "SIGTERM" | "SIGKILL") {
@@ -415,12 +406,7 @@ export class LanguageServer {
     } finally {
       if (process.platform === "win32" && this.child.pid) {
         try {
-          const killer = spawn("taskkill", [
-            "/pid",
-            String(this.child.pid),
-            "/T",
-            "/F",
-          ], {
+          const killer = spawn("taskkill", ["/pid", String(this.child.pid), "/T", "/F"], {
             stdio: "ignore",
             windowsHide: true,
           });
@@ -446,11 +432,7 @@ export class LanguageServer {
       this.child.stdout.destroy();
       this.child.stderr.destroy();
       try {
-        await bounded(
-          this.closed,
-          1500,
-          "Language server did not close after termination",
-        );
+        await bounded(this.closed, 1500, "Language server did not close after termination");
       } catch {
         // Streams and pending RPCs are already disposed even if the OS delays close.
       }

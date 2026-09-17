@@ -10,8 +10,7 @@ import { definePlugin } from "../../sdk/mod.ts";
 import { EditorLspService } from "./service.ts";
 import { editorPosition, editorText, readEditorText } from "./text.ts";
 
-const checksum = (text: string) =>
-  createHash("sha256").update(text).digest("hex");
+const checksum = (text: string) => createHash("sha256").update(text).digest("hex");
 
 export default definePlugin({
   id: "fathom:editor",
@@ -51,7 +50,7 @@ export default definePlugin({
           },
           initializationOptions: { enable: true, lint: true },
           priority: 0,
-        })
+        }),
       );
       const storage = ctx.get("storage");
       const buffers = new Map<string, { text: string; version: string }>();
@@ -61,11 +60,10 @@ export default definePlugin({
         version: string;
         error: string;
       }[] = [];
-      for (
-        const draft of storage.setting<
-          { path: string; text: string; version: string }[]
-        >("editor.drafts", [])
-      ) {
+      for (const draft of storage.setting<{ path: string; text: string; version: string }[]>(
+        "editor.drafts",
+        [],
+      )) {
         try {
           const path = await workspace.resolve(draft.path, true);
           buffers.set(path, {
@@ -113,23 +111,16 @@ export default definePlugin({
             });
             if (entries.length >= 3000) break;
           }
-          return entries.sort((a, b) =>
-            Number(b.directory) - Number(a.directory) ||
-            a.name.localeCompare(b.name)
+          return entries.sort(
+            (a, b) => Number(b.directory) - Number(a.directory) || a.name.localeCompare(b.name),
           );
         }),
         rpc.register("file.read", (params) => read(String(params.path))),
         rpc.register("file.recover", async (params) => {
           const source = String(params.path);
-          const unresolvedIndex = unresolved.findIndex((draft) =>
-            draft.path === source
-          );
-          const buffer = [...buffers].find(([path]) =>
-            relative(workspace.root, path) === source
-          );
-          const draft = unresolvedIndex >= 0
-            ? unresolved[unresolvedIndex]
-            : buffer?.[1];
+          const unresolvedIndex = unresolved.findIndex((draft) => draft.path === source);
+          const buffer = [...buffers].find(([path]) => relative(workspace.root, path) === source);
+          const draft = unresolvedIndex >= 0 ? unresolved[unresolvedIndex] : buffer?.[1];
           if (!draft) {
             throw new Error("This recovered draft is no longer available.");
           }
@@ -175,7 +166,7 @@ export default definePlugin({
           for (const [path, draft] of buffers) {
             try {
               recovered.push({
-                document: { ...await read(path), version: draft.version },
+                document: { ...(await read(path)), version: draft.version },
                 text: draft.text,
               });
             } catch (error) {
@@ -193,13 +184,15 @@ export default definePlugin({
           const text = editorText(params.text);
           const diskText = await readEditorText(path);
           if (text === diskText) buffers.delete(path);
-          else {buffers.set(path, {
+          else {
+            buffers.set(path, {
               text,
-              version: typeof params.version === "string"
-                ? params.version
-                : buffers.get(path)?.version ??
-                  checksum(diskText),
-            });}
+              version:
+                typeof params.version === "string"
+                  ? params.version
+                  : (buffers.get(path)?.version ?? checksum(diskText)),
+            });
+          }
           persist();
           await lsp.update(path, text);
           return {};
@@ -214,16 +207,10 @@ export default definePlugin({
           const path = await workspace.resolve(String(params.path), true);
           const text = await readEditorText(path);
           if (checksum(text) !== params.version) {
-            throw new Error(
-              "File changed on disk. Reload or copy your edits before saving.",
-            );
+            throw new Error("File changed on disk. Reload or copy your edits before saving.");
           }
           const next = editorText(params.text);
-          await atomicWrite(
-            path,
-            next,
-            ((await Deno.stat(path)).mode ?? 0o644) & 0o777,
-          );
+          await atomicWrite(path, next, ((await Deno.stat(path)).mode ?? 0o644) & 0o777);
           buffers.delete(path);
           persist();
           await lsp.update(path, next);
@@ -238,11 +225,7 @@ export default definePlugin({
             throw new Error("Invalid completion path");
           }
           const text = editorText(params.text);
-          return await lsp.completion(
-            params.path,
-            text,
-            editorPosition(params.position, text),
-          );
+          return await lsp.completion(params.path, text, editorPosition(params.position, text));
         }),
         rpc.register("lsp.diagnostics", async (params) => {
           if (typeof params.path !== "string") {
@@ -259,18 +242,14 @@ export default definePlugin({
         }),
         rpc.register("lsp.servers", () => lsp.servers()),
         rpc.register("lsp.restart", (params) => {
-          if (
-            typeof params.id !== "string" ||
-            !/^[a-zA-Z0-9][a-zA-Z0-9:._-]*$/.test(params.id)
-          ) {
+          if (typeof params.id !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9:._-]*$/.test(params.id)) {
             throw new Error("Invalid language server id");
           }
           return lsp.restart(params.id);
         }),
         tools.register({
           name: "lsp_diagnostics",
-          description:
-            "Inspect live editor language diagnostics, including unsaved buffers.",
+          description: "Inspect live editor language diagnostics, including unsaved buffers.",
           readOnly: true,
           deferred: true,
           parameters: Type.Object({ path: Type.String() }),

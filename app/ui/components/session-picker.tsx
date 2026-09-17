@@ -7,17 +7,13 @@ import { Icon } from "./icon.tsx";
 import { SearchDialog } from "./search-dialog.tsx";
 import { SearchList } from "./search-list.tsx";
 
-export function SessionPicker(
-  props: {
-    app: ReturnType<typeof createWorkspace>;
-    kind: "new" | "search";
-    close(): void;
-  },
-) {
+export function SessionPicker(props: {
+  app: ReturnType<typeof createWorkspace>;
+  kind: "new" | "search";
+  close(): void;
+}) {
   const app = props.app;
-  const [sessions, setSessions] = createSignal<
-    { project: Project; session: Session }[]
-  >([]);
+  const [sessions, setSessions] = createSignal<{ project: Project; session: Session }[]>([]);
   const [loading, setLoading] = createSignal(props.kind === "search");
   const [failure, setFailure] = createSignal("");
   let disposed = false;
@@ -27,18 +23,14 @@ export function SessionPicker(
   onMount(async () => {
     if (props.kind !== "search") return;
     try {
-      const result = await app.transport.request<
-        {
-          items: { project: Project; session: Session }[];
-          unavailable: string[];
-        }
-      >("sessions.catalog");
+      const result = await app.transport.request<{
+        items: { project: Project; session: Session }[];
+        unavailable: string[];
+      }>("sessions.catalog");
       if (disposed) return;
       setSessions(result.items);
       if (result.unavailable.length) {
-        setFailure(
-          `Could not read sessions in: ${result.unavailable.join(", ")}`,
-        );
+        setFailure(`Could not read sessions in: ${result.unavailable.join(", ")}`);
       }
     } catch (error) {
       if (!disposed) {
@@ -70,13 +62,10 @@ export function SessionPicker(
               scope="All projects"
               action="Open session"
               empty={loading() ? "Loading sessions…" : "No sessions found"}
-              searchText={({ session, project }) =>
-                `${session.title} ${project.name}`}
+              searchText={({ session, project }) => `${session.title} ${project.name}`}
               select={async ({ session, project }) => {
                 if (app.project()?.id !== project.id) {
-                  await app.openProject(
-                    project.path,
-                  );
+                  await app.openProject(project.path);
                 }
                 await app.chooseSession(session.id);
                 props.close();
@@ -89,9 +78,7 @@ export function SessionPicker(
                   </span>
                   <span class="min-w-0 flex-1">
                     <span class="block truncate text-sm">{session.title}</span>
-                    <span class="mt-1 block text-xs text-muted">
-                      {project.name}
-                    </span>
+                    <span class="mt-1 block text-xs text-muted">{project.name}</span>
                   </span>
                   <span class="shrink-0 text-xs text-muted">
                     {new Date(session.updatedAt).toLocaleDateString([], {
@@ -115,9 +102,7 @@ export function SessionPicker(
           searchText={(project) => `${project.name} ${project.path}`}
           select={async (project) => {
             if (app.project()?.id !== project.id) {
-              await app.openProject(
-                project.path,
-              );
+              await app.openProject(project.path);
             }
             await app.newSession();
             props.close();
@@ -130,9 +115,7 @@ export function SessionPicker(
               </span>
               <span class="min-w-0 flex-1">
                 <span class="block truncate text-sm">{project.name}</span>
-                <span class="mt-1 block truncate text-xs text-muted">
-                  {project.path}
-                </span>
+                <span class="mt-1 block truncate text-xs text-muted">{project.path}</span>
               </span>
             </>
           )}

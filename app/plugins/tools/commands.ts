@@ -5,8 +5,8 @@ import { Type } from "typebox";
 import { atomicWrite } from "../../kernel/files.ts";
 import { denoExecutable } from "../../kernel/runtime.ts";
 import { definePlugin } from "../../sdk/mod.ts";
-import { runProcess } from "./process.ts";
 import { mcpBridge } from "./mcp-bridge.ts";
+import { runProcess } from "./process.ts";
 
 export default definePlugin({
   id: "fathom:commands",
@@ -14,7 +14,8 @@ export default definePlugin({
   backend: {
     requires: ["tools", "workspace", "terminal"],
     activate(ctx) {
-      const tools = ctx.get("tools"), workspace = ctx.get("workspace");
+      const tools = ctx.get("tools"),
+        workspace = ctx.get("workspace");
       const registrations = [
         tools.register({
           name: "bash",
@@ -23,17 +24,14 @@ export default definePlugin({
           parameters: Type.Object({
             command: Type.String(),
             background: Type.Optional(Type.Boolean()),
-            timeoutMs: Type.Optional(
-              Type.Integer({ minimum: 100, maximum: 3_600_000 }),
-            ),
+            timeoutMs: Type.Optional(Type.Integer({ minimum: 100, maximum: 3_600_000 })),
           }),
           execute: async (args, context) => {
             if (args.background === true) {
               context.signal.throwIfAborted();
-              const terminal = await ctx.get("terminal").start(
-                context.sessionId,
-                String(args.command),
-              );
+              const terminal = await ctx
+                .get("terminal")
+                .start(context.sessionId, String(args.command));
               if (context.signal.aborted) {
                 ctx.get("terminal").stop(terminal.id);
                 context.signal.throwIfAborted();
@@ -61,11 +59,7 @@ export default definePlugin({
           description:
             "Save and run a multi-line script. Existing scripts can be read or patched by ID. Every execution is reviewed. Filter data inside scripts and return concise output.",
           parameters: Type.Object({
-            action: Type.Union([
-              Type.Literal("run"),
-              Type.Literal("read"),
-              Type.Literal("patch"),
-            ]),
+            action: Type.Union([Type.Literal("run"), Type.Literal("read"), Type.Literal("patch")]),
             interpreter: Type.Optional(
               Type.Union([
                 Type.Literal("deno"),
@@ -76,25 +70,18 @@ export default definePlugin({
                 Type.Literal("perl"),
               ]),
             ),
-            id: Type.Optional(
-              Type.String({ pattern: "^[a-zA-Z0-9_-]{1,100}$" }),
-            ),
+            id: Type.Optional(Type.String({ pattern: "^[a-zA-Z0-9_-]{1,100}$" })),
             code: Type.Optional(Type.String({ maxLength: 1_000_000 })),
             oldText: Type.Optional(Type.String()),
             newText: Type.Optional(Type.String()),
-            timeoutMs: Type.Optional(
-              Type.Integer({ minimum: 100, maximum: 3_600_000 }),
-            ),
+            timeoutMs: Type.Optional(Type.Integer({ minimum: 100, maximum: 3_600_000 })),
           }),
           async execute(args, context) {
             const id = String(args.id ?? crypto.randomUUID());
-            const folder = join(
-              workspace.dataDir,
-              "scratch",
-              context.sessionId,
-            );
+            const folder = join(workspace.dataDir, "scratch", context.sessionId);
             const metadata = join(folder, `${id}.json`);
-            let interpreter = String(args.interpreter ?? "deno"), code: string;
+            let interpreter = String(args.interpreter ?? "deno"),
+              code: string;
             if (args.code !== undefined) code = String(args.code);
             else {
               const saved = JSON.parse(await Deno.readTextFile(metadata));
@@ -120,17 +107,15 @@ export default definePlugin({
             const path = join(folder, `${id}.${extension[interpreter]}`);
             await atomicWrite(path, code);
             await atomicWrite(metadata, JSON.stringify({ interpreter, path }));
-            const bridge = interpreter === "deno"
-              ? await mcpBridge(join(folder, context.callId), tools, context)
-              : undefined;
+            const bridge =
+              interpreter === "deno"
+                ? await mcpBridge(join(folder, context.callId), tools, context)
+                : undefined;
             try {
-              const commandArgs = interpreter === "deno"
-                ? ["run", "-A", "--config", bridge!.config, path]
-                : [path];
+              const commandArgs =
+                interpreter === "deno" ? ["run", "-A", "--config", bridge!.config, path] : [path];
               const result = await runProcess({
-                command: interpreter === "deno"
-                  ? denoExecutable()
-                  : interpreter,
+                command: interpreter === "deno" ? denoExecutable() : interpreter,
                 args: commandArgs,
                 cwd: workspace.root,
                 signal: context.signal,
@@ -152,12 +137,7 @@ export default definePlugin({
         if (args.code === undefined && args.id) {
           const metadata = JSON.parse(
             await Deno.readTextFile(
-              join(
-                workspace.dataDir,
-                "scratch",
-                input.sessionId,
-                `${args.id}.json`,
-              ),
+              join(workspace.dataDir, "scratch", input.sessionId, `${args.id}.json`),
             ),
           );
           args.interpreter = metadata.interpreter;

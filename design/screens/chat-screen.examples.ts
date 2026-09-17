@@ -11,10 +11,12 @@ export const chatScreens: DesignEntry[] = [
     name: "Chat focus · Inspector open",
     description:
       "A web research conversation with chat history on the left and session usage and tokens on the right.",
-    examples: [{
-      name: "Chat workspace",
-      markup: html`<chat-screen></chat-screen>`,
-    }],
+    examples: [
+      {
+        name: "Chat workspace",
+        markup: html`<chat-screen></chat-screen>`,
+      },
+    ],
   },
   {
     id: "chat-focus-no-session",

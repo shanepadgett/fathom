@@ -22,8 +22,7 @@
   }
 
   ds-drawer[mode="push"][open] {
-    grid-template-columns: minmax(0, 1fr) minmax(0, var(--resized-panel-width,
-      1fr));
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--resized-panel-width, 1fr));
   }
 
   ds-drawer[mode="push"] > [data-content] {

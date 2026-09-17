@@ -38,28 +38,25 @@ export class FilesSidebarElement extends DesignElement {
       return nothing;
     }
     const { nodes, changed, selected, expanded, changes, view } = this;
-    return html`${
-      tabStrip(
-        [
-          { id: "files", label: "Files" },
-          { id: "changes", label: "Changes" },
-        ],
-        view,
-        "Files and changes",
-      )
-    }${
+    return html`${tabStrip(
+      [
+        { id: "files", label: "Files" },
+        { id: "changes", label: "Changes" },
+      ],
+      view,
+      "Files and changes",
+    )}${
       view === "files"
         ? html`
-          <file-tree .nodes=${nodes} .selected=${selected}
-            .expanded=${expanded}></file-tree>
-        `
+            <file-tree .nodes=${nodes} .selected=${selected} .expanded=${expanded}></file-tree>
+          `
         : html`
-          <changed-files-list
-            .files=${changed}
-            .selected=${selected}
-            .changes=${changes}
-          ></changed-files-list>
-        `
+            <changed-files-list
+              .files=${changed}
+              .selected=${selected}
+              .changes=${changes}
+            ></changed-files-list>
+          `
     }`;
   }
 }

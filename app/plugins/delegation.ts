@@ -25,13 +25,12 @@ export default definePlugin({
           const child = args.consultation_id
             ? storage.getSession(String(args.consultation_id))
             : storage.createSession({
-              title: `Expert · ${String(args.question).slice(0, 60)}`,
-              parentSessionId: parent.id,
-              provider: storage.setting("expertProvider", "") ||
-                parent.provider,
-              model: storage.setting("expertModel", "") || parent.model,
-              thinking: "high",
-            });
+                title: `Expert · ${String(args.question).slice(0, 60)}`,
+                parentSessionId: parent.id,
+                provider: storage.setting("expertProvider", "") || parent.provider,
+                model: storage.setting("expertModel", "") || parent.model,
+                thinking: "high",
+              });
           if (child.parentSessionId !== parent.id) {
             throw new Error("Consultation belongs to another session");
           }
@@ -42,14 +41,17 @@ export default definePlugin({
             await runtime.submit(child.id, String(args.question));
             await runtime.whenIdle(child.id);
             input.signal.throwIfAborted();
-            const message = storage.entries(child.id).filter((entry) =>
-              entry.message?.role === "assistant"
-            ).at(-1)?.message;
-            const answer = message && typeof message.content !== "string"
-              ? message.content.filter((block) => block.type === "text").map(
-                (block) => block.text,
-              ).join("\n")
-              : "Expert did not return a final answer. Inspect its session for details.";
+            const message = storage
+              .entries(child.id)
+              .filter((entry) => entry.message?.role === "assistant")
+              .at(-1)?.message;
+            const answer =
+              message && typeof message.content !== "string"
+                ? message.content
+                    .filter((block) => block.type === "text")
+                    .map((block) => block.text)
+                    .join("\n")
+                : "Expert did not return a final answer. Inspect its session for details.";
             return JSON.stringify({
               consultation_id: child.id,
               answer,

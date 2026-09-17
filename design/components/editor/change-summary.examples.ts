@@ -12,16 +12,17 @@ const files = [
 export const changeSummaryExamples = [
   {
     name: "Three changed files",
-    markup:
-      html`<change-summary .changes=${scenario.changes}></change-summary>`,
+    markup: html`<change-summary .changes=${scenario.changes}></change-summary>`,
   },
   {
     name: "Five files · three shown initially",
-    markup: html`<change-summary .changes=${{
-      files,
-      count: files.length,
-      added: files.reduce((sum, file) => sum + file.added, 0),
-      removed: files.reduce((sum, file) => sum + file.removed, 0),
-    }}></change-summary>`,
+    markup: html`<change-summary
+      .changes=${{
+        files,
+        count: files.length,
+        added: files.reduce((sum, file) => sum + file.added, 0),
+        removed: files.reduce((sum, file) => sum + file.removed, 0),
+      }}
+    ></change-summary>`,
   },
 ];

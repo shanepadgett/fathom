@@ -1,4 +1,5 @@
 import { createSignal, Show } from "solid-js";
+
 import { Button, Field, Modal } from "./primitives.tsx";
 
 export function RenameSession(props: {
@@ -48,13 +49,11 @@ export function RenameSession(props: {
           />
         </Field>
         <Show when={error()}>
-          <p role="alert" class="mb-3 text-danger">{error()}</p>
+          <p role="alert" class="mb-3 text-danger">
+            {error()}
+          </p>
         </Show>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={!title().trim() || busy()}
-        >
+        <Button type="submit" variant="primary" disabled={!title().trim() || busy()}>
           {busy() ? "Saving…" : "Save name"}
         </Button>
       </form>

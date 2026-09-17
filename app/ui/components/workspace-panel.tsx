@@ -5,9 +5,7 @@ import { onMount } from "solid-js";
 import { EdgeResizer } from "../../../design/primitives/edge-resizer.ts";
 import { IconButton } from "./primitives.tsx";
 
-export function WorkspacePanel(
-  props: { title: string; close(): void; children: JSX.Element },
-) {
+export function WorkspacePanel(props: { title: string; close(): void; children: JSX.Element }) {
   let panel!: HTMLElement;
   onMount(() => {
     const handle = new EdgeResizer();
@@ -27,11 +25,7 @@ export function WorkspacePanel(
     >
       <header class="flex h-12 shrink-0 items-center justify-between gap-3 border-b border-line px-4 font-medium">
         <h2 class="m-0 text-sm font-medium">{props.title}</h2>
-        <IconButton
-          name="x"
-          label={`Close ${props.title}`}
-          onClick={props.close}
-        />
+        <IconButton name="x" label={`Close ${props.title}`} onClick={props.close} />
       </header>
       <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-4 text-sm">
         {props.children}

@@ -93,8 +93,7 @@ export const agentScreens: DesignEntry[] = [
   {
     id: "agent-focus-context-breakdown",
     name: "Agent focus · Context breakdown",
-    description:
-      "Context usage with its breakdown open and a compaction marker at 80% capacity.",
+    description: "Context usage with its breakdown open and a compaction marker at 80% capacity.",
     examples: [
       {
         name: "Context breakdown open",

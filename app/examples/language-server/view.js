@@ -6,7 +6,11 @@ export default {
       extensions: [".rs"],
       configuration: {
         comments: { lineComment: "//", blockComment: ["/*", "*/"] },
-        brackets: [["{", "}"], ["[", "]"], ["(", ")"]],
+        brackets: [
+          ["{", "}"],
+          ["[", "]"],
+          ["(", ")"],
+        ],
         autoClosingPairs: [
           { open: "{", close: "}" },
           { open: "[", close: "]" },
@@ -64,30 +68,32 @@ export default {
             [/"/, "string", "@string"],
             [/'(?:\\.|[^'\\])'/, "string"],
             [/'[a-zA-Z_]\w*/, "type.identifier"],
-            [
-              /\b(?:u|i)(?:8|16|32|64|128|size)\b|\b(?:bool|char|str|f32|f64)\b/,
-              "type",
-            ],
+            [/\b(?:u|i)(?:8|16|32|64|128|size)\b|\b(?:bool|char|str|f32|f64)\b/, "type"],
             [/[a-zA-Z_]\w*!/, "function"],
-            [/[a-zA-Z_]\w*/, {
-              cases: { "@keywords": "keyword", "@default": "identifier" },
-            }],
+            [
+              /[a-zA-Z_]\w*/,
+              {
+                cases: { "@keywords": "keyword", "@default": "identifier" },
+              },
+            ],
             [
               /\b(?:0[xob][\da-fA-F_]+|\d[\d_]*(?:\.\d[\d_]*)?)(?:[ui](?:8|16|32|64|128|size)|f(?:32|64))?\b/,
               "number",
             ],
             [/[{}()[\]]/, "@brackets"],
-            [/[=><!~?:&|+*\/^%-]+/, "operator"],
+            [/[=><!~?:&|+*/^%-]+/, "operator"],
             [/[;,.]/, "delimiter"],
           ],
-          comment: [[/\/\*/, "comment", "@push"], [/\*\//, "comment", "@pop"], [
-            /[^/*]+|[/*]/,
-            "comment",
-          ]],
-          string: [[/\\./, "string.escape"], [/"/, "string", "@pop"], [
-            /[^\\"]+/,
-            "string",
-          ]],
+          comment: [
+            [/\/\*/, "comment", "@push"],
+            [/\*\//, "comment", "@pop"],
+            [/[^/*]+|[/*]/, "comment"],
+          ],
+          string: [
+            [/\\./, "string.escape"],
+            [/"/, "string", "@pop"],
+            [/[^\\"]+/, "string"],
+          ],
         },
       },
     });

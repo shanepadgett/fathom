@@ -12,23 +12,25 @@ export async function compileBackend(entry: string, directory: string) {
     root: dirname(entry),
     publicDir: false,
     logLevel: "error",
-    plugins: [{
-      name: "fathom-backend-source-location",
-      enforce: "pre",
-      async transform(code, id) {
-        if (!isAbsolute(id) || !/\.[cm]?[jt]sx?$/.test(id)) return;
-        return await transformWithOxc(code, id, {
-          define: {
-            "import.meta.url": JSON.stringify(pathToFileURL(id).href),
-            "import.meta.dirname": JSON.stringify(dirname(id)),
-            "import.meta.filename": JSON.stringify(id),
-          },
-        });
+    plugins: [
+      {
+        name: "fathom-backend-source-location",
+        enforce: "pre",
+        async transform(code, id) {
+          if (!isAbsolute(id) || !/\.[cm]?[jt]sx?$/.test(id)) return;
+          return await transformWithOxc(code, id, {
+            define: {
+              "import.meta.url": JSON.stringify(pathToFileURL(id).href),
+              "import.meta.dirname": JSON.stringify(dirname(id)),
+              "import.meta.filename": JSON.stringify(id),
+            },
+          });
+        },
+        resolveId(source) {
+          if (source.startsWith("file:")) return fileURLToPath(source);
+        },
       },
-      resolveId(source) {
-        if (source.startsWith("file:")) return fileURLToPath(source);
-      },
-    }],
+    ],
     build: {
       ssr: entry,
       outDir: directory,
@@ -37,8 +39,7 @@ export async function compileBackend(entry: string, directory: string) {
       minify: false,
       sourcemap: "inline",
       rolldownOptions: {
-        external: (id) =>
-          !id.startsWith(".") && !isAbsolute(id) && !id.startsWith("file:"),
+        external: (id) => !id.startsWith(".") && !isAbsolute(id) && !id.startsWith("file:"),
         output: {
           entryFileNames: "plugin.mjs",
           chunkFileNames: "[name]-[hash].mjs",

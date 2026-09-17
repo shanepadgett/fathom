@@ -13,7 +13,7 @@ interface PluginStatus {
 export function PluginSettings(props: { transport: Transport }) {
   const projectId = props.transport.projectId;
   const [plugins, { refetch }] = createResource(() =>
-    props.transport.request<PluginStatus[]>("plugins.list", { projectId })
+    props.transport.request<PluginStatus[]>("plugins.list", { projectId }),
   );
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
@@ -26,12 +26,15 @@ export function PluginSettings(props: { transport: Transport }) {
     }
   }
 
-  onCleanup(props.transport.onEvent((event) => {
-    if (
-      event.type === "connected" ||
-      (event.type === "environment" && event.projectId === projectId)
-    ) void refresh();
-  }));
+  onCleanup(
+    props.transport.onEvent((event) => {
+      if (
+        event.type === "connected" ||
+        (event.type === "environment" && event.projectId === projectId)
+      )
+        void refresh();
+    }),
+  );
 
   async function reload() {
     if (busy()) return;
@@ -56,38 +59,37 @@ export function PluginSettings(props: { transport: Transport }) {
         </Button>
       </div>
       <p class="muted">
-        Add personal plugins globally or project plugins in .fathom/plugins.
-        Reload to apply changes.
+        Add personal plugins globally or project plugins in .fathom/plugins. Reload to apply
+        changes.
       </p>
       <Show when={plugins.error}>
         <div role="alert" class="my-3 text-danger">
           <p>Could not load plugins.</p>
-          <Button
-            disabled={plugins.loading || busy()}
-            onClick={() => void refresh()}
-          >
+          <Button disabled={plugins.loading || busy()} onClick={() => void refresh()}>
             Retry
           </Button>
         </div>
       </Show>
       <Show when={plugins.loading}>
-        <p role="status" class="my-3 text-sm text-muted">Loading plugins…</p>
+        <p role="status" class="my-3 text-sm text-muted">
+          Loading plugins…
+        </p>
       </Show>
       <div aria-busy={plugins.loading || busy()}>
         <For each={plugins.error ? [] : plugins()}>
           {(plugin) => (
             <div class="plugin-row">
               <strong>{plugin.id}</strong>
-              <span class="muted">
-                {plugin.provides.join(", ") || "Contribution"}
-              </span>
+              <span class="muted">{plugin.provides.join(", ") || "Contribution"}</span>
               <small>{plugin.status}</small>
             </div>
           )}
         </For>
       </div>
       <Show when={error()}>
-        <p role="alert" class="my-3 text-danger">{error()}</p>
+        <p role="alert" class="my-3 text-danger">
+          {error()}
+        </p>
       </Show>
     </>
   );

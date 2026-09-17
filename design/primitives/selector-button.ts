@@ -8,10 +8,9 @@ export const selectorButton = (value: string, secondary = "") =>
     label: secondary ? `${value}, ${secondary}` : value,
     content: html`
       <span
-      >${value}${secondary
-        ? html`
-          <span class="text-muted">${" · "}${secondary}</span>
-        `
-        : ""}</span>${icon("caret-down", "small")}
+        >${value}${
+          secondary ? html` <span class="text-muted">${" · "}${secondary}</span> ` : ""
+        }</span
+      >${icon("caret-down", "small")}
     `,
   });

@@ -1,13 +1,11 @@
 import { For } from "solid-js";
 
-export function TabStrip<T extends string>(
-  props: {
-    items: { id: T; label: string }[];
-    selected: T;
-    label: string;
-    select(id: T): void;
-  },
-) {
+export function TabStrip<T extends string>(props: {
+  items: { id: T; label: string }[];
+  selected: T;
+  label: string;
+  select(id: T): void;
+}) {
   return (
     <div
       class="flex h-9 shrink-0 border-b border-line text-sm"

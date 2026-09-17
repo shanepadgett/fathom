@@ -6,10 +6,9 @@ export interface MessageTarget {
 }
 
 export function messageLink(target: MessageTarget): string {
-  return `fathom://message/${
-    [target.projectId, target.sessionId, target.entryId].map(encodeURIComponent)
-      .join("/")
-  }`;
+  return `fathom://message/${[target.projectId, target.sessionId, target.entryId]
+    .map(encodeURIComponent)
+    .join("/")}`;
 }
 
 export function parseMessageLink(value: string): MessageTarget {
@@ -21,8 +20,13 @@ export function parseMessageLink(value: string): MessageTarget {
   }
   const ids = url.pathname.slice(1).split("/");
   if (
-    url.protocol !== "fathom:" || url.hostname !== "message" || url.port ||
-    url.username || url.password || url.search || url.hash ||
+    url.protocol !== "fathom:" ||
+    url.hostname !== "message" ||
+    url.port ||
+    url.username ||
+    url.password ||
+    url.search ||
+    url.hash ||
     ids.length !== 3 ||
     ids.some((id) => !/^[a-zA-Z0-9_-]{1,128}$/.test(id))
   ) {

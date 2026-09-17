@@ -37,6 +37,4 @@ const iconSizes = {
 };
 
 export const icon = (name: IconName, size: keyof typeof iconSizes = "normal") =>
-  html`<i class="ph ph-${name} shrink-0 ${
-    iconSizes[size]
-  }" aria-hidden="true"></i>`;
+  html`<i class="ph ph-${name} shrink-0 ${iconSizes[size]}" aria-hidden="true"></i>`;

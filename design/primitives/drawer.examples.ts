@@ -9,7 +9,7 @@ export const drawerExamples = ["dimmed", "none"].map((backdrop) => ({
   name: backdrop === "none" ? "Without dimming" : "With dimming",
   markup: html`
     <ds-drawer backdrop="${backdrop}"
-    >${background}
+      >${background}
       <ds-button><button type="button" data-open>Open drawer</button></ds-button>
       <dialog aria-labelledby="drawer-title-${backdrop}" closedby="any">
         <div data-drawer-scroll>
@@ -74,7 +74,8 @@ drawerExamples.push({
             <header class="flex flex-wrap items-center justify-between gap-3">
               <h2 id="push-title" class="text-xl font-semibold">Session details</h2>
               <ds-button variant="quiet"
-              ><button type="button" data-close aria-label="Close drawer">✕</button></ds-button>
+                ><button type="button" data-close aria-label="Close drawer">✕</button></ds-button
+              >
             </header>
             <p class="mt-4 text-muted">
               The workspace stays usable. Try editing the session name while this panel is open.

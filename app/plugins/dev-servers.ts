@@ -1,8 +1,4 @@
-import type {
-  DevServer,
-  DevServersSnapshot,
-  TerminalInfo,
-} from "../sdk/mod.ts";
+import type { DevServer, DevServersSnapshot, TerminalInfo } from "../sdk/mod.ts";
 
 import { definePlugin } from "../sdk/mod.ts";
 
@@ -20,16 +16,20 @@ function localUrl(token: string): string | undefined {
   // Match the original authority too: URL normalization accepts ambiguous IPv4 forms.
   const value = token.replace(/[.,;!?)}]+$/, "");
   if (
-    !/^https?:\/\/(?:localhost|127(?:\.(?:0|[1-9]\d{0,2})){3}|\[::1\])(?::\d{1,5})?(?:[/?#]|$)/i
-      .test(value)
-  ) return;
+    !/^https?:\/\/(?:localhost|127(?:\.(?:0|[1-9]\d{0,2})){3}|\[::1\])(?::\d{1,5})?(?:[/?#]|$)/i.test(
+      value,
+    )
+  )
+    return;
   try {
     const url = new URL(value);
     if (url.username || url.password || url.port === "0") return;
     if (
-      url.hostname !== "localhost" && url.hostname !== "[::1]" &&
+      url.hostname !== "localhost" &&
+      url.hostname !== "[::1]" &&
       !url.hostname.startsWith("127.")
-    ) return;
+    )
+      return;
     return url.href;
   } catch {
     return;
@@ -62,11 +62,7 @@ function consume(parser: Parser, text: string, found: (url: string) => void) {
       continue;
     }
     if (parser.escape === "escape") {
-      parser.escape = char === "["
-        ? "csi"
-        : "]PX^_".includes(char)
-        ? "string"
-        : "text";
+      parser.escape = char === "[" ? "csi" : "]PX^_".includes(char) ? "string" : "text";
       continue;
     }
     if (char === "\x1b") {
@@ -124,9 +120,9 @@ export default definePlugin({
           const key = `${id}:${url}`;
           if (
             servers.has(key) ||
-            [...servers.values()].filter((server) => server.terminalId === id)
-                .length >= MAX_SERVERS
-          ) return;
+            [...servers.values()].filter((server) => server.terminalId === id).length >= MAX_SERVERS
+          )
+            return;
           servers.set(key, {
             id: key,
             terminalId: id,

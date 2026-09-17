@@ -1,9 +1,10 @@
-import { Type } from "typebox";
-import { instantiate, libName, Pty } from "@sigma/pty-ffi/noinit";
 import { fileURLToPath } from "node:url";
 
-import { definePlugin } from "../sdk/mod.ts";
+import { instantiate, libName, Pty } from "@sigma/pty-ffi/noinit";
+import { Type } from "typebox";
+
 import { workspaceEnvironment } from "../kernel/runtime.ts";
+import { definePlugin } from "../sdk/mod.ts";
 
 interface Terminal {
   id: string;
@@ -61,17 +62,12 @@ export default definePlugin({
         initialized ??= instantiate(
           Deno.env.get("FATHOM_PTY_LIBRARY") ??
             (Deno.build.standalone
-              ? fileURLToPath(
-                new URL(`../native/${libName()}`, import.meta.url),
-              )
+              ? fileURLToPath(new URL(`../native/${libName()}`, import.meta.url))
               : undefined),
         );
         await initialized;
         if (disposed) throw new Error("Terminal service disposed");
-        if (
-          [...terminals.values()].filter((terminal) => terminal.pty).length >=
-            12
-        ) {
+        if ([...terminals.values()].filter((terminal) => terminal.pty).length >= 12) {
           throw new Error("Close a terminal before starting another");
         }
         const terminal: Terminal = {
@@ -84,22 +80,17 @@ export default definePlugin({
         };
         // PTY environments overlay the parent's values. Remove the host address
         // before env replaces itself with the shell, preserving process ownership.
-        terminal.pty = new Pty(
-          "/usr/bin/env",
-          {
-            args: [
-              "-u",
-              "DENO_SERVE_ADDRESS",
-              command !== undefined
-                ? "/bin/bash"
-                : Deno.env.get("SHELL") ?? "/bin/bash",
-              ...(command !== undefined ? ["-c", command] : []),
-            ],
-            cwd: workspace.root,
-            env: { ...workspaceEnvironment(), TERM: "xterm-256color" },
-            size: { cols: 100, rows: 25, pixel_width: 0, pixel_height: 0 },
-          },
-        );
+        terminal.pty = new Pty("/usr/bin/env", {
+          args: [
+            "-u",
+            "DENO_SERVE_ADDRESS",
+            command !== undefined ? "/bin/bash" : (Deno.env.get("SHELL") ?? "/bin/bash"),
+            ...(command !== undefined ? ["-c", command] : []),
+          ],
+          cwd: workspace.root,
+          env: { ...workspaceEnvironment(), TERM: "xterm-256color" },
+          size: { cols: 100, rows: 25, pixel_width: 0, pixel_height: 0 },
+        });
         terminals.set(terminal.id, terminal);
         events.publish({
           type: "terminal",
@@ -136,25 +127,17 @@ export default definePlugin({
         stop,
       });
       const disposers = [
-        rpc.register(
-          "terminal.list",
-          () => [...terminals.values()].map(describe),
-        ),
-        rpc.register(
-          "terminal.start",
-          (params) => start(String(params.sessionId)),
-        ),
+        rpc.register("terminal.list", () => [...terminals.values()].map(describe)),
+        rpc.register("terminal.start", (params) => start(String(params.sessionId))),
         rpc.register("terminal.write", (params) => {
           get(String(params.id)).pty?.write(String(params.text));
           return {};
         }),
         rpc.register("terminal.resize", (params) => {
-          const cols = Number(params.cols), rows = Number(params.rows);
-          if (
-            ![cols, rows].every((value) =>
-              Number.isInteger(value) && value > 0 && value <= 1000
-            )
-          ) throw new Error("Invalid terminal size");
+          const cols = Number(params.cols),
+            rows = Number(params.rows);
+          if (![cols, rows].every((value) => Number.isInteger(value) && value > 0 && value <= 1000))
+            throw new Error("Invalid terminal size");
           get(String(params.id)).pty?.resize({
             cols,
             rows,
@@ -195,9 +178,9 @@ export default definePlugin({
             }
             if (args.action === "list") {
               return JSON.stringify(
-                [...terminals.values()].filter((item) =>
-                  item.sessionId === context.sessionId
-                ).map(describe),
+                [...terminals.values()]
+                  .filter((item) => item.sessionId === context.sessionId)
+                  .map(describe),
               );
             }
             const terminal = get(String(args.id));
@@ -205,9 +188,10 @@ export default definePlugin({
               throw new Error("Terminal belongs to another session");
             }
             if (args.action === "read") {
-              return terminal.output.split("\n").slice(
-                -Number(args.lines ?? 50),
-              ).join("\n");
+              return terminal.output
+                .split("\n")
+                .slice(-Number(args.lines ?? 50))
+                .join("\n");
             }
             if (args.action === "kill") stop(terminal.id);
             else terminal.pty?.write(String(args.text ?? ""));

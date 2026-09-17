@@ -49,20 +49,19 @@ export function browserViewport(
       y: Math.max(0, Math.round(rect.y)),
       width: Math.max(1, Math.round(rect.width)),
       height: Math.max(1, Math.round(rect.height)),
-      visible: ready() && !annotating() && !nativeSurfacesOccluded() &&
-        document.visibilityState === "visible" && rect.width > 0 &&
+      visible:
+        ready() &&
+        !annotating() &&
+        !nativeSurfacesOccluded() &&
+        document.visibilityState === "visible" &&
+        rect.width > 0 &&
         rect.height > 0 &&
         rect.left >= Math.max(0, clip.left) &&
         rect.top >= Math.max(0, clip.top) &&
         rect.right <= Math.min(innerWidth, clip.right) + 1 &&
         rect.bottom <= Math.min(innerHeight, clip.bottom) + 1,
     };
-    const key = JSON.stringify([
-      transport.projectId,
-      viewId(),
-      ready(),
-      bounds,
-    ]);
+    const key = JSON.stringify([transport.projectId, viewId(), ready(), bounds]);
     if (key === previous) return;
     previous = key;
     pending = { viewId: viewId(), bounds };

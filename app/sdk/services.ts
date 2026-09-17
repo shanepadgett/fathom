@@ -12,7 +12,9 @@ import type {
 import type { ArtifactService } from "./artifacts.ts";
 import type { LspService } from "./editor.ts";
 import type { FeedbackService } from "./feedback.ts";
-
+import type { ImageGenerationService } from "./images.ts";
+import type { MediaService } from "./media.ts";
+import type { ResourceService } from "./resources.ts";
 import type {
   AppEvent,
   Attribution,
@@ -23,25 +25,14 @@ import type {
   ToolExecution,
   UsageRecord,
 } from "./session.ts";
-import type { MediaService } from "./media.ts";
-import type { ImageGenerationService } from "./images.ts";
-import type { ResourceService } from "./resources.ts";
 
 export interface StorageService {
   listSessions(): Session[];
   createSession(
-    input?: Partial<
-      Pick<
-        Session,
-        "title" | "provider" | "model" | "parentSessionId" | "thinking"
-      >
-    >,
+    input?: Partial<Pick<Session, "title" | "provider" | "model" | "parentSessionId" | "thinking">>,
   ): Session;
   getSession(id: string): Session;
-  updateSession(
-    id: string,
-    changes: Partial<Omit<Session, "id" | "createdAt">>,
-  ): Session;
+  updateSession(id: string, changes: Partial<Omit<Session, "id" | "createdAt">>): Session;
   entries(sessionId: string, leafId?: string | null): Entry[];
   allEntries(sessionId: string): Entry[];
   append(
@@ -98,10 +89,7 @@ export interface ToolRegistry {
 export interface ContextService {
   assemble(sessionId: string): Promise<ModelContext>;
   registerPromptSection(id: string, text: string): () => void;
-  registerProjector(
-    type: string,
-    project: (data: unknown) => Message | null,
-  ): () => void;
+  registerProjector(type: string, project: (data: unknown) => Message | null): () => void;
 }
 
 export interface ModelService {
@@ -137,9 +125,7 @@ export interface CompactionService {
   compact(
     sessionId: string,
     signal?: AbortSignal,
-  ): Promise<
-    { summary: string; messagesCompacted: number; estimatedTokensSaved: number }
-  >;
+  ): Promise<{ summary: string; messagesCompacted: number; estimatedTokensSaved: number }>;
 }
 
 export interface ApprovalService {

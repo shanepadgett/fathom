@@ -32,8 +32,7 @@ export class ProjectSearchResultElement extends DesignElement {
       html`<span class="text-muted">${icon("folder", "large")}</span>`,
       html`
         <p class="truncate text-sm">${project.name}</p>
-        <p class="mt-0.5 truncate text-xs text-muted">Local · ${project
-          .path}</p>
+        <p class="mt-0.5 truncate text-xs text-muted">Local · ${project.path}</p>
       `,
       shortcut,
       selected,

@@ -6,9 +6,7 @@ import { Icon } from "./icon.tsx";
 import { IconButton } from "./primitives.tsx";
 
 /** Presentation follows design/components/workspace/workspace-header.ts. */
-export function WorkspaceHeader(
-  props: { app: ReturnType<typeof createWorkspace> },
-) {
+export function WorkspaceHeader(props: { app: ReturnType<typeof createWorkspace> }) {
   const app = props.app;
   return (
     <header class="relative flex h-12 shrink-0 items-center justify-between border-b border-line bg-surface pl-4">
@@ -37,9 +35,7 @@ export function WorkspaceHeader(
                 aria-label={`${mode[0].toUpperCase() + mode.slice(1)} focus`}
                 aria-pressed={app.mode() === mode}
                 class={`flex h-8 items-center justify-center border-r border-line px-3 text-dense last:border-r-0 ${
-                  app.mode() === mode
-                    ? "bg-canvas text-action"
-                    : "text-muted hover:text-ink"
+                  app.mode() === mode ? "bg-canvas text-action" : "text-muted hover:text-ink"
                 }`}
                 onClick={() => app.setMode(mode)}
               >
@@ -52,11 +48,13 @@ export function WorkspaceHeader(
       <div class="flex h-full items-center">
         <IconButton
           name="browser"
-          label={app.browserVisible()
-            ? "Hide browser"
-            : app.mode() === "editor"
-            ? "Show browser beside editor"
-            : "Open integrated browser"}
+          label={
+            app.browserVisible()
+              ? "Hide browser"
+              : app.mode() === "editor"
+                ? "Show browser beside editor"
+                : "Open integrated browser"
+          }
           toolbar
           pressed={app.browserVisible()}
           onClick={app.toggleBrowser}
@@ -64,17 +62,12 @@ export function WorkspaceHeader(
         <Show when={app.mode() !== "chat"}>
           <button
             type="button"
-            aria-label={app.mode() === "editor"
-              ? "Open agent drawer"
-              : "Open diff drawer"}
-            title={app.mode() === "editor"
-              ? "Open agent drawer"
-              : "Open diff drawer"}
+            aria-label={app.mode() === "editor" ? "Open agent drawer" : "Open diff drawer"}
+            title={app.mode() === "editor" ? "Open agent drawer" : "Open diff drawer"}
             class="flex h-full w-12 shrink-0 items-center justify-center border-l border-line text-action hover:bg-canvas"
             onClick={() =>
-              app.mode() === "editor"
-                ? app.setAgentDrawer((value) => !value)
-                : app.openDiff()}
+              app.mode() === "editor" ? app.setAgentDrawer((value) => !value) : app.openDiff()
+            }
           >
             <Icon name="caret-double-left" size="toolbar" />
           </button>

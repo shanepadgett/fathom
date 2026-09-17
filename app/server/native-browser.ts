@@ -12,16 +12,10 @@ function bind<const Definition extends Deno.ForeignFunction>(
 
 /** Process-owned FFI adapter. CEF owns view lifetimes and UI-thread dispatch. */
 export function loadNativeBrowser() {
-  const extension = Deno.build.os === "darwin"
-    ? "dylib"
-    : Deno.build.os === "linux"
-    ? "so"
-    : undefined;
+  const extension =
+    Deno.build.os === "darwin" ? "dylib" : Deno.build.os === "linux" ? "so" : undefined;
   if (!extension) return undefined;
-  const path = new URL(
-    `../native/fathom_child_ffi.${extension}`,
-    import.meta.url,
-  );
+  const path = new URL(`../native/fathom_child_ffi.${extension}`, import.meta.url);
   try {
     Deno.statSync(path);
   } catch (error) {
@@ -31,9 +25,8 @@ export function loadNativeBrowser() {
   const library = Deno.dlopen(path, {
     fathom_child_v1_resolve: { parameters: ["u32"], result: "pointer" },
   });
-  const pointers = Array.from(
-    { length: 7 },
-    (_, operation) => library.symbols.fathom_child_v1_resolve(operation),
+  const pointers = Array.from({ length: 7 }, (_, operation) =>
+    library.symbols.fathom_child_v1_resolve(operation),
   );
   // A staged shim can accompany a stock backend during development. Its
   // presence is not evidence that the running executable supports children.

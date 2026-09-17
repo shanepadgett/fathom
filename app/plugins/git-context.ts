@@ -43,9 +43,7 @@ export async function newFileContext(
     files.push({
       path,
       text: new TextDecoder().decode(content),
-      ...(info.size > length
-        ? { note: "Content truncated to preview limit." }
-        : {}),
+      ...(info.size > length ? { note: "Content truncated to preview limit." } : {}),
     });
   }
   return files;

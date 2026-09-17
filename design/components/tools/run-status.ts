@@ -22,9 +22,7 @@ export class RunStatusElement extends DesignElement {
 
   override render() {
     const { label, tone } = this;
-    return html`<span class="flex items-center gap-2">${
-      statusDot(tone)
-    }${label}</span>`;
+    return html`<span class="flex items-center gap-2">${statusDot(tone)}${label}</span>`;
   }
 }
 

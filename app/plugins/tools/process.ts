@@ -37,7 +37,10 @@ export async function runProcess(input: ProcessInput) {
       throw error;
     }
   })();
-  let count = 0, head = "", tail = "", timedOut = false;
+  let count = 0,
+    head = "",
+    tail = "",
+    timedOut = false;
   let writes = Promise.resolve();
   let escalation: ReturnType<typeof setTimeout> | undefined;
   const kill = (signal: NodeJS.Signals) => signalProcessGroup(child, signal);
@@ -73,13 +76,16 @@ export async function runProcess(input: ProcessInput) {
   const readers = [read(child.stdout), read(child.stderr)];
   try {
     const [code] = await Promise.all([exited, ...readers]);
-    const preview = count <= 50_000
-      ? head
-      : `${
-        head.split("\n").slice(0, 50).join("\n")
-      }\n[Full output: ${count} bytes saved to ${input.logPath}]\n${
-        tail.split("\n").slice(-50).join("\n")
-      }`;
+    const preview =
+      count <= 50_000
+        ? head
+        : `${head
+            .split("\n")
+            .slice(0, 50)
+            .join("\n")}\n[Full output: ${count} bytes saved to ${input.logPath}]\n${tail
+            .split("\n")
+            .slice(-50)
+            .join("\n")}`;
     return `exit=${code}${timedOut ? " (timeout)" : ""}\n${preview}`;
   } catch (error) {
     kill("SIGKILL");
