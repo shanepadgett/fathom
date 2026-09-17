@@ -152,7 +152,7 @@ export default {
   activate(host) {
     return host.registerEntryRenderer({
       id: "example:note",
-      matches: entry => entry.custom?.type === "example:note",
+      matches: (entry) => entry.custom?.type === "example:note",
       mount(element, host, entry) {
         const paragraph = document.createElement("p");
         paragraph.textContent = String(entry().custom?.data ?? "");
@@ -361,13 +361,13 @@ required during the current implementation phase; use the running desktop app.
 
 ### Choose the extension boundary
 
-| Need | Contribution | Owner |
-| --- | --- | --- |
-| Give the agent a new capability | `tools.register` | Backend |
-| Expose an action to a frontend | `rpc.register` | Backend |
-| Add a command to the palette | `registerCommand` | Frontend |
-| Add a small panel | `registerView` | Frontend |
-| Display a custom transcript entry | `registerEntryRenderer` | Frontend |
+| Need                               | Contribution              | Owner    |
+| ---------------------------------- | ------------------------- | -------- |
+| Give the agent a new capability    | `tools.register`          | Backend  |
+| Expose an action to a frontend     | `rpc.register`            | Backend  |
+| Add a command to the palette       | `registerCommand`         | Frontend |
+| Add a small panel                  | `registerView`            | Frontend |
+| Display a custom transcript entry  | `registerEntryRenderer`   | Frontend |
 | Replace a complete product surface | `registerSurfaceOverride` | Frontend |
 
 Keep file access, credentials and subprocesses in the backend. A frontend
@@ -447,13 +447,15 @@ Backend plugins declare `requires: ["lsp"]` and register an installed stdio
 server through the shared `LspService`. Bind registration to the plugin scope:
 
 ```ts
-ctx.effect(() => ctx.get("lsp").register({
-  id: "rust-analyzer",
-  name: "Rust Analyzer",
-  command: "rust-analyzer",
-  languages: { ".rs": "rust" },
-  initializationOptions: { checkOnSave: false },
-}));
+ctx.effect(() =>
+  ctx.get("lsp").register({
+    id: "rust-analyzer",
+    name: "Rust Analyzer",
+    command: "rust-analyzer",
+    languages: { ".rs": "rust" },
+    initializationOptions: { checkOnSave: false },
+  }),
+);
 ```
 
 Use the [portable language-server example](../../app/examples/language-server/README.md)

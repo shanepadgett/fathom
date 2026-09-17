@@ -27,6 +27,11 @@ description = "Open the local design system"
 dir = "{{config_root}}/design"
 run = "deno task dev --open"
 
+[tasks.baseline]
+description = "Launch the native-Cordis baseline app"
+dir = "{{config_root}}/baseline"
+run = "deno task start"
+
 [tasks."integration:desktop"]
 description = "Launch the built integration desktop app in its own workspace"
 dir = "{{config_root}}/prototype-integration"

@@ -3,6 +3,8 @@
 The September 14 goal authorizes implementation and delegates remaining product
 decisions. The requirements and design screens remain the feature baseline.
 The prototypes remain reference material; production code lives in `app/`.
+`baseline/` is a parallel native-Cordis host, not a replacement. Launch with
+`mise run baseline` and verify at <http://127.0.0.1:4050>.
 
 ## Restricted Mode and compaction presentation — awaiting native verification
 
@@ -503,7 +505,7 @@ prerequisites explicitly rather than claiming an SDK has been published.
 - September 15 follow-up on native port 55493: direct `Deno.serve` still inherited
   the host address through PTY environment overlay, so omitting the variable from
   the supplied map was insufficient. The PTY now starts `/usr/bin/env -u
-  DENO_SERVE_ADDRESS` followed by the selected shell; env replaces itself, keeping
+DENO_SERVE_ADDRESS` followed by the selected shell; env replaces itself, keeping
   terminal ownership intact. The bounded Node process runner uses the filtered
   environment map. Native retry is pending on the next build.
   A separate `Deno.listen` fixture rendered and disappeared when stopped, but
@@ -776,8 +778,7 @@ prerequisites explicitly rather than claiming an SDK has been published.
   Unavailable while Deno remained Connected. The editor displayed an intentional
   TypeScript assignment error and live `console` completion suggestions. Discard
   restored the original file and its single diagnostic.
-- Loaded a repository plugin registering the installed Deno binary at priority
-  10. Both Deno instances appeared alongside the global unavailable server.
+- Loaded a repository plugin registering the installed Deno binary at priority 10. Both Deno instances appeared alongside the global unavailable server.
   Luna's shared `lsp_diagnostics` tool selected Repository Deno. Its initial
   configuration omitted Deno's named configuration section and returned no
   diagnostics; adding nested `deno` settings and reloading produced the expected

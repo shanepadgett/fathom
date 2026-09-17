@@ -24,6 +24,8 @@ coverage/
 app/public/
 app/native/
 app/.desktop.local.json
+baseline/public/
+baseline/node_modules/
 *.tsbuildinfo
 
 # Design browser verification
