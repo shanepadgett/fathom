@@ -1,7 +1,0 @@
-@layer components {
-  .message-preview-collapsed {
-    max-block-size: 5lh;
-    overflow: hidden;
-    mask-image: linear-gradient(to bottom, black 45%, rgb(0 0 0 / 15%) 100%);
-  }
-}

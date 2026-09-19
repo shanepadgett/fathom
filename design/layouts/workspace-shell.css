@@ -1,9 +1,0 @@
-[data-screen-only] .workspace-shell {
-  @apply border-0 rounded-none;
-}
-
-@layer components {
-  .workspace-shell {
-    @apply block overflow-x-auto rounded-lg border border-line;
-  }
-}

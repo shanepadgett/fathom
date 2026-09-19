@@ -1,6 +1,0 @@
-@layer components {
-  .workspace-body {
-    /* z-0 traps edge-resizer stacking under scrim/overlay siblings. */
-    @apply relative z-0 flex min-h-0 flex-1;
-  }
-}

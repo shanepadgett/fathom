@@ -1,9 +1,0 @@
-@layer components {
-  .viewer-nav-group[open] > summary > .ph-caret-right {
-    @apply rotate-90;
-  }
-
-  .viewer-nav-row:focus-visible {
-    @apply outline-offset-0;
-  }
-}

@@ -1,5 +1,0 @@
-@layer components {
-  .workspace-scrim {
-    @apply absolute inset-0 z-20 block overlay-glass;
-  }
-}
