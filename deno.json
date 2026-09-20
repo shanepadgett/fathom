@@ -1,0 +1,54 @@
+{
+  "workspace": [
+    "./packages/sdk",
+    "./packages/kernel",
+    "./packages/host-deno",
+    "./packages/host-browser",
+    "./plugins/credentials",
+    "./plugins/llm",
+    "./plugins/plugin-manager",
+    "./plugins/provider-anthropic",
+    "./plugins/provider-openai",
+    "./plugins/provider-xai",
+    "./plugins/storage",
+    "./plugins/workspace"
+  ],
+  "imports": {
+    "@sinclair/typebox": "npm:@sinclair/typebox@0.34.33",
+    "@sinclair/typebox/value": "npm:@sinclair/typebox@0.34.33/value",
+    "solid-js": "npm:solid-js@1.9.15",
+    "solid-js/web": "npm:solid-js@1.9.15/web",
+    "solid-js/store": "npm:solid-js@1.9.15/store",
+    "esbuild": "npm:esbuild@0.25.9",
+    "@babel/core": "npm:@babel/core@7.28.4",
+    "babel-preset-solid": "npm:babel-preset-solid@1.9.15",
+    "@babel/preset-typescript": "npm:@babel/preset-typescript@7.27.1",
+    "oxlint": "npm:oxlint@1.83.0",
+    "oxfmt": "npm:oxfmt@0.68.0",
+    "@stylistic/eslint-plugin": "npm:@stylistic/eslint-plugin@5.10.0",
+    "eslint-plugin-solid": "npm:eslint-plugin-solid@0.18.0"
+  },
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "lib": ["deno.window", "dom", "dom.iterable", "dom.asynciterable"],
+    "strict": true,
+    "noImplicitOverride": true
+  },
+  "nodeModulesDir": "auto",
+  "lint": {
+    "exclude": ["design/"],
+    "rules": {
+      "include": ["no-slow-types"]
+    }
+  },
+  "tasks": {
+    "build:ui": "deno run -A packages/host-deno/build.ts",
+    "dev": "deno task build:ui && deno run -A --unstable-no-legacy-abort apps/desktop/main.ts --browser",
+    "desktop": "deno run -A apps/desktop/main.ts",
+    "check": "deno check apps/desktop/main.ts apps/ui/main.tsx packages/host-deno/build.ts packages/host-deno/install.ts plugins/*/backend/mod.ts plugins/*/ui/mod.tsx",
+    "plugin:add": "deno run -A packages/host-deno/install.ts add",
+    "plugin:remove": "deno run -A packages/host-deno/install.ts remove"
+  },
+  "exclude": ["docs", "**/dist/", ".pi", "node_modules"]
+}

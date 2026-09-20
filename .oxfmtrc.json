@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": false,
+  "objectWrap": "preserve",
+  "ignorePatterns": [
+    "design/",
+    "docs/",
+    ".pi/",
+    "**/dist/",
+    "node_modules/",
+    "deno.lock"
+  ]
+}

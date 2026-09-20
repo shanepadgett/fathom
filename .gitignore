@@ -10,7 +10,6 @@ Desktop.ini
 
 # Editors
 .idea/
-.vscode/
 *.swp
 *.swo
 *~
@@ -21,20 +20,15 @@ node_modules/
 dist/
 build/
 coverage/
-app/public/
-app/native/
-app/.desktop.local.json
-baseline/public/
-baseline/node_modules/
 *.tsbuildinfo
-
-# Design browser verification
-design/verification/**/__pycache__/
 
 # Env and local secrets
 .env
 .env.*
 !.env.example
+
+# Optional in-repo FATHOM_HOME
+/.fathom/
 
 # Local lifecycle check evidence
 .codex/verification/

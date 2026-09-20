@@ -1,0 +1,85 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc"],
+  "jsPlugins": ["@stylistic/eslint-plugin"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "curly": ["error", "all"],
+    "one-var": ["error", "never"],
+    "no-nested-ternary": "error",
+    "@stylistic/padding-line-between-statements": [
+      "error",
+      { "blankLine": "always", "prev": "import", "next": "*" },
+      { "blankLine": "any", "prev": "import", "next": "import" },
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": [
+          "function",
+          "class",
+          "interface",
+          "multiline-type",
+          "multiline-const",
+          "multiline-let",
+          "multiline-expression",
+          "multiline-export",
+          "multiline-block-like"
+        ]
+      },
+      {
+        "blankLine": "always",
+        "prev": [
+          "function",
+          "class",
+          "interface",
+          "multiline-type",
+          "multiline-const",
+          "multiline-let",
+          "multiline-expression",
+          "multiline-export",
+          "multiline-block-like"
+        ],
+        "next": "*"
+      },
+      { "blankLine": "always", "prev": "*", "next": "return" },
+      {
+        "blankLine": "any",
+        "prev": "function-overload",
+        "next": ["function-overload", "function"]
+      }
+    ],
+    "@stylistic/lines-between-class-members": [
+      "error",
+      {
+        "enforce": [
+          { "blankLine": "always", "prev": "*", "next": "method" },
+          { "blankLine": "always", "prev": "method", "next": "*" }
+        ]
+      },
+      { "exceptAfterOverload": true }
+    ]
+  },
+  "ignorePatterns": ["design/", "docs/", ".pi/", "**/dist/", "node_modules/"],
+  "overrides": [
+    {
+      "files": ["**/*.tsx", "**/ui/*.ts"],
+      "jsPlugins": ["eslint-plugin-solid"],
+      "rules": {
+        "solid/reactivity": [
+          "error",
+          {
+            "customReactiveFunctions": ["subscribe", "onReset", "watch"]
+          }
+        ],
+        "solid/no-destructure": "error",
+        "solid/components-return-once": "error",
+        "solid/event-handlers": "error",
+        "solid/jsx-no-duplicate-props": "error",
+        "solid/jsx-no-script-url": "error",
+        "solid/prefer-for": "error"
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+[tools]
+deno = "2.9.7"
+python = "3.14"
+
+[tasks.design]
+description = "Open the local design system"
+dir = "{{config_root}}/design"
+run = "deno task dev --open"
+
+[tasks.fmt]
+description = "Format source and project configuration with Oxfmt"
+run = "deno run -A oxfmt --write ."
+
+[tasks."fmt:check"]
+description = "Check formatting without changing files"
+run = "deno run -A oxfmt --check ."
+
+[tasks.lint]
+description = "Lint TypeScript and Solid code with Oxlint"
+run = "deno run -A oxlint --deny-warnings apps packages plugins"
+
+[tasks."lint:fix"]
+description = "Apply safe Oxlint fixes"
+run = "deno run -A oxlint --fix apps packages plugins"
+
+[tasks."lint:deno"]
+description = "Check Deno code and JSR public types"
+run = "deno lint"
+
+[tasks.typecheck]
+description = "Type-check the Deno workspace"
+run = "deno task check"
+
+[tasks.check]
+description = "Check formatting, lint, and types"
+depends = ["fmt:check", "lint", "lint:deno", "typecheck"]
