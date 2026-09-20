@@ -1,0 +1,45 @@
+@layer fathom {
+  .plugin-section {
+    .plugin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--fathom-border);
+    }
+    .plugin-row strong {
+      font-size: 13px;
+    }
+    .plugin-row span {
+      font-size: 11px;
+      margin-left: 12px;
+      color: var(--fathom-muted);
+    }
+    .plugin-row small {
+      display: block;
+      font-size: 11px;
+      color: var(--fathom-muted);
+      margin-top: 5px;
+      max-width: 700px;
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 800px) {
+      .plugin-row small {
+        max-width: 230px;
+      }
+    }
+  }
+}
+
+.runtime-controls {
+  padding: 12px 0;
+}
+.runtime-controls [role="status"] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.runtime-controls .plugin-row > div:last-child {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

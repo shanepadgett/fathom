@@ -1,0 +1,15 @@
+.fathom-control {
+  font: inherit;
+  color: var(--color-ink);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-control-line);
+  border-radius: var(--radius-control);
+  padding: var(--spacing-2) var(--spacing-3);
+}
+.fathom-control:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+.fathom-control:disabled {
+  opacity: 0.5;
+}

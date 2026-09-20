@@ -1,0 +1,1 @@
+{ "name": "@fathom/host-browser", "version": "0.1.0", "exports": "./mod.ts" }

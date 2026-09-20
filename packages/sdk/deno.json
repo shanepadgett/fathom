@@ -1,0 +1,10 @@
+{
+  "name": "@fathom/sdk",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./src/mod.ts",
+    "./ui": "./src/ui/mod.ts",
+    "./schema": "./src/schema.ts",
+    "./build": "./src/bundling/mod.ts"
+  }
+}

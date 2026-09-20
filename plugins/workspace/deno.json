@@ -1,0 +1,12 @@
+{
+  "name": "@fathom/workspace",
+  "version": "0.1.0",
+  "exports": {
+    "./contract": "./contract.ts"
+  },
+  "fathom": {
+    "id": "workspace",
+    "sdk": "^0.1",
+    "ui": "ui/mod.tsx"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@fathom/llm",
+  "version": "0.1.0",
+  "exports": {
+    "./contract": "./contract.ts",
+    "./protocols": "./protocols/mod.ts"
+  },
+  "fathom": {
+    "id": "llm",
+    "sdk": "^0.1",
+    "backend": "backend/mod.ts",
+    "ui": "ui/mod.tsx"
+  }
+}

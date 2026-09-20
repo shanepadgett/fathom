@@ -1,0 +1,95 @@
+@layer fathom {
+  .app {
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+    button,
+    a,
+    input,
+    select,
+    textarea {
+      outline-offset: 4px;
+    }
+    button {
+      cursor: pointer;
+      border: 1px solid var(--fathom-border);
+      border-radius: var(--fathom-radius-control);
+      padding: 10px 14px;
+      background: #fff;
+      color: inherit;
+      font-size: 13px;
+      font-weight: 550;
+    }
+    button:hover {
+      border-color: var(--fathom-accent);
+      background: #f2f6ef;
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+    a {
+      color: var(--fathom-accent);
+    }
+    .eyebrow {
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: 1.7px;
+      color: var(--fathom-accent);
+    }
+    p {
+      color: var(--fathom-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    h2 {
+      font-size: 18px;
+      letter-spacing: -0.3px;
+      font-weight: 600;
+      margin: 0;
+    }
+    label {
+      display: grid;
+      gap: 8px;
+      font-size: 12px;
+      color: #525c52;
+    }
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--fathom-border);
+      border-radius: var(--fathom-radius-control);
+      padding: 11px 12px;
+      background: white;
+      color: var(--fathom-text);
+      font-size: 13px;
+    }
+    textarea {
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .primary {
+      background: var(--fathom-accent);
+      color: white;
+      border-color: var(--fathom-accent);
+    }
+    .primary:hover {
+      background: #194d36;
+      color: white;
+    }
+    .error {
+      color: #a34232;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 15px 0;
+      overflow-wrap: anywhere;
+    }
+    .error:empty {
+      display: none;
+    }
+  }
+}

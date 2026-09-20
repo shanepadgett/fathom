@@ -1,0 +1,8 @@
+{
+  "version": "0.1.0",
+  "fathom": {
+    "id": "plugin-manager",
+    "sdk": "^0.1",
+    "ui": "ui/mod.tsx"
+  }
+}

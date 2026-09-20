@@ -1,0 +1,28 @@
+# Coding Harness Baseline Requirements
+
+- Establish a small foundation for a coding harness that can grow into a much more capable system.
+- Prioritize modularity, simple design, maintainable code, deep reuse, and composability.
+- Use Deno as the application runtime.
+- Make essentially every application capability a plugin. Built-ins and outside plugins should use the same extension model.
+- Support loading, enabling, disabling, configuring, and hot-reloading plugins while the app runs. These are baseline requirements, not later additions.
+- Reload changed code and affected dependencies without restarting the app. Keep unrelated capabilities running where possible.
+- Handle active work, resources, and durable state safely when plugins change. Make failures visible and recoverable.
+- Keep reusable logic separate from application wiring so it can be used in other hosts and tests.
+- Provide clear, type-safe plugin contracts and runtime checks for dynamically loaded code and configuration. Keep author-facing names and APIs simple.
+- Support multiple AI providers through a common interface, while preserving meaningful provider differences.
+- Share provider, streaming, transport, and authentication logic where that reduces duplication.
+- Support credential storage and provider login without tying them to a particular UI. Keep secrets out of conversation records and logs.
+- Provide an agent loop, extensible coding tools, persistent sessions, streamed progress, and cancellation.
+- Support a desktop UI and a clean boundary between the UI and the harness. The original plan proposes Solid and HTTP streaming.
+- Support built-in, global, project-local, and installed plugins. Require trust before executing project-supplied code.
+- Make plugin permissions and trust limits clear. Do not confuse loading or type checks with security isolation.
+- Provide a publishable SDK for outside plugin authors. The original plan targets JSR.
+- Keep the baseline focused. Avoid speculative frameworks, unnecessary abstractions, and premature versioned API names.
+- Do not treat Cordis, a custom runtime, workers, or any other proposed mechanism as a requirement. Choose the simplest approach that meets the live-plugin requirements.
+- Present the proposed baseline as a clear, easy-to-read document. Favor diagrams and code sketches over long explanations or lists of advantages.
+- Evaluate the design independently. Keep ideas from existing plans or references only when they serve these requirements.
+- Use `docs/plans/baseline.md` as the original proposal and `docs/plans/baseline-alternative.md` as another proposal, not as fixed implementation requirements.
+- Use these reference repositories as read-only examples of existing harness and AI designs. Read only what is relevant; their architectures are not requirements:
+  - `ai`: `/Users/shanepadgett/.local/share/tau-agent/references/ai`
+  - `deepseek-harness`: `/Users/shanepadgett/.local/share/tau-agent/references/deepseek-harness`
+  - `pi`: `/Users/shanepadgett/.local/share/tau-agent/references/pi`
