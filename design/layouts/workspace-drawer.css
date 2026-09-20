@@ -1,0 +1,10 @@
+@layer components {
+  workspace-drawer {
+    @apply pointer-events-auto absolute inset-y-0 right-0 z-10 flex
+      w-conversation-drawer flex-col border-l border-line bg-canvas shadow-md;
+  }
+
+  workspace-drawer[kind="diff"] {
+    @apply w-diff-drawer;
+  }
+}

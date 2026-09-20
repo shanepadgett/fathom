@@ -1,0 +1,2745 @@
+<!doctype html>
+<!-- Archived visual experiment. Not part of the maintained design system; see README.md. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fathom · Vibe Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fira+Code:wght@400;500;600;700&family=Fragment+Mono:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400&family=Manrope:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Red+Hat+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Code+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Spline+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --lab-bg: #121211;
+        --lab-panel: #1c1c1a;
+        --lab-panel-2: #242422;
+        --lab-ink: #f0efe8;
+        --lab-muted: #9a998f;
+        --lab-line: #33332e;
+        --lab-accent: #c4b59a;
+        --lab-sans: "IBM Plex Sans", system-ui, sans-serif;
+        --lab-mono: "IBM Plex Mono", ui-monospace, monospace;
+        --preview-bg: #f7f4ef;
+        --preview-fg: #1c1915;
+        --preview-muted: #6b6560;
+        --preview-line: #ddd6cb;
+        --preview-accent: #8a5a2b;
+        --preview-surface: #efeae2;
+        --preview-code-bg: #ebe4d8;
+        --ui-font: "IBM Plex Sans", system-ui, sans-serif;
+        --code-font: "IBM Plex Mono", ui-monospace, monospace;
+        --reading-font: "IBM Plex Serif", Georgia, serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, #2a261f 0%, transparent 55%),
+          radial-gradient(900px 500px at 100% 0%, #1a2228 0%, transparent 50%), var(--lab-bg);
+        color: var(--lab-ink);
+        font-family: var(--lab-sans);
+        font-size: 15px;
+        line-height: 1.45;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 28px 24px 80px;
+      }
+
+      header.hero {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 28px;
+        padding-bottom: 22px;
+        border-bottom: 1px solid var(--lab-line);
+      }
+
+      header.hero .kicker {
+        font-family: var(--lab-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--lab-accent);
+      }
+
+      header.hero h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+
+      header.hero p {
+        margin: 0;
+        max-width: 62ch;
+        color: var(--lab-muted);
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        align-items: center;
+        margin: 0 0 22px;
+        padding: 12px 14px;
+        background: color-mix(in srgb, var(--lab-bg) 88%, transparent);
+        border: 1px solid var(--lab-line);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+      }
+
+      .toolbar .label {
+        font-family: var(--lab-mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--lab-muted);
+      }
+
+      .toolbar .spacer {
+        flex: 1;
+        min-width: 8px;
+      }
+
+      .mode-toggle {
+        display: inline-flex;
+        padding: 3px;
+        border: 1px solid var(--lab-line);
+        border-radius: 999px;
+        background: var(--lab-panel);
+      }
+
+      .mode-toggle button {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: var(--lab-muted);
+        font: inherit;
+        font-size: 13px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .mode-toggle button[aria-pressed="true"] {
+        background: var(--lab-panel-2);
+        color: var(--lab-ink);
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .chip {
+        appearance: none;
+        border: 1px solid var(--lab-line);
+        background: var(--lab-panel);
+        color: var(--lab-ink);
+        font: inherit;
+        font-size: 12.5px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .chip[aria-pressed="true"] {
+        border-color: color-mix(in srgb, var(--lab-accent) 55%, var(--lab-line));
+        background: color-mix(in srgb, var(--lab-accent) 18%, var(--lab-panel));
+        color: #fff8ea;
+      }
+
+      .chip.small {
+        font-size: 12px;
+        padding: 5px 9px;
+      }
+
+      section.block {
+        margin-top: 34px;
+      }
+
+      section.block > h2 {
+        margin: 0 0 6px;
+        font-size: 1.15rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      section.block > .hint {
+        margin: 0 0 16px;
+        color: var(--lab-muted);
+        max-width: 70ch;
+      }
+
+      .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 16px;
+      }
+
+      .theme-card {
+        background: var(--lab-panel);
+        border: 1px solid var(--lab-line);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+      }
+
+      .theme-card.is-hidden {
+        display: none;
+      }
+
+      .theme-card header {
+        display: grid;
+        gap: 6px;
+        padding: 14px 14px 12px;
+        border-bottom: 1px solid var(--lab-line);
+      }
+
+      .theme-card header .top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .theme-card h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .theme-card .blurb {
+        margin: 0;
+        color: var(--lab-muted);
+        font-size: 13px;
+      }
+
+      .theme-card .pick {
+        appearance: none;
+        border: 1px solid var(--lab-line);
+        background: var(--lab-panel-2);
+        color: var(--lab-ink);
+        font: inherit;
+        font-size: 12px;
+        padding: 5px 9px;
+        border-radius: 8px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .theme-card .pick[aria-pressed="true"] {
+        border-color: color-mix(in srgb, var(--lab-accent) 60%, var(--lab-line));
+        background: color-mix(in srgb, var(--lab-accent) 22%, var(--lab-panel-2));
+      }
+
+      .scales {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(42px, 1fr);
+        gap: 8px;
+        padding: 14px;
+        overflow-x: auto;
+      }
+
+      .scale {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 42px;
+      }
+
+      .scale .name {
+        font-family: var(--lab-mono);
+        font-size: 10px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--lab-muted);
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .steps {
+        display: flex;
+        flex-direction: column;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid color-mix(in srgb, var(--lab-line) 80%, transparent);
+      }
+
+      .step {
+        position: relative;
+        height: 28px;
+        cursor: pointer;
+      }
+
+      .step:hover::after,
+      .step:focus-visible::after {
+        content: attr(data-step);
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-family: var(--lab-mono);
+        font-size: 10px;
+        color: inherit;
+        mix-blend-mode: difference;
+        background: transparent;
+      }
+
+      .step:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: -2px;
+        z-index: 1;
+      }
+
+      .theme-preview {
+        margin-top: auto;
+        border-top: 1px solid var(--lab-line);
+        padding: 14px;
+        background: var(--p-canvas);
+        color: var(--p-ink);
+        font-family: var(--ui-font);
+      }
+
+      .theme-preview .mode-label {
+        font-family: var(--lab-mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--p-muted);
+        margin-bottom: 8px;
+      }
+
+      .mini-app {
+        border: 1px solid var(--p-line);
+        border-radius: 10px;
+        background: var(--p-surface);
+        overflow: hidden;
+      }
+
+      .mini-app .bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--p-line);
+        background: var(--p-canvas);
+        font-size: 12px;
+      }
+
+      .mini-app .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--p-accent);
+      }
+
+      .mini-app .body {
+        display: grid;
+        grid-template-columns: 88px 1fr;
+        min-height: 118px;
+      }
+
+      .mini-app .side {
+        padding: 10px 8px;
+        border-right: 1px solid var(--p-line);
+        background: color-mix(in srgb, var(--p-canvas) 70%, var(--p-surface));
+        font-size: 11px;
+        color: var(--p-muted);
+      }
+
+      .mini-app .side div {
+        padding: 5px 6px;
+        border-radius: 6px;
+      }
+
+      .mini-app .side .on {
+        background: color-mix(in srgb, var(--p-accent) 16%, transparent);
+        color: var(--p-ink);
+      }
+
+      .mini-app .main {
+        padding: 10px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .mini-app .bubble {
+        padding: 8px 9px;
+        border-radius: 8px;
+        background: var(--p-canvas);
+        border: 1px solid var(--p-line);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .mini-app .bubble.agent {
+        border-color: color-mix(in srgb, var(--p-accent) 35%, var(--p-line));
+      }
+
+      .mini-app code,
+      .mini-app .code {
+        font-family: var(--code-font);
+        font-size: 11.5px;
+        background: var(--p-code);
+        color: var(--p-ink);
+        border-radius: 4px;
+        padding: 1px 4px;
+      }
+
+      .mini-app .codeblock {
+        font-family: var(--code-font);
+        font-size: 11px;
+        line-height: 1.4;
+        padding: 8px;
+        border-radius: 8px;
+        background: var(--p-code);
+        border: 1px solid var(--p-line);
+        white-space: pre;
+        overflow: hidden;
+      }
+
+      .mini-app .actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .mini-app .btn {
+        appearance: none;
+        border: 0;
+        border-radius: 6px;
+        padding: 5px 9px;
+        font: inherit;
+        font-size: 11.5px;
+        cursor: default;
+      }
+
+      .mini-app .btn.primary {
+        background: var(--p-accent);
+        color: var(--p-on-accent);
+      }
+
+      .mini-app .btn.ghost {
+        background: transparent;
+        color: var(--p-ink);
+        border: 1px solid var(--p-line);
+      }
+
+      .mini-app .status {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        font-size: 10.5px;
+      }
+
+      .pill {
+        border-radius: 999px;
+        padding: 2px 7px;
+        border: 1px solid var(--p-line);
+        background: var(--p-canvas);
+      }
+
+      .pill.ok {
+        color: var(--p-ok);
+        border-color: color-mix(in srgb, var(--p-ok) 35%, var(--p-line));
+      }
+      .pill.warn {
+        color: var(--p-warn);
+        border-color: color-mix(in srgb, var(--p-warn) 35%, var(--p-line));
+      }
+      .pill.bad {
+        color: var(--p-bad);
+        border-color: color-mix(in srgb, var(--p-bad) 35%, var(--p-line));
+      }
+      .pill.info {
+        color: var(--p-info);
+        border-color: color-mix(in srgb, var(--p-info) 35%, var(--p-line));
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 14px;
+      }
+
+      .compare-card {
+        border: 1px solid var(--lab-line);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--lab-panel);
+      }
+
+      .compare-card h3 {
+        margin: 0;
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        border-bottom: 1px solid var(--lab-line);
+      }
+
+      .compare-card .empty {
+        padding: 28px 14px;
+        color: var(--lab-muted);
+        font-size: 13px;
+      }
+
+      .swatch-tip {
+        position: fixed;
+        z-index: 50;
+        pointer-events: none;
+        transform: translate(12px, 12px);
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: #0d0d0c;
+        border: 1px solid #3a3a34;
+        color: #f3f1ea;
+        font-family: var(--lab-mono);
+        font-size: 11px;
+        opacity: 0;
+        transition: opacity 80ms ease;
+      }
+
+      .swatch-tip.show {
+        opacity: 1;
+      }
+
+      /* Fonts */
+      .font-layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 860px) {
+        .font-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .font-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        position: sticky;
+        top: 72px;
+        align-self: start;
+      }
+
+      .font-nav h3 {
+        margin: 0 0 6px;
+        font-size: 12px;
+        font-family: var(--lab-mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--lab-muted);
+        font-weight: 500;
+      }
+
+      .font-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .font-stage {
+        border: 1px solid var(--lab-line);
+        border-radius: 14px;
+        background: var(--lab-panel);
+        overflow: hidden;
+      }
+
+      .font-stage .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 14px;
+        align-items: baseline;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--lab-line);
+      }
+
+      .font-stage .meta strong {
+        font-size: 1.05rem;
+      }
+
+      .font-stage .meta span {
+        color: var(--lab-muted);
+        font-size: 12.5px;
+      }
+
+      .pair-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--lab-line);
+        background: var(--lab-panel-2);
+      }
+
+      .specimen {
+        padding: 18px 16px 22px;
+        background: var(--preview-bg);
+        color: var(--preview-fg);
+      }
+
+      .specimen.dark {
+        background: #161615;
+        color: #eceae3;
+      }
+
+      .specimen .row {
+        display: grid;
+        gap: 14px;
+      }
+
+      .specimen h4 {
+        margin: 0 0 4px;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--preview-muted);
+        font-family: var(--lab-mono);
+        font-weight: 500;
+      }
+
+      .specimen.dark h4 {
+        color: #9c9a90;
+      }
+
+      .ui-sample {
+        font-family: var(--ui-font);
+      }
+
+      .ui-sample .title {
+        font-size: 1.65rem;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        margin: 0 0 6px;
+      }
+
+      .ui-sample .body {
+        margin: 0;
+        max-width: 60ch;
+        font-size: 15px;
+        line-height: 1.5;
+        color: color-mix(in srgb, var(--preview-fg) 82%, var(--preview-muted));
+      }
+
+      .specimen.dark .ui-sample .body {
+        color: color-mix(in srgb, #eceae3 78%, #9c9a90);
+      }
+
+      .ui-sample .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+        align-items: center;
+      }
+
+      .ui-sample .controls button,
+      .ui-sample .controls .field {
+        font: inherit;
+        font-size: 13px;
+        border-radius: 8px;
+        border: 1px solid var(--preview-line);
+        background: var(--preview-surface);
+        color: var(--preview-fg);
+        padding: 7px 11px;
+      }
+
+      .specimen.dark .ui-sample .controls button,
+      .specimen.dark .ui-sample .controls .field {
+        border-color: #33332e;
+        background: #222220;
+        color: #eceae3;
+      }
+
+      .ui-sample .controls button.primary {
+        background: var(--preview-accent);
+        border-color: transparent;
+        color: #fff;
+      }
+
+      .code-sample {
+        font-family: var(--code-font);
+        font-size: 13px;
+        line-height: 1.55;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: var(--preview-code-bg);
+        border: 1px solid var(--preview-line);
+        overflow-x: auto;
+        white-space: pre;
+      }
+
+      .specimen.dark .code-sample {
+        background: #1d1d1b;
+        border-color: #33332e;
+        color: #e8e6de;
+      }
+
+      .code-sample .kw {
+        color: #7a4f2a;
+      }
+      .code-sample .str {
+        color: #2f6b4f;
+      }
+      .code-sample .cm {
+        color: #8a8478;
+      }
+      .code-sample .fn {
+        color: #345f8f;
+      }
+
+      .specimen.dark .code-sample .kw {
+        color: #d4a574;
+      }
+      .specimen.dark .code-sample .str {
+        color: #8fbfa0;
+      }
+      .specimen.dark .code-sample .cm {
+        color: #8a877c;
+      }
+      .specimen.dark .code-sample .fn {
+        color: #8fb3d9;
+      }
+
+      .reading-sample {
+        font-family: var(--reading-font);
+        font-size: 16.5px;
+        line-height: 1.55;
+        max-width: 58ch;
+      }
+
+      .reading-sample p {
+        margin: 0 0 0.7em;
+      }
+      .reading-sample p:last-child {
+        margin-bottom: 0;
+      }
+
+      .mono-matrix {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 8px;
+        font-family: var(--code-font);
+        font-size: 13px;
+      }
+
+      .mono-matrix div {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--preview-line);
+        background: var(--preview-surface);
+      }
+
+      .specimen.dark .mono-matrix div {
+        border-color: #33332e;
+        background: #222220;
+      }
+
+      .footer-note {
+        margin-top: 40px;
+        padding-top: 16px;
+        border-top: 1px solid var(--lab-line);
+        color: var(--lab-muted);
+        font-size: 13px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+
+      .tabs button {
+        appearance: none;
+        border: 1px solid var(--lab-line);
+        background: var(--lab-panel);
+        color: var(--lab-muted);
+        font: inherit;
+        font-size: 13px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+
+      .tabs button[aria-selected="true"] {
+        color: var(--lab-ink);
+        background: var(--lab-panel-2);
+        border-color: color-mix(in srgb, var(--lab-accent) 40%, var(--lab-line));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <div class="kicker">Fathom · design</div>
+        <h1>Vibe Lab</h1>
+        <p>
+          Standalone mood board for default light/dark identity. Pick themes to compare, hover a
+          swatch for the hex, and try UI / code / reading fonts from Google Fonts. Nothing here is
+          wired into the app tokens yet.
+        </p>
+      </header>
+
+      <div class="toolbar" role="region" aria-label="Lab controls">
+        <span class="label">Show</span>
+        <div class="chip-row" id="theme-filters"></div>
+        <div class="spacer"></div>
+        <span class="label">Mini preview</span>
+        <div class="mode-toggle" role="group" aria-label="Preview mode">
+          <button type="button" id="mode-light" aria-pressed="true">Light</button>
+          <button type="button" id="mode-dark" aria-pressed="false">Dark</button>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Lab sections">
+        <button
+          type="button"
+          role="tab"
+          id="tab-themes"
+          aria-selected="true"
+          aria-controls="panel-themes"
+        >
+          Themes
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-compare"
+          aria-selected="false"
+          aria-controls="panel-compare"
+        >
+          Compare
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-fonts"
+          aria-selected="false"
+          aria-controls="panel-fonts"
+        >
+          Fonts
+        </button>
+      </div>
+
+      <div id="panel-themes" role="tabpanel" aria-labelledby="tab-themes">
+        <section class="block">
+          <h2>Color scales</h2>
+          <p class="hint">
+            Each column is one scale, top = 50 (lightest) through bottom = 950. Cards include a tiny
+            app chrome preview so the mood hits as a product, not a paint fan.
+          </p>
+          <div class="theme-grid" id="theme-grid"></div>
+        </section>
+      </div>
+
+      <div id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" hidden>
+        <section class="block">
+          <h2>Side-by-side</h2>
+          <p class="hint">
+            Use <strong>Compare</strong> on theme cards (up to four). Same light/dark toggle as
+            above.
+          </p>
+          <div class="compare" id="compare-grid"></div>
+        </section>
+      </div>
+
+      <div id="panel-fonts" role="tabpanel" aria-labelledby="tab-fonts" hidden>
+        <section class="block">
+          <h2>Fonts</h2>
+          <p class="hint">
+            Three jobs only: UI chrome, code, and long reading (plans, docs, agent prose). Pick one
+            of each. Pairings below are starting points, not rules.
+          </p>
+          <div class="font-layout">
+            <aside class="font-nav">
+              <div>
+                <h3>UI</h3>
+                <div class="font-group" id="ui-fonts"></div>
+              </div>
+              <div>
+                <h3>Code</h3>
+                <div class="font-group" id="code-fonts"></div>
+              </div>
+              <div>
+                <h3>Reading</h3>
+                <div class="font-group" id="reading-fonts"></div>
+              </div>
+            </aside>
+            <div class="font-stage">
+              <div class="meta">
+                <strong id="font-pair-label">IBM Plex Sans + IBM Plex Mono</strong>
+                <span id="font-pair-note">One family system — tidy default</span>
+              </div>
+              <div class="pair-bar" id="pair-presets"></div>
+              <div class="specimen" id="font-specimen-light"></div>
+              <div class="specimen dark" id="font-specimen-dark"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <p class="footer-note">
+        Open this file directly in a browser, or serve <code>design/</code>. Path:
+        <code>design/vibe-lab.html</code>
+      </p>
+    </div>
+
+    <div class="swatch-tip" id="tip" hidden></div>
+
+    <script>
+      const STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+
+      /** @type {Record<string, {label:string, blurb:string, scales:Record<string, string[]>, roles: {light: object, dark: object}}>} */
+      const THEMES = {
+        harbor: {
+          label: "Harbor chart",
+          blurb: "Cool chart paper and signal blue. Navigator energy.",
+          scales: {
+            paper: [
+              "#f4f7fa",
+              "#e9eef4",
+              "#d5dee8",
+              "#b7c5d4",
+              "#8fa3b8",
+              "#6d849c",
+              "#556a82",
+              "#445567",
+              "#364555",
+              "#2c3846",
+              "#1b242e",
+            ],
+            ink: [
+              "#f3f5f7",
+              "#e6eaee",
+              "#cfd6de",
+              "#aeb8c4",
+              "#8793a3",
+              "#667487",
+              "#515f70",
+              "#434e5c",
+              "#38414c",
+              "#303740",
+              "#1e242b",
+            ],
+            signal: [
+              "#eff6ff",
+              "#dbeafe",
+              "#bfdbfe",
+              "#93c5fd",
+              "#60a5fa",
+              "#3b82f6",
+              "#2563eb",
+              "#1d4ed8",
+              "#1e40af",
+              "#1e3a8a",
+              "#172554",
+            ],
+            sea: [
+              "#f0fafa",
+              "#d5f5f6",
+              "#aeeaec",
+              "#76d6db",
+              "#3fb8c1",
+              "#2a9aa4",
+              "#247c86",
+              "#23636c",
+              "#235259",
+              "#1f454b",
+              "#122f34",
+            ],
+            ok: [
+              "#f0fdf6",
+              "#dcfce9",
+              "#bbf7d4",
+              "#86efb3",
+              "#4ade8a",
+              "#22c55e",
+              "#16a34a",
+              "#15803d",
+              "#166534",
+              "#14532d",
+              "#052e16",
+            ],
+            warn: [
+              "#fffbeb",
+              "#fef3c7",
+              "#fde68a",
+              "#fcd34d",
+              "#fbbf24",
+              "#f59e0b",
+              "#d97706",
+              "#b45309",
+              "#92400e",
+              "#78350f",
+              "#451a03",
+            ],
+            bad: [
+              "#fef2f2",
+              "#fee2e2",
+              "#fecaca",
+              "#fca5a5",
+              "#f87171",
+              "#ef4444",
+              "#dc2626",
+              "#b91c1c",
+              "#991b1b",
+              "#7f1d1d",
+              "#450a0a",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "paper.50",
+              surface: "paper.100",
+              ink: "ink.900",
+              muted: "ink.500",
+              line: "paper.200",
+              accent: "signal.600",
+              onAccent: "paper.50",
+              code: "paper.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "signal.600",
+            },
+            dark: {
+              canvas: "paper.950",
+              surface: "paper.900",
+              ink: "paper.50",
+              muted: "ink.300",
+              line: "paper.800",
+              accent: "signal.400",
+              onAccent: "paper.950",
+              code: "paper.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "signal.400",
+            },
+          },
+        },
+        oak: {
+          label: "Workshop oak",
+          blurb: "Timber, iron, brass. Craft bench, not cloud chrome.",
+          scales: {
+            cream: [
+              "#faf7f2",
+              "#f3eee5",
+              "#e7dfd1",
+              "#d5c9b4",
+              "#b9a890",
+              "#9c8a70",
+              "#827359",
+              "#6b5e4a",
+              "#584e40",
+              "#4a4237",
+              "#2c271f",
+            ],
+            iron: [
+              "#f5f3f0",
+              "#e8e4de",
+              "#d2cbc1",
+              "#b4aa9c",
+              "#928574",
+              "#74685a",
+              "#5f5449",
+              "#4f463d",
+              "#423c35",
+              "#39342f",
+              "#221f1b",
+            ],
+            brass: [
+              "#fbf6e8",
+              "#f5e9c8",
+              "#ead28a",
+              "#dbb44d",
+              "#c7922e",
+              "#a87422",
+              "#8a5a2b",
+              "#714826",
+              "#5c3b24",
+              "#4c3221",
+              "#2c1b10",
+            ],
+            moss: [
+              "#f3f6f0",
+              "#e4ebdc",
+              "#c9d7b8",
+              "#a6bc8d",
+              "#84a06b",
+              "#688352",
+              "#536943",
+              "#445439",
+              "#394632",
+              "#313c2c",
+              "#1c2418",
+            ],
+            ok: [
+              "#f2f8f1",
+              "#e0f0dd",
+              "#c1e0bb",
+              "#97c98f",
+              "#6aaf62",
+              "#4e9248",
+              "#3f753b",
+              "#355d32",
+              "#2d4c2b",
+              "#263f25",
+              "#122314",
+            ],
+            warn: [
+              "#fff8eb",
+              "#feefc7",
+              "#fbd98a",
+              "#f5be4d",
+              "#e9a01f",
+              "#c97f14",
+              "#a05f12",
+              "#814a15",
+              "#6a3d16",
+              "#583415",
+              "#321c09",
+            ],
+            bad: [
+              "#fbf1ef",
+              "#f7e0db",
+              "#eec1b7",
+              "#e09687",
+              "#cd6b59",
+              "#b54f3f",
+              "#983f34",
+              "#7c362e",
+              "#67302a",
+              "#562c27",
+              "#2f1512",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "cream.50",
+              surface: "cream.100",
+              ink: "iron.900",
+              muted: "iron.500",
+              line: "cream.200",
+              accent: "brass.700",
+              onAccent: "cream.50",
+              code: "cream.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "brass.600",
+            },
+            dark: {
+              canvas: "iron.950",
+              surface: "iron.900",
+              ink: "cream.50",
+              muted: "cream.300",
+              line: "iron.800",
+              accent: "brass.400",
+              onAccent: "iron.950",
+              code: "iron.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "brass.400",
+            },
+          },
+        },
+        library: {
+          label: "Library lamp",
+          blurb: "Bone paper, deep ink, one warm lamp. Long sessions.",
+          scales: {
+            bone: [
+              "#fbf8f1",
+              "#f4efe3",
+              "#e8dfcb",
+              "#d6c7a8",
+              "#c0a882",
+              "#a88b60",
+              "#8f734c",
+              "#765e41",
+              "#624e39",
+              "#524231",
+              "#2f261c",
+            ],
+            ink: [
+              "#f4f2ec",
+              "#e5e1d7",
+              "#cbc4b5",
+              "#aaa08c",
+              "#877b66",
+              "#6c6150",
+              "#594f42",
+              "#4b4339",
+              "#403a32",
+              "#37322c",
+              "#1f1c18",
+            ],
+            lamp: [
+              "#fff9eb",
+              "#fef0c7",
+              "#fbe6a1",
+              "#f5d072",
+              "#f5c04e",
+              "#e9a61f",
+              "#d48812",
+              "#b36a0f",
+              "#915510",
+              "#764512",
+              "#432606",
+            ],
+            wine: [
+              "#faf4f3",
+              "#f3e5e2",
+              "#e6c9c3",
+              "#d3a59c",
+              "#bc7d72",
+              "#a46157",
+              "#8a4e46",
+              "#72423c",
+              "#5f3935",
+              "#51322f",
+              "#2e1a18",
+            ],
+            ok: [
+              "#f1f7f0",
+              "#ddeedd",
+              "#bbd9ba",
+              "#90bf90",
+              "#68a368",
+              "#4f8750",
+              "#416d43",
+              "#375839",
+              "#2f4932",
+              "#293d2b",
+              "#152218",
+            ],
+            warn: [
+              "#fff6e8",
+              "#ffebc5",
+              "#fdd68a",
+              "#f7b94b",
+              "#ea9a1d",
+              "#c97a12",
+              "#9f5d12",
+              "#814a15",
+              "#6a3d15",
+              "#583315",
+              "#321d08",
+            ],
+            bad: [
+              "#fbf2f0",
+              "#f6e1dc",
+              "#ecc3ba",
+              "#dc9b8e",
+              "#c67161",
+              "#ad5648",
+              "#91453c",
+              "#773b35",
+              "#633430",
+              "#542f2c",
+              "#301714",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "bone.50",
+              surface: "bone.100",
+              ink: "ink.950",
+              muted: "ink.500",
+              line: "bone.200",
+              accent: "lamp.600",
+              onAccent: "bone.50",
+              code: "bone.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "lamp.700",
+            },
+            dark: {
+              canvas: "ink.950",
+              surface: "ink.900",
+              ink: "bone.50",
+              muted: "bone.300",
+              line: "ink.800",
+              accent: "lamp.400",
+              onAccent: "ink.950",
+              code: "ink.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "lamp.400",
+            },
+          },
+        },
+        signal: {
+          label: "Signal green",
+          blurb: "Near-mono chrome, CRT green pulse. Alive machine.",
+          scales: {
+            ash: [
+              "#f5f6f4",
+              "#e8ebe7",
+              "#d0d5ce",
+              "#b0b8ad",
+              "#8b9587",
+              "#6d7769",
+              "#586157",
+              "#494f48",
+              "#3e433d",
+              "#353934",
+              "#1f221f",
+            ],
+            green: [
+              "#f0fdf2",
+              "#dcfce5",
+              "#bbf7cd",
+              "#86efac",
+              "#4ade80",
+              "#22c55e",
+              "#16a34a",
+              "#15803d",
+              "#166534",
+              "#14532d",
+              "#052e16",
+            ],
+            phosphor: [
+              "#f3fef5",
+              "#d9fce3",
+              "#b4f6c9",
+              "#7eecab",
+              "#45da86",
+              "#1fc16a",
+              "#16a156",
+              "#147f46",
+              "#14653b",
+              "#125333",
+              "#052e1c",
+            ],
+            mist: [
+              "#f4f7f5",
+              "#e3ebe6",
+              "#c5d5cb",
+              "#9db8a8",
+              "#739487",
+              "#58756c",
+              "#475f59",
+              "#3c4f4b",
+              "#344240",
+              "#2d3836",
+              "#1a2221",
+            ],
+            ok: [
+              "#f0fdf2",
+              "#dcfce5",
+              "#bbf7cd",
+              "#86efac",
+              "#4ade80",
+              "#22c55e",
+              "#16a34a",
+              "#15803d",
+              "#166534",
+              "#14532d",
+              "#052e16",
+            ],
+            warn: [
+              "#fefce8",
+              "#fef9c3",
+              "#fef08a",
+              "#fde047",
+              "#facc15",
+              "#eab308",
+              "#ca8a04",
+              "#a16207",
+              "#854d0e",
+              "#713f12",
+              "#422006",
+            ],
+            bad: [
+              "#fef2f2",
+              "#fee2e2",
+              "#fecaca",
+              "#fca5a5",
+              "#f87171",
+              "#ef4444",
+              "#dc2626",
+              "#b91c1c",
+              "#991b1b",
+              "#7f1d1d",
+              "#450a0a",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "ash.50",
+              surface: "ash.100",
+              ink: "ash.950",
+              muted: "ash.500",
+              line: "ash.200",
+              accent: "phosphor.700",
+              onAccent: "ash.50",
+              code: "ash.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "phosphor.600",
+            },
+            dark: {
+              canvas: "ash.950",
+              surface: "ash.900",
+              ink: "ash.50",
+              muted: "ash.300",
+              line: "ash.800",
+              accent: "phosphor.400",
+              onAccent: "ash.950",
+              code: "ash.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "phosphor.400",
+            },
+          },
+        },
+        ember: {
+          label: "Obsidian + ember",
+          blurb: "Stern mono structure, one hot coal. Power tool.",
+          scales: {
+            stone: [
+              "#f7f7f6",
+              "#eeeeec",
+              "#dcdcd8",
+              "#c2c2bc",
+              "#a3a39b",
+              "#85857c",
+              "#6c6c64",
+              "#595952",
+              "#4b4b46",
+              "#40403c",
+              "#252522",
+            ],
+            soot: [
+              "#f4f4f3",
+              "#e7e7e5",
+              "#d0d0cd",
+              "#b1b1ac",
+              "#8e8e87",
+              "#72726b",
+              "#5c5c56",
+              "#4d4d48",
+              "#42423e",
+              "#393936",
+              "#1a1a18",
+            ],
+            ember: [
+              "#fff5f1",
+              "#ffe8de",
+              "#ffd0bc",
+              "#ffb08f",
+              "#ff8b5c",
+              "#f86835",
+              "#e54d1c",
+              "#c13c15",
+              "#993418",
+              "#7a2e17",
+              "#42140a",
+            ],
+            coal: [
+              "#faf5f3",
+              "#f3e8e4",
+              "#e5cfc7",
+              "#d0aea2",
+              "#b68676",
+              "#9a6a5b",
+              "#80574b",
+              "#6a4941",
+              "#583f3a",
+              "#4b3733",
+              "#2a1d1a",
+            ],
+            ok: [
+              "#f1f8f2",
+              "#dcefe0",
+              "#b9ddc1",
+              "#8bc49a",
+              "#5ea774",
+              "#468a5b",
+              "#396f4b",
+              "#305a3f",
+              "#294a36",
+              "#233e2e",
+              "#112319",
+            ],
+            warn: [
+              "#fff8eb",
+              "#feefc6",
+              "#fde9a8",
+              "#fbd88a",
+              "#f5bd4d",
+              "#e9a01f",
+              "#c97f14",
+              "#a15f12",
+              "#824c15",
+              "#6b3f15",
+              "#3a2109",
+            ],
+            bad: [
+              "#fef3f2",
+              "#fee4e2",
+              "#fecfc9",
+              "#fcaea6",
+              "#f88074",
+              "#ef5a4b",
+              "#d63d2f",
+              "#b43025",
+              "#952c23",
+              "#7b2b23",
+              "#42120e",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "stone.50",
+              surface: "stone.100",
+              ink: "soot.950",
+              muted: "soot.500",
+              line: "stone.200",
+              accent: "ember.600",
+              onAccent: "stone.50",
+              code: "stone.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "ember.500",
+            },
+            dark: {
+              canvas: "soot.950",
+              surface: "soot.900",
+              ink: "stone.50",
+              muted: "stone.300",
+              line: "soot.800",
+              accent: "ember.400",
+              onAccent: "soot.950",
+              code: "soot.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "ember.400",
+            },
+          },
+        },
+        glacier: {
+          label: "Glacier glass",
+          blurb: "Ice air, thin edges, cyan bite. Clear harness.",
+          scales: {
+            ice: [
+              "#f6fafb",
+              "#eaf3f6",
+              "#d3e6ec",
+              "#b0d0db",
+              "#84b4c7",
+              "#5f97ad",
+              "#4a7c92",
+              "#3f6678",
+              "#385564",
+              "#324855",
+              "#1d2e38",
+            ],
+            slate: [
+              "#f5f7f9",
+              "#e8ecf0",
+              "#d0d8e0",
+              "#aebbc8",
+              "#8696a9",
+              "#677890",
+              "#526177",
+              "#445163",
+              "#3a4554",
+              "#323b48",
+              "#1d232c",
+            ],
+            cyan: [
+              "#ecfeff",
+              "#cffafe",
+              "#a5f3fc",
+              "#67e8f9",
+              "#22d3ee",
+              "#06b6d4",
+              "#0891b2",
+              "#0e7490",
+              "#155e75",
+              "#164e63",
+              "#083344",
+            ],
+            glass: [
+              "#f3f8f8",
+              "#e1eeee",
+              "#c3dcdc",
+              "#9bc3c4",
+              "#6ea5a8",
+              "#51898d",
+              "#437075",
+              "#3a5d61",
+              "#344e52",
+              "#2e4246",
+              "#1a2a2d",
+            ],
+            ok: [
+              "#f0fdfa",
+              "#ccfbf1",
+              "#99f6e4",
+              "#5eead4",
+              "#2dd4bf",
+              "#14b8a6",
+              "#0d9488",
+              "#0f766e",
+              "#115e59",
+              "#134e4a",
+              "#042f2e",
+            ],
+            warn: [
+              "#fffbeb",
+              "#fef3c7",
+              "#fde68a",
+              "#fcd34d",
+              "#fbbf24",
+              "#f59e0b",
+              "#d97706",
+              "#b45309",
+              "#92400e",
+              "#78350f",
+              "#451a03",
+            ],
+            bad: [
+              "#fff1f2",
+              "#ffe4e6",
+              "#fecdd3",
+              "#fda4af",
+              "#fb7185",
+              "#f43f5e",
+              "#e11d48",
+              "#be123c",
+              "#9f1239",
+              "#881337",
+              "#4c0519",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "ice.50",
+              surface: "ice.100",
+              ink: "slate.900",
+              muted: "slate.500",
+              line: "ice.200",
+              accent: "cyan.700",
+              onAccent: "ice.50",
+              code: "ice.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "cyan.600",
+            },
+            dark: {
+              canvas: "slate.950",
+              surface: "slate.900",
+              ink: "ice.50",
+              muted: "ice.300",
+              line: "slate.800",
+              accent: "cyan.400",
+              onAccent: "slate.950",
+              code: "slate.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "cyan.400",
+            },
+          },
+        },
+        chalk: {
+          label: "Ink & chalk",
+          blurb: "Editorial mono. Weight does the work. Honest and spare.",
+          scales: {
+            chalk: [
+              "#fbfbfa",
+              "#f2f2f0",
+              "#e4e4e0",
+              "#cecec8",
+              "#b1b1a9",
+              "#93938a",
+              "#77776f",
+              "#63635c",
+              "#54544e",
+              "#484843",
+              "#2b2b28",
+            ],
+            ink: [
+              "#f7f7f5",
+              "#ecece8",
+              "#d6d6d0",
+              "#b7b7ae",
+              "#939388",
+              "#75756b",
+              "#5f5f57",
+              "#505049",
+              "#44443f",
+              "#3b3b36",
+              "#22221f",
+            ],
+            mark: [
+              "#f5f5f4",
+              "#e7e7e5",
+              "#d0d0cc",
+              "#b2b2ab",
+              "#8f8f86",
+              "#727269",
+              "#5c5c55",
+              "#4d4d47",
+              "#42423d",
+              "#393935",
+              "#20201d",
+            ],
+            soft: [
+              "#f8f7f4",
+              "#efeee9",
+              "#dddbd2",
+              "#c4c1b4",
+              "#a5a090",
+              "#888270",
+              "#6f6a5b",
+              "#5c574c",
+              "#4e4a41",
+              "#433f39",
+              "#282621",
+            ],
+            ok: [
+              "#f3f6f3",
+              "#e2eae2",
+              "#c4d4c5",
+              "#9db8a0",
+              "#769a7b",
+              "#5b7e62",
+              "#4a664f",
+              "#3e5443",
+              "#354639",
+              "#2e3b32",
+              "#18201b",
+            ],
+            warn: [
+              "#f8f6f1",
+              "#efe9dc",
+              "#ddd0b5",
+              "#c7b289",
+              "#b09365",
+              "#94784f",
+              "#796141",
+              "#644f38",
+              "#544232",
+              "#47392c",
+              "#2a2118",
+            ],
+            bad: [
+              "#f7f3f2",
+              "#ece3e1",
+              "#d7c5c2",
+              "#bba09b",
+              "#9c7b75",
+              "#81615c",
+              "#6b504c",
+              "#594440",
+              "#4c3b38",
+              "#423432",
+              "#271f1d",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "chalk.50",
+              surface: "chalk.100",
+              ink: "ink.950",
+              muted: "ink.500",
+              line: "chalk.200",
+              accent: "ink.800",
+              onAccent: "chalk.50",
+              code: "chalk.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.700",
+              info: "ink.600",
+            },
+            dark: {
+              canvas: "ink.950",
+              surface: "ink.900",
+              ink: "chalk.50",
+              muted: "chalk.300",
+              line: "ink.800",
+              accent: "chalk.200",
+              onAccent: "ink.950",
+              code: "ink.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "chalk.300",
+            },
+          },
+        },
+        kelp: {
+          label: "Deep kelp",
+          blurb: "Sea-glass and sand, biolume focus. Ownable water.",
+          scales: {
+            sand: [
+              "#f8f5ef",
+              "#f0eae0",
+              "#e0d5c3",
+              "#cbb89a",
+              "#b29774",
+              "#987b58",
+              "#7f6549",
+              "#68533d",
+              "#574636",
+              "#4a3c30",
+              "#2c241c",
+            ],
+            kelp: [
+              "#f1f7f4",
+              "#dceee6",
+              "#b8dbcc",
+              "#8bc1ad",
+              "#5fa38c",
+              "#468572",
+              "#396b5d",
+              "#31574d",
+              "#2b4841",
+              "#263c37",
+              "#14241f",
+            ],
+            depth: [
+              "#eef5f6",
+              "#d8e9ec",
+              "#b3d2d8",
+              "#84b4bf",
+              "#5895a4",
+              "#427887",
+              "#386170",
+              "#32505c",
+              "#2e434c",
+              "#293940",
+              "#172428",
+            ],
+            lume: [
+              "#ecfdf7",
+              "#d1faf0",
+              "#a7f3e1",
+              "#6ee7cb",
+              "#34d3ae",
+              "#14b894",
+              "#0f9678",
+              "#107861",
+              "#125f4f",
+              "#134e42",
+              "#042f28",
+            ],
+            foam: [
+              "#f5f9f8",
+              "#e6f0ee",
+              "#c9dfdb",
+              "#a3c7c2",
+              "#78a8a3",
+              "#5a8c88",
+              "#487270",
+              "#3c5d5c",
+              "#344e4e",
+              "#2d4242",
+              "#1a2828",
+            ],
+            ok: [
+              "#f0fdf6",
+              "#dcfce9",
+              "#bbf7d4",
+              "#86efb3",
+              "#4ade8a",
+              "#22c55e",
+              "#16a34a",
+              "#15803d",
+              "#166534",
+              "#14532d",
+              "#052e16",
+            ],
+            warn: [
+              "#fffbeb",
+              "#fef3c7",
+              "#fde68a",
+              "#fcd34d",
+              "#fbbf24",
+              "#f59e0b",
+              "#d97706",
+              "#b45309",
+              "#92400e",
+              "#78350f",
+              "#451a03",
+            ],
+            bad: [
+              "#fef2f2",
+              "#fee2e2",
+              "#fecaca",
+              "#fca5a5",
+              "#f87171",
+              "#ef4444",
+              "#dc2626",
+              "#b91c1c",
+              "#991b1b",
+              "#7f1d1d",
+              "#450a0a",
+            ],
+          },
+          roles: {
+            light: {
+              canvas: "sand.50",
+              surface: "sand.100",
+              ink: "depth.950",
+              muted: "depth.500",
+              line: "sand.200",
+              accent: "kelp.700",
+              onAccent: "sand.50",
+              code: "sand.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "lume.700",
+            },
+            dark: {
+              canvas: "depth.950",
+              surface: "depth.900",
+              ink: "sand.50",
+              muted: "foam.300",
+              line: "depth.800",
+              accent: "lume.400",
+              onAccent: "depth.950",
+              code: "depth.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "lume.300",
+            },
+          },
+        },
+      };
+
+      // Neutral surfaces stay consistent; only a trace of warmth/coolness varies.
+      const NEUTRAL_SCALES = {
+        cool: [
+          "#fafafb",
+          "#f1f2f3",
+          "#e2e3e6",
+          "#caced3",
+          "#a1a5ad",
+          "#737780",
+          "#595d65",
+          "#43464d",
+          "#303237",
+          "#232529",
+          "#17181b",
+        ],
+        warm: [
+          "#fbfaf9",
+          "#f3f2f0",
+          "#e6e4e1",
+          "#d0cdc9",
+          "#aaa6a1",
+          "#7c7771",
+          "#625e59",
+          "#4b4844",
+          "#353330",
+          "#272624",
+          "#191918",
+        ],
+        neutral: [
+          "#fafafa",
+          "#f2f2f2",
+          "#e4e4e4",
+          "#cecece",
+          "#a6a6a6",
+          "#777777",
+          "#5e5e5e",
+          "#484848",
+          "#333333",
+          "#252525",
+          "#181818",
+        ],
+        iris: [
+          "#fafafb",
+          "#f2f1f3",
+          "#e4e3e6",
+          "#ceccd1",
+          "#a7a4ac",
+          "#78757e",
+          "#5e5b64",
+          "#48464d",
+          "#333136",
+          "#262428",
+          "#19181b",
+        ],
+      };
+
+      const ACCENT_THEMES = [
+        {
+          id: "cornflower",
+          label: "Cornflower blue",
+          gray: "cool",
+          blurb: "Neutral cool grays. Calm, precise blue without the corporate edge.",
+          colors: [
+            "#f2f5fd",
+            "#e5ebfb",
+            "#ccd8f7",
+            "#a8bdef",
+            "#829de3",
+            "#5e7dd2",
+            "#4761b4",
+            "#3b5095",
+            "#334477",
+            "#2e3b61",
+            "#1b243e",
+          ],
+        },
+        {
+          id: "persimmon",
+          label: "Burnt persimmon",
+          gray: "warm",
+          blurb: "Barely warm grays. Rich orange-red, practical and direct.",
+          colors: [
+            "#fff5ef",
+            "#ffe8da",
+            "#fcd0b8",
+            "#f5ad8c",
+            "#eb855f",
+            "#d96139",
+            "#b84726",
+            "#953a24",
+            "#793123",
+            "#632c22",
+            "#37160f",
+          ],
+        },
+        {
+          id: "iris",
+          label: "Muted iris",
+          gray: "iris",
+          blurb: "A trace of violet in charcoal. Restrained purple with quiet character.",
+          colors: [
+            "#f7f5fc",
+            "#eee9f8",
+            "#ddd3ef",
+            "#c4b3e2",
+            "#a58cd0",
+            "#896bb8",
+            "#70539b",
+            "#5c447f",
+            "#4c3967",
+            "#403157",
+            "#251c34",
+          ],
+        },
+        {
+          id: "teal",
+          label: "Deep teal",
+          gray: "neutral",
+          blurb: "True neutral surfaces. Deep teal by day, soft turquoise at night.",
+          colors: [
+            "#effaf8",
+            "#d9f0ec",
+            "#b5e1da",
+            "#87cabe",
+            "#59ad9f",
+            "#398f82",
+            "#287568",
+            "#245e55",
+            "#224d46",
+            "#203f3a",
+            "#102824",
+          ],
+        },
+        {
+          id: "ochre",
+          label: "Ochre gold",
+          gray: "neutral",
+          blurb: "Chalk and graphite. Dark ochre and pale gold, like an instrument dial.",
+          colors: [
+            "#fcf8ed",
+            "#f6edcf",
+            "#ead99f",
+            "#dbbe69",
+            "#c9a043",
+            "#af8128",
+            "#8d621d",
+            "#704c1c",
+            "#5b3e1e",
+            "#4c351e",
+            "#2b1c0d",
+          ],
+        },
+        {
+          id: "raspberry",
+          label: "Raspberry",
+          gray: "neutral",
+          blurb: "White and charcoal. Expressive berry accents, never pink panels.",
+          colors: [
+            "#fdf3f6",
+            "#fbe5ed",
+            "#f5cbdc",
+            "#eaa4c0",
+            "#da78a0",
+            "#c45181",
+            "#a73667",
+            "#892c55",
+            "#712748",
+            "#5f253e",
+            "#371222",
+          ],
+        },
+      ];
+
+      for (const { id, label, gray, blurb, colors } of ACCENT_THEMES) {
+        THEMES[id] = {
+          label,
+          blurb,
+          scales: {
+            gray: NEUTRAL_SCALES[gray],
+            accent: colors,
+            ok: THEMES.oak.scales.ok,
+            warn: THEMES.oak.scales.warn,
+            bad: THEMES.oak.scales.bad,
+          },
+          roles: {
+            light: {
+              canvas: "gray.50",
+              surface: "gray.100",
+              ink: "gray.950",
+              muted: "gray.600",
+              line: "gray.200",
+              accent: "accent.700",
+              onAccent: "gray.50",
+              code: "gray.100",
+              ok: "ok.700",
+              warn: "warn.700",
+              bad: "bad.600",
+              info: "accent.700",
+            },
+            dark: {
+              canvas: "gray.950",
+              surface: "gray.900",
+              ink: "gray.50",
+              muted: "gray.400",
+              line: "gray.800",
+              accent: "accent.300",
+              onAccent: "gray.950",
+              code: "gray.900",
+              ok: "ok.400",
+              warn: "warn.400",
+              bad: "bad.400",
+              info: "accent.300",
+            },
+          },
+        };
+      }
+
+      const UI_FONTS = [
+        {
+          id: "ibm-plex-sans",
+          family: '"IBM Plex Sans", system-ui, sans-serif',
+          name: "IBM Plex Sans",
+          note: "Engineer-clean, pairs with Plex Mono",
+        },
+        {
+          id: "inter",
+          family: '"Inter", system-ui, sans-serif',
+          name: "Inter",
+          note: "Default product UI workhorse",
+        },
+        {
+          id: "source-sans",
+          family: '"Source Sans 3", system-ui, sans-serif',
+          name: "Source Sans 3",
+          note: "Adobe UI, calm and wide",
+        },
+        {
+          id: "dm-sans",
+          family: '"DM Sans", system-ui, sans-serif',
+          name: "DM Sans",
+          note: "Geometric, slightly softer",
+        },
+        {
+          id: "manrope",
+          family: '"Manrope", system-ui, sans-serif',
+          name: "Manrope",
+          note: "Modern, rounded, friendly",
+        },
+        {
+          id: "plus-jakarta",
+          family: '"Plus Jakarta Sans", system-ui, sans-serif',
+          name: "Plus Jakarta Sans",
+          note: "Startup-polished UI",
+        },
+        {
+          id: "space-grotesk",
+          family: '"Space Grotesk", system-ui, sans-serif',
+          name: "Space Grotesk",
+          note: "Techy display-ish UI",
+        },
+        {
+          id: "spline-sans",
+          family: '"Spline Sans", system-ui, sans-serif',
+          name: "Spline Sans",
+          note: "Neutral grotesque",
+        },
+        {
+          id: "atkinson",
+          family: '"Atkinson Hyperlegible", system-ui, sans-serif',
+          name: "Atkinson Hyperlegible",
+          note: "Max clarity, a11y-first",
+        },
+      ];
+
+      const CODE_FONTS = [
+        {
+          id: "ibm-plex-mono",
+          family: '"IBM Plex Mono", ui-monospace, monospace',
+          name: "IBM Plex Mono",
+          note: "Matches Plex Sans",
+        },
+        {
+          id: "jetbrains",
+          family: '"JetBrains Mono", ui-monospace, monospace',
+          name: "JetBrains Mono",
+          note: "IDE native feel",
+        },
+        {
+          id: "fira-code",
+          family: '"Fira Code", ui-monospace, monospace',
+          name: "Fira Code",
+          note: "Ligatures, popular in editors",
+        },
+        {
+          id: "source-code",
+          family: '"Source Code Pro", ui-monospace, monospace',
+          name: "Source Code Pro",
+          note: "Classic code body",
+        },
+        {
+          id: "red-hat-mono",
+          family: '"Red Hat Mono", ui-monospace, monospace',
+          name: "Red Hat Mono",
+          note: "Clear, slightly soft",
+        },
+        {
+          id: "fragment-mono",
+          family: '"Fragment Mono", ui-monospace, monospace',
+          name: "Fragment Mono",
+          note: "Compact, modern",
+        },
+      ];
+
+      const READING_FONTS = [
+        {
+          id: "ibm-plex-serif",
+          family: '"IBM Plex Serif", Georgia, serif',
+          name: "IBM Plex Serif",
+          note: "Same system as Plex UI",
+        },
+        {
+          id: "newsreader",
+          family: '"Newsreader", Georgia, serif',
+          name: "Newsreader",
+          note: "Editorial longform",
+        },
+        {
+          id: "literata",
+          family: '"Literata", Georgia, serif',
+          name: "Literata",
+          note: "Built for reading screens",
+        },
+        {
+          id: "ui-as-reading",
+          family: "var(--ui-font)",
+          name: "Same as UI",
+          note: "No serif — one face only",
+        },
+      ];
+
+      const PAIRINGS = [
+        {
+          ui: "ibm-plex-sans",
+          code: "ibm-plex-mono",
+          reading: "ibm-plex-serif",
+          label: "Full Plex",
+          note: "One family system — tidy default",
+        },
+        {
+          ui: "inter",
+          code: "jetbrains",
+          reading: "ui-as-reading",
+          label: "Inter + JetBrains",
+          note: "Common modern IDE chrome",
+        },
+        {
+          ui: "source-sans",
+          code: "source-code",
+          reading: "literata",
+          label: "Source stack",
+          note: "Calm Adobe-adjacent",
+        },
+        {
+          ui: "atkinson",
+          code: "ibm-plex-mono",
+          reading: "literata",
+          label: "Clarity",
+          note: "Max legibility pairing",
+        },
+        {
+          ui: "dm-sans",
+          code: "fira-code",
+          reading: "newsreader",
+          label: "Soft + sharp",
+          note: "Friendly UI, nerdy code",
+        },
+        {
+          ui: "space-grotesk",
+          code: "fragment-mono",
+          reading: "ui-as-reading",
+          label: "Tech sparse",
+          note: "More character, less serif",
+        },
+        {
+          ui: "manrope",
+          code: "red-hat-mono",
+          reading: "newsreader",
+          label: "Warm product",
+          note: "Rounded UI, soft mono",
+        },
+      ];
+
+      const state = {
+        mode: "light",
+        visible: new Set(Object.keys(THEMES)),
+        compare: [],
+        ui: "ibm-plex-sans",
+        code: "ibm-plex-mono",
+        reading: "ibm-plex-serif",
+        tab: "themes",
+      };
+
+      const tip = document.getElementById("tip");
+
+      function resolve(theme, ref) {
+        const [scale, step] = ref.split(".");
+        const idx = STEPS.indexOf(Number(step));
+        return theme.scales[scale][idx];
+      }
+
+      function roleVars(theme, mode) {
+        const roles = theme.roles[mode];
+        return {
+          "--p-canvas": resolve(theme, roles.canvas),
+          "--p-surface": resolve(theme, roles.surface),
+          "--p-ink": resolve(theme, roles.ink),
+          "--p-muted": resolve(theme, roles.muted),
+          "--p-line": resolve(theme, roles.line),
+          "--p-accent": resolve(theme, roles.accent),
+          "--p-on-accent": resolve(theme, roles.onAccent),
+          "--p-code": resolve(theme, roles.code),
+          "--p-ok": resolve(theme, roles.ok),
+          "--p-warn": resolve(theme, roles.warn),
+          "--p-bad": resolve(theme, roles.bad),
+          "--p-info": resolve(theme, roles.info),
+        };
+      }
+
+      function applyVars(el, vars) {
+        for (const [k, v] of Object.entries(vars)) el.style.setProperty(k, v);
+      }
+
+      function miniPreviewHTML(themeName) {
+        return `
+            <div class="mode-label">${state.mode} preview</div>
+            <div class="mini-app">
+              <div class="bar"><span class="dot"></span><span>${
+                THEMES[themeName].label
+              }</span><span style="margin-left:auto;color:var(--p-muted)">session</span></div>
+              <div class="body">
+                <div class="side">
+                  <div class="on">Agent</div>
+                  <div>Diffs</div>
+                  <div>Tools</div>
+                </div>
+                <div class="main">
+                  <div class="bubble">Trace the auth bug in <code>session.ts</code>.</div>
+                  <div class="bubble agent">Reading <code>src/session.ts</code>…</div>
+                  <div class="codeblock"><span style="color:var(--p-muted)">42</span>  if (!token) throw new Error(</div>
+                  <div class="status">
+                    <span class="pill ok">ok</span>
+                    <span class="pill warn">wait</span>
+                    <span class="pill bad">fail</span>
+                    <span class="pill info">run</span>
+                  </div>
+                  <div class="actions">
+                    <button class="btn primary" type="button">Steer</button>
+                    <button class="btn ghost" type="button">Follow up</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+      }
+
+      function renderScales(theme) {
+        const scales = document.createElement("div");
+        scales.className = "scales";
+        for (const [name, colors] of Object.entries(theme.scales)) {
+          const col = document.createElement("div");
+          col.className = "scale";
+          col.innerHTML = `<div class="name">${name}</div>`;
+          const steps = document.createElement("div");
+          steps.className = "steps";
+          colors.forEach((hex, i) => {
+            const step = document.createElement("div");
+            step.className = "step";
+            step.style.background = hex;
+            step.dataset.step = String(STEPS[i]);
+            step.dataset.hex = hex;
+            step.dataset.scale = name;
+            step.tabIndex = 0;
+            step.title = `${name}-${STEPS[i]} · ${hex}`;
+            step.addEventListener("pointermove", (e) => showTip(e, `${name}-${STEPS[i]}  ${hex}`));
+            step.addEventListener("pointerleave", hideTip);
+            step.addEventListener("focus", (e) => {
+              const r = e.target.getBoundingClientRect();
+              tip.style.left = `${r.right}px`;
+              tip.style.top = `${r.top}px`;
+              tip.textContent = `${name}-${STEPS[i]}  ${hex}`;
+              tip.hidden = false;
+              tip.classList.add("show");
+            });
+            step.addEventListener("blur", hideTip);
+            steps.appendChild(step);
+          });
+          col.appendChild(steps);
+          scales.appendChild(col);
+        }
+        return scales;
+      }
+
+      function showTip(e, text) {
+        tip.hidden = false;
+        tip.classList.add("show");
+        tip.textContent = text;
+        tip.style.left = `${e.clientX}px`;
+        tip.style.top = `${e.clientY}px`;
+      }
+
+      function hideTip() {
+        tip.classList.remove("show");
+        tip.hidden = true;
+      }
+
+      function renderThemeCard(id) {
+        const theme = THEMES[id];
+        const card = document.createElement("article");
+        card.className = "theme-card";
+        card.dataset.theme = id;
+        if (!state.visible.has(id)) card.classList.add("is-hidden");
+
+        const header = document.createElement("header");
+        header.innerHTML = `
+            <div class="top">
+              <div>
+                <h3>${theme.label}</h3>
+                <p class="blurb">${theme.blurb}</p>
+              </div>
+              <button type="button" class="pick" aria-pressed="${state.compare.includes(
+                id,
+              )}">${state.compare.includes(id) ? "Comparing" : "Compare"}</button>
+            </div>`;
+        header.querySelector(".pick").addEventListener("click", () => toggleCompare(id));
+
+        const preview = document.createElement("div");
+        preview.className = "theme-preview";
+        applyVars(preview, roleVars(theme, state.mode));
+        preview.innerHTML = miniPreviewHTML(id);
+
+        card.append(header, renderScales(theme), preview);
+        return card;
+      }
+
+      function renderThemes() {
+        const grid = document.getElementById("theme-grid");
+        grid.replaceChildren();
+        for (const id of Object.keys(THEMES)) grid.appendChild(renderThemeCard(id));
+      }
+
+      function renderFilters() {
+        const row = document.getElementById("theme-filters");
+        row.replaceChildren();
+        const all = document.createElement("button");
+        all.type = "button";
+        all.className = "chip";
+        all.textContent = "All";
+        all.setAttribute(
+          "aria-pressed",
+          state.visible.size === Object.keys(THEMES).length ? "true" : "false",
+        );
+        all.addEventListener("click", () => {
+          state.visible = new Set(Object.keys(THEMES));
+          renderFilters();
+          renderThemes();
+        });
+        row.appendChild(all);
+
+        for (const [id, theme] of Object.entries(THEMES)) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "chip";
+          btn.textContent = theme.label;
+          btn.setAttribute("aria-pressed", state.visible.has(id) ? "true" : "false");
+          btn.addEventListener("click", () => {
+            if (state.visible.has(id) && state.visible.size === 1) return;
+            if (state.visible.has(id)) state.visible.delete(id);
+            else state.visible.add(id);
+            renderFilters();
+            renderThemes();
+          });
+          row.appendChild(btn);
+        }
+      }
+
+      function toggleCompare(id) {
+        if (state.compare.includes(id)) {
+          state.compare = state.compare.filter((x) => x !== id);
+        } else {
+          if (state.compare.length >= 4) state.compare.shift();
+          state.compare.push(id);
+        }
+        renderThemes();
+        renderCompare();
+      }
+
+      function renderCompare() {
+        const grid = document.getElementById("compare-grid");
+        grid.replaceChildren();
+        const ids = state.compare.length ? state.compare : [];
+        if (!ids.length) {
+          const empty = document.createElement("div");
+          empty.className = "compare-card";
+          empty.innerHTML = `<div class="empty">Select Compare on one or more theme cards.</div>`;
+          grid.appendChild(empty);
+          return;
+        }
+        for (const id of ids) {
+          const theme = THEMES[id];
+          const card = document.createElement("div");
+          card.className = "compare-card";
+          const h = document.createElement("h3");
+          h.textContent = theme.label;
+          const preview = document.createElement("div");
+          preview.className = "theme-preview";
+          applyVars(preview, roleVars(theme, state.mode));
+          preview.innerHTML = miniPreviewHTML(id);
+          const scales = renderScales(theme);
+          card.append(h, scales, preview);
+          grid.appendChild(card);
+        }
+      }
+
+      function fontById(list, id) {
+        return list.find((f) => f.id === id);
+      }
+
+      function applyFontVars() {
+        const ui = fontById(UI_FONTS, state.ui);
+        const code = fontById(CODE_FONTS, state.code);
+        const reading = fontById(READING_FONTS, state.reading);
+        document.documentElement.style.setProperty("--ui-font", ui.family);
+        document.documentElement.style.setProperty("--code-font", code.family);
+        document.documentElement.style.setProperty(
+          "--reading-font",
+          state.reading === "ui-as-reading" ? ui.family : reading.family,
+        );
+        const pair = PAIRINGS.find(
+          (p) => p.ui === state.ui && p.code === state.code && p.reading === state.reading,
+        );
+        document.getElementById("font-pair-label").textContent = pair
+          ? pair.label
+          : `${ui.name} + ${code.name}`;
+        document.getElementById("font-pair-note").textContent = pair
+          ? pair.note
+          : `${ui.note} · ${code.note}`;
+      }
+
+      function specimenHTML(dark) {
+        return `
+            <div class="row">
+              <div>
+                <h4>${dark ? "Dark" : "Light"} · UI</h4>
+                <div class="ui-sample">
+                  <p class="title">Steer the active run</p>
+                  <p class="body">Fathom keeps the transcript intact while you redirect the agent mid-tool. The chrome should stay quiet so the code and the conversation stay loud.</p>
+                  <div class="controls">
+                    <button type="button" class="primary">Submit</button>
+                    <button type="button">Cancel</button>
+                    <span class="field">Cmd+K command palette</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4>Code</h4>
+                <div class="code-sample"><span class="cm">// session admission</span>
+    <span class="kw">export async function</span> <span class="fn">admit</span>(input: UserInput) {
+      <span class="kw">const</span> run = <span class="kw">await</span> queue.enqueue(input);
+      <span class="kw">return</span> run.id;
+    }</div>
+              </div>
+              <div>
+                <h4>Reading</h4>
+                <div class="reading-sample">
+                  <p>Plans and long agent prose need a face that holds a paragraph without turning into a slide deck. If you pick “Same as UI,” reading inherits the chrome font.</p>
+                  <p>0O 1lI 8B · spacing · rust_case · camelCase</p>
+                </div>
+              </div>
+              <div>
+                <h4>Mono matrix</h4>
+                <div class="mono-matrix">
+                  <div>abcdefghijk</div>
+                  <div>ABCDEFGHIJK</div>
+                  <div>0123456789</div>
+                  <div>()[]{}&lt;&gt;;:</div>
+                  <div>=&gt; !== &lt;= &gt;=</div>
+                  <div>src/agent/run.ts</div>
+                </div>
+              </div>
+            </div>`;
+      }
+
+      function renderFontPickers() {
+        const mount = (elId, list, key) => {
+          const el = document.getElementById(elId);
+          el.replaceChildren();
+          for (const font of list) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "chip small";
+            btn.textContent = font.name;
+            btn.style.fontFamily = font.id === "ui-as-reading" ? "var(--ui-font)" : font.family;
+            btn.setAttribute("aria-pressed", state[key] === font.id ? "true" : "false");
+            btn.title = font.note;
+            btn.addEventListener("click", () => {
+              state[key] = font.id;
+              applyFontVars();
+              renderFontPickers();
+              renderSpecimens();
+              renderPairPresets();
+            });
+            el.appendChild(btn);
+          }
+        };
+        mount("ui-fonts", UI_FONTS, "ui");
+        mount("code-fonts", CODE_FONTS, "code");
+        mount("reading-fonts", READING_FONTS, "reading");
+      }
+
+      function renderPairPresets() {
+        const bar = document.getElementById("pair-presets");
+        bar.replaceChildren();
+        const label = document.createElement("span");
+        label.className = "label";
+        label.textContent = "Pairings";
+        label.style.alignSelf = "center";
+        bar.appendChild(label);
+        for (const pair of PAIRINGS) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "chip small";
+          btn.textContent = pair.label;
+          const active =
+            state.ui === pair.ui && state.code === pair.code && state.reading === pair.reading;
+          btn.setAttribute("aria-pressed", active ? "true" : "false");
+          btn.title = pair.note;
+          btn.addEventListener("click", () => {
+            state.ui = pair.ui;
+            state.code = pair.code;
+            state.reading = pair.reading;
+            applyFontVars();
+            renderFontPickers();
+            renderSpecimens();
+            renderPairPresets();
+          });
+          bar.appendChild(btn);
+        }
+      }
+
+      function renderSpecimens() {
+        document.getElementById("font-specimen-light").innerHTML = specimenHTML(false);
+        document.getElementById("font-specimen-dark").innerHTML = specimenHTML(true);
+      }
+
+      function setTab(tab) {
+        state.tab = tab;
+        for (const id of ["themes", "compare", "fonts"]) {
+          document
+            .getElementById(`tab-${id}`)
+            .setAttribute("aria-selected", id === tab ? "true" : "false");
+          document.getElementById(`panel-${id}`).hidden = id !== tab;
+        }
+        if (tab === "compare") renderCompare();
+      }
+
+      document.getElementById("tab-themes").addEventListener("click", () => setTab("themes"));
+      document.getElementById("tab-compare").addEventListener("click", () => setTab("compare"));
+      document.getElementById("tab-fonts").addEventListener("click", () => setTab("fonts"));
+
+      document.getElementById("mode-light").addEventListener("click", () => {
+        state.mode = "light";
+        document.getElementById("mode-light").setAttribute("aria-pressed", "true");
+        document.getElementById("mode-dark").setAttribute("aria-pressed", "false");
+        renderThemes();
+        renderCompare();
+      });
+      document.getElementById("mode-dark").addEventListener("click", () => {
+        state.mode = "dark";
+        document.getElementById("mode-light").setAttribute("aria-pressed", "false");
+        document.getElementById("mode-dark").setAttribute("aria-pressed", "true");
+        renderThemes();
+        renderCompare();
+      });
+
+      renderFilters();
+      renderThemes();
+      renderCompare();
+      applyFontVars();
+      renderFontPickers();
+      renderPairPresets();
+      renderSpecimens();
+    </script>
+  </body>
+</html>

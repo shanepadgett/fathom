@@ -1,0 +1,19 @@
+@layer components {
+  .context-menu {
+    @apply m-0 w-64 max-w-full rounded-lg border border-line bg-surface p-1.5
+      text-dense text-ink shadow-menu;
+  }
+
+  .context-menu[popover] {
+    @apply fixed;
+  }
+
+  .context-menu ds-button:has(.context-menu-action) {
+    @apply flex min-w-0 flex-1;
+  }
+
+  .context-menu .context-menu-action {
+    @apply w-full justify-start gap-2.5 px-2 py-2 font-normal
+      hover:enabled:bg-canvas;
+  }
+}

@@ -1,0 +1,34 @@
+@layer components {
+  .tool-execution-working {
+    color: var(--color-action);
+    /* Two-second linear sweep, adapted from Motion Primitives text shimmer. */
+    mask-image: linear-gradient(
+      90deg,
+      rgb(0 0 0 / 55%) 34%,
+      black 50%,
+      rgb(0 0 0 / 55%) 66%
+    );
+    /* Both ends expose only the flat mask, so the loop resets invisibly. */
+    mask-size: 300% 100%;
+    mask-repeat: no-repeat;
+    animation: tool-execution-shimmer var(--motion-duration-shimmer) linear
+      infinite;
+  }
+
+  @keyframes tool-execution-shimmer {
+    from {
+      mask-position: 100% 0;
+    }
+    to {
+      mask-position: 0% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tool-execution-working {
+      animation: none;
+      mask-image: none;
+      color: var(--color-action);
+    }
+  }
+}
