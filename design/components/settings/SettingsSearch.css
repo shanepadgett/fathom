@@ -1,0 +1,14 @@
+@layer components {
+  ds-modal > dialog.settings-search-dialog {
+    padding: 0;
+    width: min(var(--spacing-search-panel), calc(100% - 2rem));
+  }
+  .settings-search-dialog [data-component="search-surface"] {
+    width: 100%;
+    border: 0;
+  }
+  .settings-search-results {
+    max-height: min(28rem, 60dvh);
+    overflow-y: auto;
+  }
+}

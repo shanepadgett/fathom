@@ -2,6 +2,11 @@ import { html } from "lit";
 
 export type IconName =
   | "arrow-counter-clockwise"
+  | "clipboard"
+  | "gear"
+  | "sliders-horizontal"
+  | "plugs"
+  | "arrow-square-out"
   | "push-pin"
   | "archive"
   | "tree-structure"

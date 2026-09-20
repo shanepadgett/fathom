@@ -90,6 +90,12 @@ export const viewerNavigation = () =>
         true,
       ),
       group(
+        "Settings",
+        screens.filter((entry) => entry.id.startsWith("settings-")),
+        "screens",
+        true,
+      ),
+      group(
         "Chat focus",
         screens.filter((entry) => entry.id.startsWith("chat-")),
         "screens",

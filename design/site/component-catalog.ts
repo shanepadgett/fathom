@@ -1,3 +1,4 @@
+import { settingControlExamples } from "../components/settings/setting-controls.examples.ts";
 import { metricListExamples } from "../primitives/metric-list.examples.ts";
 import { diffPreviewExamples } from "../components/editor/diff-preview.examples.ts";
 import { codePreviewExamples } from "../components/editor/code-preview.examples.ts";
@@ -51,6 +52,14 @@ import { shortcutHintExamples } from "../primitives/shortcut-hint.examples.ts";
 import { tabStripExamples } from "../primitives/tab-strip.examples.ts";
 
 const entries: DesignEntry[] = [
+  {
+    id: "setting-controls",
+    name: "Setting controls",
+    category: "Primitives",
+    description:
+      "Labeled switches, selections, and text fields for workspace preferences.",
+    examples: settingControlExamples,
+  },
   {
     id: "meter",
     name: "Meter",

@@ -1,0 +1,33 @@
+@layer components {
+  .device-sign-in {
+    @apply overflow-hidden rounded-lg border border-line bg-surface;
+  }
+  .device-sign-in-body {
+    @apply flex flex-col items-center px-6 py-8 text-center;
+  }
+  .device-sign-in-code {
+    @apply my-6 flex items-center gap-4 rounded-control border
+      border-control-line bg-canvas px-4 py-3;
+  }
+  .device-sign-in-code code {
+    @apply select-all font-mono text-2xl tracking-wide;
+  }
+  .device-sign-in-footer {
+    @apply flex items-center justify-between gap-4 border-t border-line px-5
+      py-3;
+  }
+  .device-sign-in-spinner {
+    display: inline-flex;
+    animation: device-sign-in-spin 2s linear infinite;
+  }
+}
+@keyframes device-sign-in-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .device-sign-in-spinner {
+    animation: none;
+  }
+}

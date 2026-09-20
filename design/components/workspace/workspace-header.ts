@@ -3,6 +3,7 @@ import type { Focus } from "./focus-switch.ts";
 import { html, nothing } from "lit";
 
 import { DesignElement } from "../../foundation/design-element.ts";
+import { icon } from "../../primitives/icon.ts";
 import { drawerControl } from "./drawer-control.ts";
 import { iconButton } from "../../primitives/icon-button.ts";
 import "./fathom-wordmark.ts";
@@ -37,6 +38,10 @@ export class WorkspaceHeaderElement extends DesignElement {
           <focus-switch .mode=${mode}></focus-switch>
         </div>
         <div class="flex h-full items-center">
+          <a class="mx-3 flex h-7 w-7 items-center justify-center rounded-control text-muted hover:bg-canvas hover:text-ink" href="./?screen=settings-general" aria-label="Settings" title="Settings">${icon(
+            "gear",
+            "toolbar",
+          )}</a>
           ${mode === "chat"
             ? nothing
             : drawerControl(mode === "editor" ? "agent" : "diff")}
