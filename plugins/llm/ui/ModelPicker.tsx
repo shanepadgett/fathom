@@ -19,7 +19,7 @@ export function ModelPicker(props: {
             value={props.catalog.provider()}
             disabled={props.running}
             onChange={(event) =>
-              void props.catalog.loadModels(event.currentTarget.value)
+              props.catalog.loadModels(event.currentTarget.value)
             }
           >
             <option value="">Choose a connected provider</option>
@@ -64,9 +64,7 @@ export function ModelPicker(props: {
             props.catalog.loadingModels() ||
             props.running
           }
-          onClick={() =>
-            void props.catalog.loadModels(props.catalog.provider())
-          }
+          onClick={() => void props.catalog.refetch()}
         >
           Refresh models
         </Button>

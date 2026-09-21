@@ -1,5 +1,5 @@
 import { createModelCatalog } from "./create-model-catalog.ts";
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createResource, createSignal, onCleanup, onMount } from "solid-js";
 import type { ApiClient, Static } from "@fathom/sdk";
 import type {
   CredentialsApi,
@@ -13,19 +13,11 @@ export function createModelWorkbench(props: {
   llm: ApiClient<typeof LlmApi.operations>;
   client: ClientApi;
 }) {
-  const [providers, setProviders] = createSignal<
+  const [providers, { refetch }] = createResource<
     Static<typeof ProviderStatusSchema>[]
-  >([]);
+  >(() => props.auth.status({}), { initialValue: [] });
 
   const [error, setError] = createSignal("");
-
-  async function refresh() {
-    try {
-      setProviders(await props.auth.status({}));
-    } catch (e) {
-      setError(String(e));
-    }
-  }
 
   async function cancel() {
     try {
@@ -65,10 +57,8 @@ export function createModelWorkbench(props: {
     }
   }
 
-  onMount(() => void refresh());
-
   onMount(() => {
-    onCleanup(props.auth.changed.subscribe(() => void refresh()));
+    onCleanup(props.auth.changed.subscribe(() => void refetch()));
 
     onCleanup(
       props.llm.progress.subscribe((event) => {
@@ -90,7 +80,7 @@ export function createModelWorkbench(props: {
 
     onCleanup(
       props.client.onReset(() => {
-        void refresh();
+        void refetch();
 
         if (run()) {
           void props.llm
@@ -106,8 +96,9 @@ export function createModelWorkbench(props: {
   });
 
   return {
-    providers,
-    error,
+    // Reading an errored resource throws; the view shows the error separately.
+    providers: () => (providers.error ? [] : providers()),
+    error: (): string => providers.error?.message ?? error(),
     catalog,
     prompt,
     setPrompt,

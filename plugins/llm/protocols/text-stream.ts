@@ -46,7 +46,15 @@ export async function* streamProtocol(
       break;
     }
 
-    const value = decodeFrame(JSON.parse(frame.data));
+    let data: unknown;
+
+    try {
+      data = JSON.parse(frame.data);
+    } catch {
+      throw new Error("Provider stream sent a frame that is not valid JSON");
+    }
+
+    const value = decodeFrame(data);
 
     if (value.text !== undefined) {
       yield value.text;

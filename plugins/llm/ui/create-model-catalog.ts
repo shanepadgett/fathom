@@ -1,4 +1,10 @@
-import { createSignal, onCleanup } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  onCleanup,
+  untrack,
+} from "solid-js";
 import type { ApiClient } from "@fathom/sdk";
 import type { LlmApi, ModelInfo } from "@fathom/llm/contract";
 
@@ -6,65 +12,50 @@ export function createModelCatalog(
   llm: () => ApiClient<typeof LlmApi.operations>,
 ) {
   const [provider, setProvider] = createSignal("");
-  const [models, setModels] = createSignal<ModelInfo[]>([]);
   const [model, setModel] = createSignal("");
-  const [loadingModels, setLoadingModels] = createSignal(false);
-  const [modelError, setModelError] = createSignal("");
 
-  let modelController: AbortController | undefined;
-  let modelRequest = 0;
+  let controller: AbortController | undefined;
+  onCleanup(() => controller?.abort());
 
-  onCleanup(() => {
-    modelRequest++;
-    modelController?.abort();
-  });
+  const [catalog, { refetch, mutate }] = createResource<ModelInfo[], string>(
+    // An empty provider is "nothing selected"; only null-ish sources skip the fetch.
+    () => provider() || undefined,
+    async (id) => {
+      controller?.abort();
+      controller = new AbortController();
 
-  async function loadModels(id: string) {
-    const generation = ++modelRequest;
-    const previous = id === provider() ? model() : "";
-
-    modelController?.abort();
-    modelController = new AbortController();
-
-    setProvider(id);
-    setModels([]);
-    setModel("");
-    setModelError("");
-    setLoadingModels(false);
-
-    if (!id) {
-      return;
-    }
-
-    setLoadingModels(true);
-
-    try {
-      const list = await llm().models({ provider: id }, modelController.signal);
-
-      if (generation !== modelRequest) {
-        return;
-      }
-
-      setModels(list);
-
-      setModel(
-        list.some((m) => m.id === previous) ? previous : (list[0]?.id ?? ""),
-      );
+      const list = await llm().models({ provider: id }, controller.signal);
 
       if (!list.length) {
-        setModelError(
+        throw new Error(
           "This provider returned no visible text models. Try refreshing the list.",
         );
       }
-    } catch (e) {
-      if (generation === modelRequest) {
-        setModelError(e instanceof Error ? e.message : String(e));
-      }
-    } finally {
-      if (generation === modelRequest) {
-        setLoadingModels(false);
-      }
-    }
+
+      return list;
+    },
+    { initialValue: [] },
+  );
+
+  // Reading an errored resource throws; the picker wants an empty list instead.
+  const models = () => (catalog.error ? [] : catalog());
+  const loadingModels = () => catalog.loading;
+
+  const modelError = (): string =>
+    catalog.loading ? "" : (catalog.error?.message ?? "");
+
+  createEffect(() => {
+    const list = models();
+    const previous = untrack(model);
+
+    setModel(
+      list.some((m) => m.id === previous) ? previous : (list[0]?.id ?? ""),
+    );
+  });
+
+  function loadModels(id: string) {
+    mutate([]);
+    setProvider(id);
   }
 
   function modelPlaceholder() {
@@ -99,6 +90,7 @@ export function createModelCatalog(
     loadingModels,
     modelError,
     loadModels,
+    refetch,
     modelPlaceholder,
     modelSummary,
   };

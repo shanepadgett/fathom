@@ -8,10 +8,11 @@ interface Route {
 export function createWorkspaceNavigation() {
   const read = (): Route => {
     const [area, ...parts] = location.hash.slice(2).split("/");
+    const id = parts.join("/");
 
     return {
       area: area === "settings" ? "settings" : "workspace",
-      id: parts.join("/") || undefined,
+      id: id ? decodeURIComponent(id) : undefined,
     };
   };
 
@@ -32,7 +33,7 @@ export function createWorkspaceNavigation() {
   onCleanup(() => removeEventListener("hashchange", update));
 
   const navigate = (area: Route["area"], id?: string) => {
-    location.hash = `/${area}${id ? `/${id}` : ""}`;
+    location.hash = `/${area}${id ? `/${encodeURIComponent(id)}` : ""}`;
   };
 
   return {

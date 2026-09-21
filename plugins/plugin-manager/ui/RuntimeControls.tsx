@@ -1,6 +1,7 @@
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import {
   type Change,
+  delay,
   type KernelControlApi,
   type PluginStatus,
 } from "@fathom/sdk";
@@ -9,17 +10,16 @@ import { ConfigForm } from "./ConfigForm.tsx";
 import { PluginRow } from "./PluginRow.tsx";
 
 const OPERATION_POLL_INTERVAL_MS = 200;
+const OPERATION_TIMEOUT_MS = 60_000;
 
 export function RuntimeControls(props: { control: KernelControlApi }) {
   const [plugins, setPlugins] = createSignal<PluginStatus[]>([]);
   const [message, setMessage] = createSignal("");
   const [busy, setBusy] = createSignal(false);
   const [editing, setEditing] = createSignal<PluginStatus>();
-  let live = true;
+  const unmounted = new AbortController();
 
-  onCleanup(() => {
-    live = false;
-  });
+  onCleanup(() => unmounted.abort());
 
   const refresh = async () => {
     try {
@@ -32,14 +32,24 @@ export function RuntimeControls(props: { control: KernelControlApi }) {
   onMount(() => void refresh());
 
   onMount(() => {
-    onCleanup(
-      props.control.watch((status) => {
-        if (live) {
-          setPlugins(status);
-        }
-      }),
-    );
+    onCleanup(props.control.watch(setPlugins));
   });
+
+  const settled = async (id: string, signal: AbortSignal) => {
+    while (true) {
+      const op = (await props.control.operations()).find((o) => o.id === id);
+
+      if (op?.state === "failed") {
+        throw new Error(op.error);
+      }
+
+      if (op?.state === "succeeded") {
+        return;
+      }
+
+      await delay(OPERATION_POLL_INTERVAL_MS, signal);
+    }
+  };
 
   const change = async (
     p: PluginStatus,
@@ -57,26 +67,26 @@ export function RuntimeControls(props: { control: KernelControlApi }) {
         ...(action === "config" ? { config } : {}),
       });
 
-      while (live) {
-        const op = (await props.control.operations()).find((o) => o.id === id);
+      // The timeout aborts the poll with a TimeoutError reason.
+      await settled(
+        id,
+        AbortSignal.any([
+          unmounted.signal,
+          AbortSignal.timeout(OPERATION_TIMEOUT_MS),
+        ]),
+      );
 
-        if (op?.state === "failed") {
-          throw new Error(op.error);
-        }
-
-        if (op?.state === "succeeded") {
-          setMessage(`${action}: ${p.id} completed`);
-          break;
-        }
-
-        await new Promise((resolve) =>
-          setTimeout(resolve, OPERATION_POLL_INTERVAL_MS),
-        );
-      }
+      setMessage(`${action}: ${p.id} completed`);
     } catch (e) {
-      setMessage(String(e));
+      const timedOut = e instanceof DOMException && e.name === "TimeoutError";
+
+      setMessage(
+        timedOut
+          ? `${action}: ${p.id} timed out after ${OPERATION_TIMEOUT_MS / 1000}s`
+          : String(e),
+      );
     } finally {
-      if (live) {
+      if (!unmounted.signal.aborted) {
         setBusy(false);
         await refresh();
       }
@@ -151,17 +161,15 @@ export function RuntimeControls(props: { control: KernelControlApi }) {
         title={`Configure ${editing()?.id ?? "plugin"}`}
         onClose={() => setEditing(undefined)}
       >
-        <Show when={editing()}>
+        <Show when={editing()} keyed>
           {(plugin) => (
             <ConfigForm
-              schema={plugin().configSchema}
-              value={plugin().desired.config}
+              schema={plugin.configSchema}
+              value={plugin.desired.config}
               busy={busy()}
               onSubmit={(config) => {
-                // Read the target before closing; the accessor empties with the dialog.
-                const target = plugin();
                 setEditing(undefined);
-                void change(target, "config", config);
+                void change(plugin, "config", config);
               }}
             />
           )}
