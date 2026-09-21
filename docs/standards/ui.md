@@ -49,6 +49,6 @@ provides the controls and theme.
 
 ## Verify
 
-Run `deno task dev:browser` for DevTools. Check light and dark by toggling the
+Run `mise run dev:browser` for DevTools. Check light and dark by toggling the
 `data-theme` attribute. SDK edits need a restart of the dev task; plugin edits
 reload in place.

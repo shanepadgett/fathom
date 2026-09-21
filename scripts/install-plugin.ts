@@ -6,7 +6,7 @@ const [action, directory] = Deno.args;
 
 if (!["add", "remove"].includes(action) || !directory) {
   throw new Error(
-    "Usage: deno task plugin:add|plugin:remove /absolute/plugin/directory",
+    "Usage: mise run plugin:add|plugin:remove /absolute/plugin/directory",
   );
 }
 
@@ -97,7 +97,7 @@ try {
       action === "add"
         ? "Registered trusted local source"
         : "Removed registration"
-    }: ${source}\nRun deno task build:ui, then restart the host to apply installation changes. Existing plugins support live reload.`,
+    }: ${source}\nRun mise run build:ui, then restart the host to apply installation changes. Existing plugins support live reload.`,
   );
 } finally {
   lock.close();

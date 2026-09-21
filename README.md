@@ -22,22 +22,22 @@ echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc && exec zsh
 mise install
 ```
 
-That installs Deno at the version in `mise.toml`. Nothing else is required.
+That installs the tools pinned in `mise.toml`. Nothing else is required.
 
 ## Run
 
 ```bash
-deno task dev
+mise run dev
 ```
 
 Builds the UI and opens Fathom in its own window with hot reload. For Chrome
-DevTools, run `deno task dev:browser` instead; it prints a launch link and
+DevTools, run `mise run dev:browser` instead; it prints a launch link and
 opens a browser tab.
 
 ## Write a plugin
 
 ```bash
-deno task new hello
+mise run new hello
 ```
 
 ```text
@@ -49,21 +49,33 @@ plugins/hello/
   ui/HelloSettings.tsx
 ```
 
-Restart `deno task dev`; new directories are picked up at start. Open
+Restart `mise run dev`; new directories are picked up at start. Open
 **Settings** from the gear in the header and **Hello** is in the navigation.
 Edit `backend/mod.ts` or `ui/HelloSettings.tsx` and save: the changed half
 reloads in place.
 
 ## Tasks
 
-| Command                      | Does                                                 |
-| ---------------------------- | ---------------------------------------------------- |
-| `deno task dev`              | Build, open the native window, reload edited plugins |
-| `deno task dev:browser`      | The same in a browser tab, for DevTools              |
-| `deno task new <id>`         | Scaffold a plugin under `plugins/`                   |
-| `deno task plugin:add <dir>` | Register a plugin outside the repo; starts disabled  |
-| `deno task desktop:build`    | Package `dist/Fathom.app`                            |
-| `mise run check`             | Format, lint, and type checks                        |
+Everything runs through mise. `mise tasks` lists the same set with descriptions.
+
+| Command                        | Does                                                 |
+| ------------------------------ | ---------------------------------------------------- |
+| `mise run dev`                 | Build, open the native window, reload edited plugins |
+| `mise run dev:browser`         | The same in a browser tab, for DevTools              |
+| `mise run build:ui`            | Build the app shell and plugin UI bundles            |
+| `mise run new <id>`            | Scaffold a plugin under `plugins/`                   |
+| `mise run plugin:add <dir>`    | Register a plugin outside the repo; starts disabled  |
+| `mise run plugin:remove <dir>` | Unregister a plugin outside the repo                 |
+| `mise run desktop:build`       | Package `dist/Fathom.app`                            |
+| `mise run design`              | Open the local design system                         |
+| `mise run fmt`                 | Format source and project configuration              |
+| `mise run fmt:check`           | Check formatting without changing files              |
+| `mise run lint`                | Lint TypeScript and Solid code                       |
+| `mise run lint:fix`            | Apply safe lint fixes                                |
+| `mise run lint:deno`           | Run `deno lint` and check JSR public types           |
+| `mise run typecheck`           | Type-check the Deno workspace                        |
+| `mise run check`               | Format, lint, and type checks                        |
+| `mise run publish:check`       | Dry-run the JSR publish of the SDK                   |
 
 ## Learn more
 

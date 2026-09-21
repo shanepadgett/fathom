@@ -24,8 +24,8 @@ Read a standard when its reason applies.
   `mise run check`.
 - Validate by running the app. Do not add tests or validation scripts unless
   asked.
-- SDK, kernel, server, renderer, and app edits need a restart of
-  `deno task dev`. Plugin edits reload in place.
+- Restart `mise run dev` after edits to the SDK, kernel, server, renderer, or
+  app; plugin edits reload in place.
 - Point a run at a throwaway home with `FATHOM_HOME`. Never print saved
   credentials.
 - `design/` is the copied design reference. Never reorganize or reformat it.

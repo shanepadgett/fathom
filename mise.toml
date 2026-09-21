@@ -7,13 +7,33 @@ description = "Open the local design system"
 dir = "{{config_root}}/design"
 run = "deno task dev --open"
 
-[tasks.app]
+[tasks.dev]
 description = "Build the UI and open Fathom in its native window with hot reload"
 run = "deno task dev"
 
-[tasks.browser]
+[tasks."dev:browser"]
 description = "Build the UI and run Fathom in a browser tab for DevTools"
 run = "deno task dev:browser"
+
+[tasks."build:ui"]
+description = "Build the app shell and plugin UI bundles"
+run = "deno task build:ui"
+
+[tasks."desktop:build"]
+description = "Package the native app as dist/Fathom.app"
+run = "deno task desktop:build"
+
+[tasks.new]
+description = "Scaffold a plugin under plugins/"
+run = "deno task new"
+
+[tasks."plugin:add"]
+description = "Register a plugin outside the repo; starts disabled"
+run = "deno task plugin:add"
+
+[tasks."plugin:remove"]
+description = "Unregister a plugin outside the repo"
+run = "deno task plugin:remove"
 
 [tasks.fmt]
 description = "Format source and project configuration with Oxfmt"

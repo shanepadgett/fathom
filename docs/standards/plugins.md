@@ -15,7 +15,7 @@ plugins/<id>/
   ui/*.tsx           one PascalCase file per named component
 ```
 
-Scaffold with `deno task new <id>`. Add `plugins/<id>` to the root `deno.json`
+Scaffold with `mise run new <id>`. Add `plugins/<id>` to the root `deno.json`
 workspace. A plugin without a UI or backend half omits that entry and folder.
 
 ## Rules
@@ -45,17 +45,17 @@ workspace. A plugin without a UI or backend half omits that entry and folder.
 
 ## Change a plugin
 
-1. Edit under `plugins/<id>/`. With `deno task dev` running, UI edits rebuild
+1. Edit under `plugins/<id>/`. With `mise run dev` running, UI edits rebuild
    and reload the page half; backend edits reload the process half.
 2. Confirm in **Settings → Plugins** that the plugin is `ready`. A `blocked`
    plugin lists the token ids it waits on; `failed` shows the error.
 
 ## Add a bundled plugin
 
-1. `deno task new <id>`, then add the directory to the workspace in the root
+1. `mise run new <id>`, then add the directory to the workspace in the root
    `deno.json`.
 2. Add `"lint": { "rules": { "exclude": ["no-slow-types"] } }` to its
    `deno.json`. That rule applies to the SDK only.
-3. Start `deno task dev`. Bundled plugins start enabled; the counter example
-   and other external directories are added with `deno task plugin:add` and
+3. Start `mise run dev`. Bundled plugins start enabled; the counter example
+   and other external directories are added with `mise run plugin:add` and
    start disabled.

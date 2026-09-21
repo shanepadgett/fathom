@@ -95,8 +95,8 @@ The component wraps its content in `SettingsSection`, uses `Card` and
 The example lives outside `plugins/`, so register it once:
 
 ```bash
-deno task plugin:add "$PWD/examples/counter"
-deno task dev
+mise run plugin:add "$PWD/examples/counter"
+mise run dev
 ```
 
 External plugins start disabled. Enable both halves under **Settings →

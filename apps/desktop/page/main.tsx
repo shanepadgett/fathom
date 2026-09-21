@@ -16,7 +16,7 @@ const token = await readLaunchToken();
 
 if (!token) {
   root.textContent =
-    "Open the launch link printed by deno task dev:browser to connect to Fathom.";
+    "Open the launch link printed by mise run dev:browser to connect to Fathom.";
 } else {
   try {
     await bootBrowser(root, token);

@@ -19,7 +19,7 @@ try {
     throw error;
   }
 
-  throw new Error("Build the UI first: deno task build:ui", { cause: error });
+  throw new Error("Build the UI first: mise run build:ui", { cause: error });
 }
 
 const BrowserWindow = desktopRuntime();

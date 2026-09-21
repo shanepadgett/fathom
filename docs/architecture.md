@@ -81,7 +81,7 @@ models, sessions, or providers, it belongs in a plugin.
 4. `ui/mod.tsx` declares `requires` and contributes components to slots. It runs
    in the page. Controls come from `@fathom/sdk/ui`; utility classes compile per
    plugin against the SDK theme.
-5. Register the directory once with `deno task plugin:add`, then run Fathom.
+5. Register the directory once with `mise run plugin:add`, then run Fathom.
    The server builds the UI entry, the kernel starts the backend entry, and the
    plugin manager shows both with enable, disable, reload, and configure.
 6. Replace a bundled plugin by providing the same service token or contributing

@@ -36,7 +36,7 @@ entry. JSR exports are modules only; do not export CSS.
 ## Change the SDK
 
 1. Edit under `packages/sdk/src/`. Add new exports to the relevant barrel.
-2. Restart `deno task dev`; the SDK does not hot reload.
+2. Restart `mise run dev`; the SDK does not hot reload.
 3. Run `mise run check` and `mise run publish:check`.
 4. Removing or renaming an export is a breaking change. Update every bundled
    plugin, `examples/counter`, the scaffold in `scripts/new-plugin.ts`, and the

@@ -37,7 +37,7 @@ general contract. Do not add framework features for plugins that do not exist.
 | Repository license | Not chosen. Blocks JSR publication and keeps `publish:check` out of `check`. |
 | Slot composition settings | The composition JSON file and the revision-checked API select a shell or sidebar; no UI. |
 | WebKit rendering check | Dialog and menu transitions in the native window are unverified. If they degrade, set `"backend": "cef"` in `deno.json`. |
-| Adding a plugin directory | Requires restarting `deno task dev`; edits inside a known directory reload in place. |
+| Adding a plugin directory | Requires restarting `mise run dev`; edits inside a known directory reload in place. |
 | Remote install, marketplace, updates | Not started. Local registration is an explicit trust decision. |
 | Signing and notarization | The packaged app is ad-hoc signed. |
 | Control coverage | Not every component in `design/` has an SDK control. |

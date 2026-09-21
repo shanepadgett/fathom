@@ -4,7 +4,7 @@ const [id] = Deno.args;
 
 if (!id || !/^[a-z][a-z0-9-]*$/.test(id)) {
   throw new Error(
-    "Usage: deno task new <plugin-id> (lowercase, digits, dashes)",
+    "Usage: mise run new <plugin-id> (lowercase, digits, dashes)",
   );
 }
 
@@ -116,4 +116,4 @@ for (const [path, content] of Object.entries(files)) {
   await Deno.writeTextFile(target, content);
 }
 
-console.log(`Created plugins/${id}. Run: deno task dev`);
+console.log(`Created plugins/${id}. Run: mise run dev`);

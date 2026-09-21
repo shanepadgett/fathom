@@ -18,7 +18,7 @@ it:
 
 1. Write a plugin whose `provides` includes `Storage` and whose `start` returns
    an implementation of `StorageNamespace`.
-2. Register it with `deno task plugin:add` and enable it.
+2. Register it with `mise run plugin:add` and enable it.
 3. Disable `storage` in **Settings → Plugins**.
 
 While both are enabled the kernel refuses the second provider and reports the
