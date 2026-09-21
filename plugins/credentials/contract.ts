@@ -5,39 +5,13 @@ import {
   defineService,
   event,
   query,
-  type ApiToken,
-  type Event,
-  type Operation,
-  type RegistryToken,
-  type ServiceToken,
   type Static,
   T,
 } from "@fathom/sdk";
-import type {
-  TObject,
-  TString,
-  TUnion,
-  TLiteral,
-  TNumber,
-  TOptional,
-  TArray,
-  TBoolean,
-} from "@sinclair/typebox";
 
 const MAX_LOGIN_REPLY_LENGTH = 16_384;
 
-export const CredentialSchema: TUnion<
-  [
-    TObject<{ kind: TLiteral<"api-key">; key: TString }>,
-    TObject<{
-      kind: TLiteral<"oauth">;
-      accessToken: TString;
-      refreshToken: TString;
-      expiresAt: TNumber;
-      accountId: TOptional<TString>;
-    }>,
-  ]
-> = T.Union([
+export const CredentialSchema = T.Union([
   T.Object(
     { kind: T.Literal("api-key"), key: T.String({ minLength: 1 }) },
     {
@@ -59,24 +33,7 @@ export const CredentialSchema: TUnion<
 
 export type Credential = Static<typeof CredentialSchema>;
 
-export const LoginStateSchema: TObject<{
-  id: TString;
-  provider: TString;
-  method: TString;
-  state: TUnion<
-    [
-      TLiteral<"working">,
-      TLiteral<"waiting">,
-      TLiteral<"connected">,
-      TLiteral<"failed">,
-      TLiteral<"cancelled">,
-    ]
-  >;
-  message: TString;
-  url: TOptional<TString>;
-  code: TOptional<TString>;
-  prompt: TOptional<TString>;
-}> = T.Object({
+export const LoginStateSchema = T.Object({
   id: T.String(),
   provider: T.String(),
   method: T.String(),
@@ -114,30 +71,20 @@ export interface LoginFlow {
   ): Promise<Credential>;
 }
 
-export const Logins: RegistryToken<LoginFlow> = defineRegistry(
-  "fathom.credentials.logins",
-  {
-    key: (entry) => entry.provider,
-  },
-);
+export const Logins = defineRegistry<LoginFlow>("fathom.credentials.logins", {
+  key: (entry) => entry.provider,
+});
 
-export const Credentials: ServiceToken<{
+export const Credentials = defineService<{
   /**
    * Backend-only secret access. Returns undefined if missing or being removed.
    * May refresh and persist tokens; concurrent callers share that refresh.
    * Caller cancellation does not cancel a shared refresh. Refresh failures reject.
    */
   get(provider: string, signal: AbortSignal): Promise<Credential | undefined>;
-}> = defineService("fathom.credentials");
+}>("fathom.credentials");
 
-export const ProviderStatusSchema: TObject<{
-  id: TString;
-  label: TString;
-  connected: TBoolean;
-  kind: TOptional<TString>;
-  expiresAt: TOptional<TNumber>;
-  methods: TArray<TObject<{ id: TString; label: TString }>>;
-}> = T.Object({
+export const ProviderStatusSchema = T.Object({
   id: T.String(),
   label: T.String(),
   connected: T.Boolean(),
@@ -146,25 +93,10 @@ export const ProviderStatusSchema: TObject<{
   methods: T.Array(T.Object({ id: T.String(), label: T.String() })),
 });
 
-const Empty: TObject<Record<never, never>> = T.Object(
-  {},
-  { additionalProperties: false },
-);
+const Empty = T.Object({}, { additionalProperties: false });
 
 /** UI login controls and status; saved credentials are never returned. */
-export const CredentialsApi: ApiToken<{
-  status: Operation<typeof Empty, TArray<typeof ProviderStatusSchema>>;
-  logins: Operation<typeof Empty, TArray<typeof LoginStateSchema>>;
-  login: Operation<
-    TObject<{ provider: TString; method: TString }>,
-    TObject<{ id: TString }>
-  >;
-  reply: Operation<TObject<{ id: TString; value: TString }>, typeof Empty>;
-  cancel: Operation<TObject<{ id: TString }>, typeof Empty>;
-  remove: Operation<TObject<{ provider: TString }>, typeof Empty>;
-  changed: Event<TObject<Record<never, never>>>;
-  loginChanged: Event<typeof LoginStateSchema>;
-}> = defineApi("fathom.credentials.api", {
+export const CredentialsApi = defineApi("fathom.credentials.api", {
   status: query({ input: Empty, output: T.Array(ProviderStatusSchema) }),
   logins: query({ input: Empty, output: T.Array(LoginStateSchema) }),
   login: command({

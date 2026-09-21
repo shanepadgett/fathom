@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Fathom</title>
+    <script>
+      // Paint with the saved appearance before the module graph loads.
+      (() => {
+        try {
+          const saved = localStorage.getItem("fathom.theme");
+          let theme = matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+
+          if (saved === "light" || saved === "dark") {
+            theme = saved;
+          }
+
+          document.documentElement.dataset.theme = theme;
+
+          document.documentElement.dataset.reducedMotion = String(
+            localStorage.getItem("fathom.motion") === "reduce" ||
+              matchMedia("(prefers-reduced-motion: reduce)").matches,
+          );
+        } catch {
+          // Storage access failed; the appearance service applies defaults.
+        }
+      })();
+    </script>
+    <link rel="stylesheet" href="/assets/icons/phosphor.css" />
+    <link rel="stylesheet" href="/ui.css" />
+    <link rel="stylesheet" href="/app.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "solid-js": "/solid.js",
+          "solid-js/web": "/solid-web.js",
+          "solid-js/store": "/solid-store.js",
+          "@fathom/sdk": "/sdk.js",
+          "@fathom/sdk/ui": "/sdk-ui.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">Starting Fathom…</div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

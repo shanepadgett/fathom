@@ -1,0 +1,19 @@
+[independent-recovery]
+description = "Keep plugin recovery available and operable when the workspace shell or plugin manager is unavailable"
+read = [
+  "packages/renderer/RecoveryPanel.tsx",
+  "packages/renderer/mount-recovery.tsx",
+  "packages/renderer/app.css",
+  "packages/sdk/src/kernel-control.ts",
+  "packages/sdk/src/ui/client.ts",
+  "packages/sdk/src/ui/controls/Button.tsx",
+  "packages/sdk/src/ui/controls/Card.tsx",
+  "packages/sdk/src/ui/controls/InlineNotice.tsx",
+]
+show = []
+outline = []
+references = [
+  "packages/renderer/boot.ts",
+  "packages/kernel/kernel.ts",
+  "packages/renderer/control.ts",
+]

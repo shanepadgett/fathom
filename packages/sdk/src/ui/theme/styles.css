@@ -1,0 +1,10 @@
+/* Everything the application shell loads once. Plugins compile utilities against theme.css and typography.css only. */
+@import "./theme.css";
+@import "./fonts.css";
+@import "./base.css";
+@import "./typography.css";
+@import "../controls/Accordion.css";
+@import "../controls/Button.css";
+@import "../controls/Dialog.css";
+@import "../controls/Menu.css";
+@import "../controls/ResizableSidebar.css";

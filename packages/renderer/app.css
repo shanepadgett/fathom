@@ -1,0 +1,17 @@
+#app {
+  @apply min-h-dvh;
+}
+
+/* Recovery is mounted outside the replaceable workspace root. */
+.host-controls {
+  @apply fixed bottom-2 left-2 z-50 max-h-[80dvh] overflow-auto text-xs;
+  max-width: min(36rem, calc(100vw - 1rem));
+}
+
+.host-controls > summary {
+  @apply text-muted;
+}
+
+.host-controls[open] > div {
+  @apply mt-4;
+}

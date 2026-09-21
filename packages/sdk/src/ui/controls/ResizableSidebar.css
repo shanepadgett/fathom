@@ -1,0 +1,40 @@
+@layer components {
+  /* Mirrors design/layouts/workspace-sidebar.css and edge-resizer.css. */
+  .fathom-sidebar {
+    @apply relative flex min-h-0 shrink-0 flex-col border-r border-line
+      bg-surface;
+  }
+
+  .fathom-sidebar[data-side="right"] {
+    @apply border-r-0 border-l;
+  }
+
+  .fathom-resizer {
+    @apply absolute inset-y-0 z-40 block w-2 translate-x-1/2
+      cursor-col-resize touch-none select-none;
+    right: calc(var(--spacing-resize-line) / -2);
+  }
+
+  .fathom-sidebar[data-side="right"] > .fathom-resizer {
+    @apply -translate-x-1/2 right-auto;
+    left: calc(var(--spacing-resize-line) / -2);
+  }
+
+  .fathom-resizer::after {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 left-1/2 w-resize-line
+      -translate-x-1/2 bg-focus opacity-0 shadow-resize-glow
+      duration-motion-fast;
+    transition-property: opacity;
+  }
+
+  .fathom-resizer:hover::after,
+  .fathom-resizer[data-dragging]::after,
+  .fathom-resizer:focus-visible::after {
+    @apply opacity-100;
+  }
+
+  .fathom-resizer:focus-visible {
+    @apply outline-none;
+  }
+}

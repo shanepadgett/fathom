@@ -18,15 +18,15 @@ export default definePlugin({
   id: "credentials",
   requires: { environment: AppEnvironment, api: Api },
   provides: { credentials: Credentials, logins: Logins },
-  async start({ use, scope }) {
-    const store = await openCredentialStore(use.environment.home);
+  async start({ environment, logins, api, scope }) {
+    const store = await openCredentialStore(environment.home);
     scope.defer(() => store.close());
 
     const changed = () => publication.emit("changed", {});
-    const access = createCredentialAccess(store, use.logins, scope, changed);
+    const access = createCredentialAccess(store, logins, scope, changed);
 
     const sessions = createLoginSessions(
-      use.logins,
+      logins,
       scope,
       access,
       (state) => publication.emit("loginChanged", state),
@@ -34,12 +34,12 @@ export default definePlugin({
     );
 
     const publication: ApiPublication<typeof CredentialsApi.operations> =
-      use.api.serve(
+      api.serve(
         CredentialsApi,
-        createCredentialHandlers(store, use.logins, access, sessions),
+        createCredentialHandlers(store, logins, access, sessions),
       );
 
-    use.logins.watch(changed);
+    logins.watch(changed);
 
     return { credentials: { get: access.get } };
   },

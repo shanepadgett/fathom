@@ -1,10 +1,17 @@
-import { ModelPicker } from "./ModelPicker.tsx";
-import "./ModelWorkbench.css";
 import { Show } from "solid-js";
 import type { ApiClient } from "@fathom/sdk";
 import type { CredentialsApi } from "@fathom/credentials/contract";
 import type { LlmApi } from "@fathom/llm/contract";
 import type { ClientApi } from "@fathom/sdk/ui";
+import {
+  Button,
+  Card,
+  Field,
+  InlineNotice,
+  Textarea,
+  SettingsSection,
+} from "@fathom/sdk/ui";
+import { ModelPicker } from "./ModelPicker.tsx";
 import { createModelWorkbench } from "./create-model-workbench.ts";
 
 export function ModelWorkbench(props: {
@@ -25,61 +32,62 @@ export function ModelWorkbench(props: {
   } = createModelWorkbench(props);
 
   return (
-    <div class="llm-panel">
-      <Show when={error()}>
-        <div class="error" role="alert">
-          {error()}
-        </div>
-      </Show>
-      <section class="model-section" aria-labelledby="model-title">
-        <div>
-          <span class="eyebrow">FIRST REQUEST</span>
-          <h2 id="model-title">Try a model.</h2>
-          <p>One streaming request through the selected provider.</p>
-        </div>
-        <div class="model-form">
-          <ModelPicker
-            providers={providers()}
-            running={state() === "running"}
-            catalog={catalog}
+    <SettingsSection
+      title="Model diagnostics"
+      description="One streaming request to check a provider connection. This is not a conversation."
+    >
+      <div class="grid gap-6">
+        <Show when={error()}>
+          <InlineNotice error>{error()}</InlineNotice>
+        </Show>
+        <ModelPicker
+          providers={providers()}
+          running={state() === "running"}
+          catalog={catalog}
+        />
+        <Field id="model-prompt" label="Prompt">
+          <Textarea
+            id="model-prompt"
+            class="w-full"
+            rows={4}
+            value={prompt()}
+            disabled={state() === "running"}
+            onInput={(event) => setPrompt(event.currentTarget.value)}
           />
-          <label>
-            Prompt
-            <textarea
-              rows={3}
-              value={prompt()}
-              disabled={state() === "running"}
-              onInput={(e) => setPrompt(e.currentTarget.value)}
-            />
-          </label>
-          <div class="request-actions">
-            <button
-              type="button"
-              class="primary"
-              disabled={
-                !catalog.provider() ||
-                !catalog.model() ||
-                !prompt().trim() ||
-                state() === "running"
-              }
-              onClick={() => void start()}
+        </Field>
+        <div class="flex items-center gap-3">
+          <Button
+            variant="primary"
+            disabled={
+              !catalog.provider() ||
+              !catalog.model() ||
+              !prompt().trim() ||
+              state() === "running"
+            }
+            onClick={() => void start()}
+          >
+            Send request
+          </Button>
+          <Show when={state() === "running"}>
+            <Button variant="secondary" onClick={() => void cancel()}>
+              Cancel
+            </Button>
+          </Show>
+          <span class="type-description" role="status">
+            {state()}
+          </span>
+        </div>
+        <Show when={output()}>
+          <Card>
+            <pre
+              class="max-h-96 overflow-auto whitespace-pre-wrap break-words font-mono text-sm"
+              aria-live="polite"
             >
-              Send request <span>→</span>
-            </button>
-            <Show when={state() === "running"}>
-              <button type="button" onClick={() => void cancel()}>
-                Cancel
-              </button>
-            </Show>
-            <span>{state() === "idle" ? "Ready when you are" : state()}</span>
-          </div>
-          <Show when={output()}>
-            <pre class="model-output" aria-live="polite">
               {output()}
             </pre>
-          </Show>
-        </div>
-      </section>
-    </div>
+          </Card>
+        </Show>
+      </div>
+    </SettingsSection>
   );
 }

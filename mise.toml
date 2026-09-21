@@ -7,6 +7,14 @@ description = "Open the local design system"
 dir = "{{config_root}}/design"
 run = "deno task dev --open"
 
+[tasks.app]
+description = "Build the UI and open Fathom in its native window with hot reload"
+run = "deno task dev"
+
+[tasks.browser]
+description = "Build the UI and run Fathom in a browser tab for DevTools"
+run = "deno task dev:browser"
+
 [tasks.fmt]
 description = "Format source and project configuration with Oxfmt"
 run = "deno run -A oxfmt --write ."
@@ -31,6 +39,15 @@ run = "deno lint"
 description = "Type-check the Deno workspace"
 run = "deno task check"
 
+[tasks."docs:check"]
+description = "Fail when the generated reference docs are stale"
+run = "deno task docs --check"
+
+[tasks."publish:check"]
+description = "Dry-run the JSR publish of the SDK"
+dir = "{{config_root}}/packages/sdk"
+run = "deno publish --dry-run --allow-dirty"
+
 [tasks.check]
-description = "Check formatting, lint, and types"
-depends = ["fmt:check", "lint", "lint:deno", "typecheck"]
+description = "Check formatting, lint, types, and generated docs"
+depends = ["fmt:check", "lint", "lint:deno", "typecheck", "docs:check"]

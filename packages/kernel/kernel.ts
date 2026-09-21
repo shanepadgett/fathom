@@ -252,10 +252,10 @@ export class Kernel {
           );
         }
 
-        const use: Record<string, unknown> = {};
+        const dependencies: Record<string, unknown> = {};
 
         for (const [key, t] of Object.entries(record.def.requires)) {
-          use[key] =
+          dependencies[key] =
             t.kind === "service"
               ? this.resolveService(t.id, scope)
               : this.registries.get(t.id)!.registry.view(scope);
@@ -269,7 +269,7 @@ export class Kernel {
           if (t.kind === "registry") {
             const registry = new KernelRegistry(t.id, t.key, () => this.emit());
             this.registries.set(t.id, { owner: record.status.id, registry });
-            use[key] = registry.view(scope);
+            dependencies[key] = registry.view(scope);
           }
         }
 
@@ -283,7 +283,10 @@ export class Kernel {
           handoff = undefined;
         }
 
-        const result = await record.def.start({ use, scope, handoff }, config);
+        const result = await record.def.start(
+          { ...dependencies, scope, handoff },
+          config,
+        );
 
         if (
           result != null &&
@@ -590,8 +593,12 @@ export class Kernel {
   }
 
   plugins(): PluginStatus[] {
+    // Schemas are plain JSON apart from TypeBox's symbol keys, which cloning drops.
     return structuredClone(
-      [...this.records.values()].map((record) => record.status),
+      [...this.records.values()].map((record) => ({
+        ...record.status,
+        ...(record.def ? { configSchema: record.def.config } : {}),
+      })),
     );
   }
 

@@ -7,6 +7,7 @@ import type {
   TRecord,
   TString,
   TArray,
+  TOptional,
 } from "@sinclair/typebox";
 
 export const DesiredSchema: TObject<{ enabled: TBoolean; config: TUnknown }> =
@@ -22,6 +23,7 @@ export const CompositionSchema: TObject<{
   slots: TObject<{
     order: TRecord<TString, TArray<TString>>;
     hidden: TArray<TString>;
+    selected: TOptional<TRecord<TString, TString>>;
   }>;
 }> = T.Object({
   revision: T.Integer({ minimum: 0 }),
@@ -32,5 +34,7 @@ export const CompositionSchema: TObject<{
     order: T.Record(T.String(), T.Array(T.String())),
     /** Full contribution IDs to omit from rendering. */
     hidden: T.Array(T.String()),
+    /** Explicit single-slot selections, by full contribution ID. */
+    selected: T.Optional(T.Record(T.String(), T.String())),
   }),
 });

@@ -77,6 +77,17 @@ export function createConnections(props: {
     return action(provider, () => auth.login({ provider, method }));
   }
 
+  /** Reference API key form: one submit starts the login and sends the key. */
+  function connect(provider: string, method: string, value: string) {
+    const auth = props.auth;
+
+    return action(provider, async () => {
+      const { id } = await auth.login({ provider, method });
+
+      await auth.reply({ id, value });
+    });
+  }
+
   function remove(provider: string) {
     const auth = props.auth;
 
@@ -95,5 +106,15 @@ export function createConnections(props: {
     return action(provider, () => auth.cancel({ id }));
   }
 
-  return { providers, error, busy, loginFor, login, remove, reply, cancel };
+  return {
+    providers,
+    error,
+    busy,
+    loginFor,
+    login,
+    connect,
+    remove,
+    reply,
+    cancel,
+  };
 }

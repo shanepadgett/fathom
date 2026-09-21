@@ -45,6 +45,8 @@ export const PluginStatusSchema: TObject<{
   id: TString;
   host: TUnion<[TLiteral<"backend">, TLiteral<"ui">]>;
   desired: TObject<{ enabled: TBoolean; source: TString; config: TUnknown }>;
+  /** The plugin's config schema as JSON Schema; absent until its definition has loaded. */
+  configSchema: TOptional<TUnknown>;
   actual: TObject<{
     state: TUnion<
       TLiteral<
@@ -64,6 +66,7 @@ export const PluginStatusSchema: TObject<{
     source: T.String(),
     config: T.Unknown(),
   }),
+  configSchema: T.Optional(T.Unknown()),
   actual: T.Object({
     state: T.Union(
       (

@@ -1,0 +1,26 @@
+[slot-runtime]
+description = "Define host-owned application outlets, persist their composition, and render list, single, and keyed contributions"
+read = [
+  "packages/sdk/src/composition.ts",
+  "packages/sdk/src/registry.ts",
+  "packages/sdk/src/service.ts",
+  "packages/sdk/src/schema.ts",
+  "packages/sdk/src/ui/application-slots.ts",
+  "packages/sdk/src/ui/create-slot-entries.ts",
+  "packages/renderer/renderer.tsx",
+  "packages/sdk/src/ui/slot-context.ts",
+  "packages/sdk/src/ui/slot-contract.ts",
+  "packages/sdk/src/ui/Slot.tsx",
+  "packages/sdk/src/ui/mod.ts",
+  "packages/server/composition.ts",
+]
+show = []
+outline = []
+references = [
+  "packages/sdk/src/scope.ts",
+  "plugins/workspace/ui/mod.tsx",
+  "plugins/credentials/ui/mod.tsx",
+  "plugins/llm/ui/mod.tsx",
+  "plugins/plugin-manager/ui/mod.tsx",
+]
+

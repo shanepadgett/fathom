@@ -1,0 +1,39 @@
+/* Mirrors design/primitives/dialog-overlay.css for the modal case. */
+@layer components {
+  .fathom-dialog {
+    @apply fixed m-auto overflow-auto rounded-lg border border-line bg-canvas
+      p-6 text-ink opacity-0 shadow-md duration-motion-fast ease-exit
+      transition-discrete;
+    width: min(var(--spacing-dialog), calc(100% - 2 * var(--spacing-4)));
+    max-height: calc(100dvh - 2 * var(--spacing-4));
+    transform: translateY(var(--motion-distance-small))
+      scale(var(--motion-scale-enter));
+    transition-property: opacity, transform, display, overlay;
+  }
+
+  .fathom-dialog[open] {
+    @apply opacity-100 transform-none duration-motion-normal ease-enter;
+  }
+
+  .fathom-dialog::backdrop {
+    @apply overlay-glass opacity-0 duration-motion-normal ease-standard
+      transition-discrete;
+    transition-property: opacity, display, overlay;
+  }
+
+  .fathom-dialog[open]::backdrop {
+    @apply opacity-100;
+  }
+
+  @starting-style {
+    .fathom-dialog[open] {
+      @apply opacity-0;
+      transform: translateY(var(--motion-distance-small))
+        scale(var(--motion-scale-enter));
+    }
+
+    .fathom-dialog[open]::backdrop {
+      @apply opacity-0;
+    }
+  }
+}

@@ -4,7 +4,11 @@
   "exports": {
     ".": "./src/mod.ts",
     "./ui": "./src/ui/mod.ts",
-    "./schema": "./src/schema.ts",
-    "./build": "./src/bundling/mod.ts"
+    "./schema": "./src/schema.ts"
+  },
+  "lint": {
+    "rules": {
+      "include": ["no-slow-types"]
+    }
   }
 }

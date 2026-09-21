@@ -1,20 +1,19 @@
 import { definePlugin } from "@fathom/sdk";
 import { CredentialsApi } from "@fathom/credentials/contract";
-import { WorkspacePanels } from "@fathom/workspace/contract";
-import { Client } from "@fathom/sdk/ui";
-import { ConnectionsPanel } from "./ConnectionsPanel.tsx";
+import { Client, SettingsSections } from "@fathom/sdk/ui";
+import { ProviderSettings } from "./ProviderSettings.tsx";
 
 export default definePlugin({
   id: "credentials",
-  requires: { auth: CredentialsApi, panels: WorkspacePanels, client: Client },
-  start({ use }) {
-    use.panels.add(
+  requires: { auth: CredentialsApi, panels: SettingsSections, client: Client },
+  start({ panels, auth, client }) {
+    panels.add(
       {
-        component: () => (
-          <ConnectionsPanel auth={use.auth} client={use.client} />
-        ),
+        label: "Providers",
+        icon: "plugs",
+        component: () => <ProviderSettings auth={auth} client={client} />,
       },
-      { id: "workbench", order: 0 },
+      { id: "providers", order: 10 },
     );
   },
 });

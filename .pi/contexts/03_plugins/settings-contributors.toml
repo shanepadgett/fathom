@@ -1,0 +1,69 @@
+[provider-settings]
+description = "Provide the credentials Providers settings section and its login, reply, and connection states"
+read = [
+  "plugins/credentials/ui/ProviderSettings.tsx",
+  "plugins/credentials/ui/ProviderConnection.tsx",
+  "plugins/credentials/ui/LoginReplyForm.tsx",
+  "plugins/credentials/ui/LoginStatus.tsx",
+  "plugins/credentials/ui/create-connections.ts",
+  "plugins/credentials/ui/mod.tsx",
+  "plugins/credentials/contract.ts",
+  "packages/sdk/src/ui/application-slots.ts",
+  "packages/sdk/src/ui/client.ts",
+]
+show = []
+outline = []
+references = [
+  "packages/sdk/src/api.ts",
+  "packages/sdk/src/ui/controls/Button.tsx",
+  "packages/sdk/src/ui/controls/Field.tsx",
+  "packages/sdk/src/ui/controls/Input.tsx",
+  "packages/sdk/src/ui/controls/NavItem.tsx",
+  "packages/sdk/src/ui/controls/StatusDot.tsx",
+]
+
+[llm-diagnostics]
+description = "Maintain the LLM model diagnostics settings section, model selection, streaming request, and reset recovery"
+read = [
+  "plugins/llm/ui/ModelWorkbench.tsx",
+  "plugins/llm/ui/ModelPicker.tsx",
+  "plugins/llm/ui/create-model-workbench.ts",
+  "plugins/llm/ui/create-model-catalog.ts",
+  "plugins/llm/ui/mod.tsx",
+  "plugins/llm/contract.ts",
+  "plugins/credentials/contract.ts",
+  "packages/sdk/src/ui/application-slots.ts",
+  "packages/sdk/src/ui/client.ts",
+]
+show = []
+outline = []
+references = [
+  "packages/sdk/src/api.ts",
+  "packages/sdk/src/ui/controls/Button.tsx",
+  "packages/sdk/src/ui/controls/Card.tsx",
+  "packages/sdk/src/ui/controls/Field.tsx",
+  "packages/sdk/src/ui/controls/InlineNotice.tsx",
+  "packages/sdk/src/ui/controls/Select.tsx",
+  "packages/sdk/src/ui/controls/Textarea.tsx",
+]
+
+[plugin-management]
+description = "Operate plugin enablement, reload, configuration, status, and dependency graph diagnostics from settings"
+read = [
+  "plugins/plugin-manager/ui/PluginManagerPanel.tsx",
+  "plugins/plugin-manager/ui/RuntimeControls.tsx",
+  "plugins/plugin-manager/ui/mod.tsx",
+  "packages/sdk/src/kernel-control.ts",
+  "packages/sdk/src/ui/application-slots.ts",
+]
+show = []
+outline = []
+references = [
+  "packages/sdk/src/ui/controls/Button.tsx",
+  "packages/sdk/src/ui/controls/Card.tsx",
+  "packages/sdk/src/ui/controls/Dialog.tsx",
+  "packages/sdk/src/ui/controls/Field.tsx",
+  "packages/sdk/src/ui/controls/InlineNotice.tsx",
+  "packages/sdk/src/ui/controls/Textarea.tsx",
+  "packages/renderer/control.ts",
+]

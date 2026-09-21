@@ -1,6 +1,7 @@
 import { For, Show } from "solid-js";
 import type { Static } from "@fathom/sdk";
 import type { ProviderStatusSchema } from "@fathom/credentials/contract";
+import { Button, Field, InlineNotice, Select } from "@fathom/sdk/ui";
 import type { createModelCatalog } from "./create-model-catalog.ts";
 
 export function ModelPicker(props: {
@@ -10,25 +11,31 @@ export function ModelPicker(props: {
 }) {
   return (
     <>
-      <div class="field-row">
-        <label>
-          Provider
-          <select
+      <div class="grid grid-cols-2 gap-4">
+        <Field id="model-provider" label="Provider">
+          <Select
+            id="model-provider"
+            class="w-full"
             value={props.catalog.provider()}
             disabled={props.running}
-            onChange={(e) =>
-              void props.catalog.loadModels(e.currentTarget.value)
+            onChange={(event) =>
+              void props.catalog.loadModels(event.currentTarget.value)
             }
           >
             <option value="">Choose a connected provider</option>
-            <For each={props.providers.filter((p) => p.connected)}>
-              {(p) => <option value={p.id}>{p.label}</option>}
+            <For
+              each={props.providers.filter((provider) => provider.connected)}
+            >
+              {(provider) => (
+                <option value={provider.id}>{provider.label}</option>
+              )}
             </For>
-          </select>
-        </label>
-        <label>
-          Model
-          <select
+          </Select>
+        </Field>
+        <Field id="model-selection" label="Model">
+          <Select
+            id="model-selection"
+            class="w-full"
             value={props.catalog.model()}
             disabled={
               !props.catalog.provider() ||
@@ -36,20 +43,22 @@ export function ModelPicker(props: {
               !props.catalog.models().length ||
               props.running
             }
-            onChange={(e) => props.catalog.setModel(e.currentTarget.value)}
+            onChange={(event) =>
+              props.catalog.setModel(event.currentTarget.value)
+            }
           >
             <option value="" disabled>
               {props.catalog.modelPlaceholder()}
             </option>
             <For each={props.catalog.models()}>
-              {(m) => <option value={m.id}>{m.name}</option>}
+              {(model) => <option value={model.id}>{model.name}</option>}
             </For>
-          </select>
-        </label>
+          </Select>
+        </Field>
       </div>
-      <div class="request-actions" aria-live="polite">
-        <button
-          type="button"
+      <div class="flex items-center gap-3">
+        <Button
+          variant="secondary"
           disabled={
             !props.catalog.provider() ||
             props.catalog.loadingModels() ||
@@ -60,13 +69,11 @@ export function ModelPicker(props: {
           }
         >
           Refresh models
-        </button>
-        <span>{props.catalog.modelSummary()}</span>
+        </Button>
+        <InlineNotice>{props.catalog.modelSummary()}</InlineNotice>
       </div>
       <Show when={props.catalog.modelError()}>
-        <div class="error" role="alert">
-          {props.catalog.modelError()}
-        </div>
+        <InlineNotice error>{props.catalog.modelError()}</InlineNotice>
       </Show>
     </>
   );

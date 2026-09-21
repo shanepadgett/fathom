@@ -7,9 +7,10 @@ connections. Sessions, tools, approvals, and the agent loop each get a later pla
 
 ## Status
 
-Established as the browser development foundation. The local SDK authoring workflow
-is documented in [plugin authoring](../plugin-authoring.md). Installation changes
-require a host restart; existing entries support explicit live reload.
+Established. Fathom runs as a native window through `deno desktop`, with a
+browser fallback for DevTools. The authoring workflow is documented from the
+[quickstart](../quickstart.md); `deno task dev` rebuilds and reloads edited
+plugins while it runs. Adding a plugin directory still requires a restart.
 
 Manual checks covered an external backend/UI plugin, typed API events and SQLite
 persistence, nested source and CSS rebuilds, workspace recovery, dependency blocking
@@ -17,25 +18,28 @@ and restoration, configuration rejection, activation rollback with handoff, leas
 drain, replay-gap reset, and persisted UI enablement. The imported design folder
 matches all 202 files on `deno-desktop`. No test suite or validation scripts were added.
 
-The [remediation](baseline-remediation.md#implementation-status) moves feature
-contracts and implementations into their plugins, simplifies scoped authoring,
-and removes unused baseline code. Saved OpenAI and xAI connections and live
-streamed requests were verified after those changes.
+Later passes moved feature contracts into their plugins, replaced the browser
+host with a server and renderer pair behind one application, folded the UI
+package into `@fathom/sdk/ui`, and added the desktop shell, the dev loop, the
+plugin scaffold, schema-driven plugin configuration, and startup diagnostics.
+See [desktop shell](desktop-shell.md) and [SDK and developer experience](sdk-dx.md).
 
 ## Ownership
 
 | Layer | Responsibility |
 | --- | --- |
-| SDK | Service and registry tokens, plugin definitions, schemas, typed API definitions, transport helpers, UI slots and controls |
+| SDK | The one published package: plugin definitions, tokens, schemas, typed APIs, UI slot contracts, controls, theme |
 | Kernel | Dependency graph, scopes, staged contributions, leases, serialized changes, status, rollback, and handoff |
-| Deno host | Startup, manifest discovery, trusted local sources, fresh module loading, persisted composition, API bridge, events, assets, and management endpoints |
-| Browser host | Authenticated client, shared Solid runtime, artifact/CSS loading, local kernel, UI lifecycle, and recovery controls |
+| Server | The Deno process: manifest discovery, trusted local sources, fresh module loading, persisted composition, API bridge, events, static assets |
+| Renderer | The page: authenticated client, shared Solid runtime, artifact loading, local kernel, slot rendering, recovery and startup diagnostics |
+| Application | `apps/desktop`: the native window, menu, lifecycle, launch token binding, browser fallback |
 | Plugins | Replaceable feature implementations and contributions |
 
-The HTTP listener is a host transport. It carries requests to the API bridge;
+The loopback HTTP listener is the server's transport. It carries requests to the API bridge;
 feature plugins contribute typed handlers and events. Backend management endpoints remain available when feature plugins are disabled.
-The browser host keeps a small recovery surface outside the workspace so disabled
-or failed UI entries can be restored. The plugin manager owns the full management UI.
+The renderer keeps a small recovery surface outside the workspace that lists
+every plugin's state and why it is not ready, so disabled or failed entries can
+be restored. The plugin manager owns the full management UI.
 
 Plugins execute with their host's privileges. Adding an external directory is an
 explicit trust decision. The baseline never automatically imports project code,
@@ -80,9 +84,9 @@ outside replaceable workspace roots.
 | provider-anthropic | API-key and browser/code login, Messages protocol |
 | provider-xai | API-key and device login, Responses protocol |
 | workspace | Minimal replaceable shell with panel slots |
-| plugin-manager | Optional management UI over the host's management services |
+| plugin-manager | Management UI: enable, disable, reload, schema-driven configuration |
 
-Design tokens and reusable controls belong to the SDK UI foundation. The imported
+Design tokens and reusable controls belong to `@fathom/sdk/ui`. The imported
 `design/` directory is the visual reference. Dedicated theme, settings, commands,
 and other plugins should be introduced when they own replaceable behavior, rather
 than just to give every module a plugin label.
@@ -92,8 +96,8 @@ than just to give every module a plugin label.
 A plugin directory has `deno.json` with a `fathom` property declaring its plugin ID,
 SDK compatibility, and backend and/or browser source entries. Package version and
 exports use the normal Deno fields.
-Both entries use `@fathom/sdk`; UI code also uses `@fathom/sdk/ui` and the host's
-Solid singletons. Shared contracts live inside the plugin or in a contracts package.
+Both entries use `@fathom/sdk`; UI code also uses `@fathom/sdk/ui` and the
+page's Solid singletons. Shared contracts live inside the plugin or in a contracts package.
 
 The SDK exports `bundleUi(pluginDir)` to compile one plugin and externalize the
 singletons. The host discovers plugins and writes content-addressed UI assets. Backend reload copies source
@@ -129,7 +133,8 @@ Each feature starts with its own plan, contract, ownership boundary, failure
 behavior, and manual acceptance checks. Implement and validate one at a time.
 See [plugin roadmap](plugins/README.md) for the sequence.
 
-Deferred foundation extensions include automatic file watching, remote installation,
-marketplace/update flows, SDK publication, full design-system component coverage,
-and packaged native desktop transport. The browser development host is the baseline
-application. They are separate deliverables with their own plans.
+Deferred foundation extensions include remote installation, marketplace and
+update flows, SDK publication to JSR (blocked on a repository license), a
+settings surface for slot composition, signing and notarization, and full
+design-system component coverage. They are separate deliverables with their own
+plans.

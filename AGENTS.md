@@ -6,13 +6,24 @@ This is a plugin baseline for a future agent harness. Keep sessions, tools,
 approvals, and agent execution in their individual plugin plans. The provider
 workbench is a bounded manual check, not the future conversation interface.
 
-The SDK defines contracts and UI primitives. The kernel owns serialized lifecycle
-changes and rollback. Hosts load plugins and connect them to their environment.
-Features and provider-specific behavior belong in plugins.
+`@fathom/sdk` is the one published package: contracts and slot primitives at
+its root, and tokens, fonts, icons, typography roles, and the shared controls
+under `@fathom/sdk/ui`. The kernel owns serialized lifecycle changes and
+rollback. The server (`packages/server`) is the Deno process that loads backend
+plugins and serves the page; the renderer (`packages/renderer`) is the page
+that loads UI plugins. `apps/desktop` is the only application: the native
+window, its browser fallback, and the page it serves. Features and
+provider-specific behavior belong in plugins. `examples/counter` is the plugin
+the guides walk through. Read [architecture](docs/architecture.md) for the
+boundary.
 
 - Package `mod.ts` files are export-only. Plugin `backend/mod.ts` and `ui/mod.tsx`
   files declare dependencies and wire named implementations; don't add feature
   logic or whole views there.
+- `packages/sdk/src/ui/controls` imports `solid-js` alone. Controls take props
+  and children; they never import tokens, the client, the kernel, or a host,
+  and they carry no fallback copy. Their stylesheets sit beside them and are
+  imported by `src/ui/theme/styles.css`, never by the component.
 - Put each named UI component in a matching PascalCase `.tsx` file. Keep its
   stylesheet beside it. Inline list items and registration callbacks are fine;
   don't collect independent components in a controls file.
@@ -35,14 +46,22 @@ of application cleanup. Archived plans are historical, not current instructions.
 
 - `mise run fmt` / `mise run fmt:check`: Oxfmt formatting and verification.
 - `mise run lint` / `mise run lint:fix`: Oxlint checks and safe fixes.
-- `mise run lint:deno`: Deno lint and JSR public-type checks.
-- `mise run check`: formatting, both linters, and Deno type checking.
-- `deno task build:ui`: compile the application and plugin UIs.
-- `deno task dev`: build and launch the browser host.
+- `mise run lint:deno`: Deno lint; JSR slow-type checks apply to the SDK only.
+- `mise run check`: formatting, both linters, Deno type checking, and generated
+  docs freshness.
+- `mise run publish:check`: JSR publish dry run of the SDK.
+- `deno task docs`: regenerate `docs/reference/sdk.md` and `plugins.md`.
+- `deno task build:ui`: compile the page, runtimes, and plugin UIs into `dist/`.
+- `deno task dev`: build, open the native window, rebuild and reload edited
+  plugins. `deno task dev:browser` does the same in a browser tab for DevTools.
+- `deno task new <id>`: scaffold a plugin under `plugins/`.
+- `deno task desktop:build`: package `dist/Fathom.app`.
 
 For baseline work, use these checks and manual runtime validation. Don't add
-tests or custom validation scripts unless requested. SDK changes require a host
-restart and browser refresh. Never print saved credentials during validation.
+tests or custom validation scripts unless requested. SDK and kernel changes
+require restarting `deno task dev`; plugin edits reload in place. Never print
+saved credentials during validation. Use `FATHOM_HOME` to point a run at a
+throwaway home directory.
 
 ## Standards
 

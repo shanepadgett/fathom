@@ -1,67 +1,48 @@
 import {
   createComponent,
-  createEffect,
-  createSignal,
   ErrorBoundary,
   For,
   type JSX,
-  onCleanup,
   useContext,
 } from "solid-js";
-import type { Entry, Registry } from "../registry.ts";
+import type { Registry } from "../registry.ts";
 import type { Contribution } from "./slot-contract.ts";
 import { SlotsContext } from "./slot-context.ts";
+import { createSlotEntries } from "./create-slot-entries.ts";
 
-/** Render visible contributions in composition order. Requires a host renderer. */
+/** Lists render all visible entries. Single/keyed outlets never elect an arbitrary entry. */
 export function Slot<C extends Record<string, unknown>>(props: {
   registry: Registry<Contribution<C>>;
   context: C;
+  mode?: "list" | "single" | "keyed";
+  selected?: string;
+  defaultId?: string;
+  fallback?: JSX.Element;
 }): JSX.Element {
-  const settingsForHost = useContext(SlotsContext);
+  const settings = useContext(SlotsContext);
+  const entries = createSlotEntries(() => props.registry);
 
-  if (!settingsForHost) {
-    throw new Error("Slot requires a host renderer");
-  }
+  const visible = () => {
+    if (!props.mode || props.mode === "list") {
+      return entries();
+    }
 
-  const [entries, setEntries] = createSignal<Entry<Contribution<C>>[]>([]);
+    const id =
+      props.mode === "keyed"
+        ? props.selected
+        : (settings?.().selected?.[props.registry.id] ?? props.defaultId);
 
-  createEffect(() => {
-    setEntries(props.registry.entries());
-    const unsubscribe = props.registry.watch(setEntries);
-
-    onCleanup(() => {
-      void unsubscribe();
-    });
-  });
+    return entries().filter((entry) => entry.id === id);
+  };
 
   return (
-    <For
-      each={(() => {
-        const settings = settingsForHost();
-        const order = settings.order[props.registry.id] ?? [];
-
-        const sorted = entries()
-          .filter((e) => !settings.hidden.includes(e.id))
-          .sort((a, b) => {
-            const ai = order.indexOf(a.id);
-            const bi = order.indexOf(b.id);
-
-            return (
-              (ai < 0 ? order.length : ai) - (bi < 0 ? order.length : bi) ||
-              a.order - b.order ||
-              a.id.localeCompare(b.id)
-            );
-          });
-
-        return sorted;
-      })()}
-    >
+    <For each={visible()} fallback={props.fallback}>
       {(entry) => (
         <ErrorBoundary
           fallback={
-            <div role="alert" class="error">
-              This panel failed to render. Reload its plugin to try again.
-            </div>
+            <p role="alert" class="p-4 text-sm text-danger">
+              This view failed. Reload its plugin from Plugin recovery.
+            </p>
           }
         >
           {createComponent(entry.value.component, props.context)}

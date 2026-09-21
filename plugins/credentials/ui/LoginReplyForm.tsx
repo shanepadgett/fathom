@@ -1,4 +1,5 @@
-import "./LoginReplyForm.css";
+import { createUniqueId } from "solid-js";
+import { Button, Field, Input } from "@fathom/sdk/ui";
 
 export function LoginReplyForm(props: {
   prompt: string;
@@ -6,33 +7,38 @@ export function LoginReplyForm(props: {
   busy: boolean;
   onReply: (value: string) => void;
 }) {
+  const id = createUniqueId();
+
   return (
     <form
+      class="grid gap-3"
       onSubmit={(event) => {
         event.preventDefault();
-
         const form = event.currentTarget;
         props.onReply(String(new FormData(form).get("reply") ?? ""));
         form.reset();
       }}
     >
-      <label>
-        {props.prompt}
-        <input
+      <Field id={id} label={props.prompt}>
+        <Input
+          id={id}
           name="reply"
           type="password"
           autocomplete="off"
           required
+          disabled={props.busy}
           placeholder={
             props.method === "api-key"
               ? "Paste API key"
               : "Paste callback URL or code"
           }
         />
-      </label>
-      <button type="submit" class="primary" disabled={props.busy}>
-        Continue
-      </button>
+      </Field>
+      <div>
+        <Button type="submit" variant="primary" disabled={props.busy}>
+          Continue
+        </Button>
+      </div>
     </form>
   );
 }

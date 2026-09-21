@@ -14,7 +14,16 @@ export function assertPluginDefinition(def: PluginDef) {
 
   for (const key of Object.keys(def.requires)) {
     if (key in def.provides) {
-      throw new Error(`Duplicate use key ${key}`);
+      throw new Error(`Duplicate dependency key ${key}`);
+    }
+  }
+
+  for (const key of [
+    ...Object.keys(def.requires),
+    ...Object.keys(def.provides),
+  ]) {
+    if (key === "scope" || key === "handoff") {
+      throw new Error(`Reserved dependency key ${key}`);
     }
   }
 

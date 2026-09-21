@@ -1,0 +1,16 @@
+/* Mirrors design/primitives/context-menu.css. */
+@layer components {
+  .fathom-menu {
+    @apply m-0 w-64 max-w-full rounded-lg border border-line bg-surface p-1.5
+      text-dense text-ink shadow-menu;
+  }
+
+  .fathom-menu[popover] {
+    @apply fixed;
+  }
+
+  .fathom-menu .fathom-menu-action {
+    @apply w-full justify-start gap-2.5 px-2 py-2 font-normal
+      hover:enabled:bg-canvas;
+  }
+}

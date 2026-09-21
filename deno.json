@@ -2,8 +2,8 @@
   "workspace": [
     "./packages/sdk",
     "./packages/kernel",
-    "./packages/host-deno",
-    "./packages/host-browser",
+    "./packages/server",
+    "./packages/renderer",
     "./plugins/credentials",
     "./plugins/llm",
     "./plugins/plugin-manager",
@@ -11,15 +11,22 @@
     "./plugins/provider-openai",
     "./plugins/provider-xai",
     "./plugins/storage",
-    "./plugins/workspace"
+    "./plugins/workspace",
+    "./examples/counter"
   ],
   "imports": {
     "@sinclair/typebox": "npm:@sinclair/typebox@0.34.33",
     "@sinclair/typebox/value": "npm:@sinclair/typebox@0.34.33/value",
+    "@fontsource-variable/space-grotesk": "npm:@fontsource-variable/space-grotesk@5.3.0",
+    "@fontsource/fragment-mono": "npm:@fontsource/fragment-mono@5.3.0",
+    "@phosphor-icons/web": "npm:@phosphor-icons/web@2.1.2",
     "solid-js": "npm:solid-js@1.9.15",
     "solid-js/web": "npm:solid-js@1.9.15/web",
     "solid-js/store": "npm:solid-js@1.9.15/store",
     "esbuild": "npm:esbuild@0.25.9",
+    "tailwindcss": "npm:tailwindcss@4.3.3",
+    "@tailwindcss/postcss": "npm:@tailwindcss/postcss@4.3.3",
+    "postcss": "npm:postcss@8.5.28",
     "@babel/core": "npm:@babel/core@7.28.4",
     "babel-preset-solid": "npm:babel-preset-solid@1.9.15",
     "@babel/preset-typescript": "npm:@babel/preset-typescript@7.27.1",
@@ -37,18 +44,29 @@
   },
   "nodeModulesDir": "auto",
   "lint": {
-    "exclude": ["design/"],
-    "rules": {
-      "include": ["no-slow-types"]
-    }
+    "exclude": ["design/"]
   },
   "tasks": {
-    "build:ui": "deno run -A packages/host-deno/build.ts",
-    "dev": "deno task build:ui && deno run -A --unstable-no-legacy-abort apps/desktop/main.ts --browser",
-    "desktop": "deno run -A apps/desktop/main.ts",
-    "check": "deno check apps/desktop/main.ts apps/ui/main.tsx packages/host-deno/build.ts packages/host-deno/install.ts plugins/*/backend/mod.ts plugins/*/ui/mod.tsx",
-    "plugin:add": "deno run -A packages/host-deno/install.ts add",
-    "plugin:remove": "deno run -A packages/host-deno/install.ts remove"
+    "build:ui": "deno run -A scripts/build-ui.ts",
+    "dev": "deno run -A scripts/dev.ts",
+    "dev:browser": "deno run -A scripts/dev.ts --browser",
+    "desktop:build": "deno task build:ui && deno desktop -A --exclude-unused-npm --include dist/app --include dist/plugins --include plugins --exclude plugins/*/node_modules -o dist/Fathom apps/desktop/main.ts",
+    "check": "deno check apps/desktop/main.ts apps/desktop/page/main.tsx packages/sdk/src/mod.ts packages/sdk/src/ui/mod.ts scripts/build-ui.ts scripts/install-plugin.ts plugins/*/backend/mod.ts plugins/*/ui/mod.tsx scripts/new-plugin.ts examples/*/backend/mod.ts examples/*/ui/mod.tsx scripts/dev.ts scripts/docs.ts",
+    "plugin:add": "deno run -A scripts/install-plugin.ts add",
+    "plugin:remove": "deno run -A scripts/install-plugin.ts remove",
+    "new": "deno run -A scripts/new-plugin.ts",
+    "docs": "deno run -A scripts/docs.ts"
   },
-  "exclude": ["docs", "**/dist/", ".pi", "node_modules"]
+  "exclude": ["docs", "**/dist/", ".pi", "node_modules"],
+  "desktop": {
+    "app": {
+      "name": "Fathom",
+      "identifier": "dev.fathom.app"
+    },
+    "backend": "webview",
+    "output": {
+      "macos": "./dist/Fathom.app"
+    }
+  },
+  "unstable": ["no-legacy-abort"]
 }

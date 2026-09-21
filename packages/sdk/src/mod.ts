@@ -14,3 +14,4 @@ export * from "./event-envelope.ts";
 export * from "./delay.ts";
 export * from "./http.ts";
 export * from "./sse.ts";
+export * from "./desktop.ts";

@@ -1,16 +1,18 @@
-import { WorkspacePanels } from "@fathom/workspace/contract";
+import { SettingsSections } from "@fathom/sdk/ui";
 import { definePlugin, KernelControl } from "@fathom/sdk";
 import { PluginManagerPanel } from "./PluginManagerPanel.tsx";
 
 export default definePlugin({
   id: "plugin-manager",
-  requires: { panels: WorkspacePanels, control: KernelControl },
-  start({ use }) {
-    use.panels.add(
+  requires: { panels: SettingsSections, control: KernelControl },
+  start({ panels, control }) {
+    panels.add(
       {
-        component: () => <PluginManagerPanel control={use.control} />,
+        label: "Plugins",
+        icon: "tree-structure",
+        component: () => <PluginManagerPanel control={control} />,
       },
-      { id: "panel", order: 10 },
+      { id: "runtime", order: 100 },
     );
   },
 });

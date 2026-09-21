@@ -8,14 +8,14 @@ export default definePlugin({
   id: "llm",
   requires: { credentials: Credentials, api: Api },
   provides: { llm: Llm, providers: Providers },
-  start({ use, scope }) {
-    const llm = createLlmService(use.providers, use.credentials, scope);
+  start({ providers, credentials, api, scope }) {
+    const llm = createLlmService(providers, credentials, scope);
 
     const handlers = createModelChecks(llm, scope, (event) =>
       publication.emit("progress", event),
     );
 
-    const publication: ApiPublication<typeof LlmApi.operations> = use.api.serve(
+    const publication: ApiPublication<typeof LlmApi.operations> = api.serve(
       LlmApi,
       handlers,
     );

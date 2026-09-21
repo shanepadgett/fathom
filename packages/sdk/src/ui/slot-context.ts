@@ -1,4 +1,5 @@
-import { createContext } from "solid-js";
+import { createContext, type Context } from "solid-js";
 import type { SlotComposition } from "./slot-contract.ts";
 
-export const SlotsContext = createContext<() => SlotComposition>();
+export const SlotsContext: Context<(() => SlotComposition) | undefined> =
+  createContext<() => SlotComposition>();

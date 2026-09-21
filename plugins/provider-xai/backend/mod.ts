@@ -7,8 +7,8 @@ import { loginFlow } from "./login.ts";
 export default definePlugin({
   id: "provider-xai",
   requires: { providers: Providers, logins: Logins },
-  start({ use }) {
-    use.providers.add(provider, { id: "provider" });
-    use.logins.add(loginFlow, { id: "login" });
+  start({ providers, logins }) {
+    providers.add(provider, { id: "provider" });
+    logins.add(loginFlow, { id: "login" });
   },
 });

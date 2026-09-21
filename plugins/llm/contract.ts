@@ -5,37 +5,17 @@ import {
   defineService,
   event,
   query,
-  type ApiToken,
-  type Event,
-  type Operation,
-  type RegistryToken,
-  type ServiceToken,
   type Static,
   T,
 } from "@fathom/sdk";
 import type { Credential } from "@fathom/credentials/contract";
-import type {
-  TObject,
-  TString,
-  TArray,
-  TUnion,
-  TLiteral,
-  TOptional,
-} from "@sinclair/typebox";
 
 const MAX_CHECK_ID_LENGTH = 100;
 const MAX_PROMPT_TEXT_LENGTH = 100_000;
 
-const Empty: TObject<Record<never, never>> = T.Object(
-  {},
-  { additionalProperties: false },
-);
+const Empty = T.Object({}, { additionalProperties: false });
 
-export const ModelSchema: TObject<{
-  id: TString;
-  name: TString;
-  provider: TString;
-}> = T.Object({
+export const ModelSchema = T.Object({
   id: T.String(),
   name: T.String(),
   provider: T.String(),
@@ -56,25 +36,11 @@ export interface Provider {
   ): AsyncIterable<string>;
 }
 
-export const Providers: RegistryToken<Provider> = defineRegistry(
-  "fathom.llm.providers",
-  {
-    key: (entry) => entry.id,
-  },
-);
+export const Providers = defineRegistry<Provider>("fathom.llm.providers", {
+  key: (entry) => entry.id,
+});
 
-export const StreamEventSchema: TObject<{
-  id: TString;
-  type: TUnion<
-    [
-      TLiteral<"text">,
-      TLiteral<"done">,
-      TLiteral<"error">,
-      TLiteral<"cancelled">,
-    ]
-  >;
-  text: TOptional<TString>;
-}> = T.Object({
+export const StreamEventSchema = T.Object({
   id: T.String(),
   type: T.Union([
     T.Literal("text"),
@@ -92,33 +58,16 @@ export type StreamEvent = Static<typeof StreamEventSchema>;
  * Calls can fail on missing credentials, provider shutdown, or timeout.
  * Finish or close stream iteration to release its lease.
  */
-export const Llm: ServiceToken<{
+export const Llm = defineService<{
   models(provider: string, signal: AbortSignal): Promise<ModelInfo[]>;
   stream(
     opts: { provider: string; model: string; prompt: string },
     signal: AbortSignal,
   ): AsyncIterable<string>;
-}> = defineService("fathom.llm");
+}>("fathom.llm");
 
 /** In-memory workbench checks, not durable conversations. History is bounded. */
-export const LlmApi: ApiToken<{
-  models: Operation<TObject<{ provider: TString }>, TArray<typeof ModelSchema>>;
-  start: Operation<
-    TObject<{
-      id: TString;
-      provider: TString;
-      model: TString;
-      prompt: TString;
-    }>,
-    typeof Empty
-  >;
-  cancel: Operation<TObject<{ id: TString }>, typeof Empty>;
-  state: Operation<
-    TObject<{ id: TString }>,
-    TObject<{ text: TString; state: TString }>
-  >;
-  progress: Event<typeof StreamEventSchema>;
-}> = defineApi("fathom.llm.api", {
+export const LlmApi = defineApi("fathom.llm.api", {
   models: query({
     input: T.Object({ provider: T.String() }),
     output: T.Array(ModelSchema),

@@ -4,6 +4,9 @@ export const AppEnvironment: ServiceToken<{
   home: string;
   resources: string;
   platform: string;
-  port: number;
+  /** Loopback origin the page is served from. */
+  origin: string;
   launchToken: string;
+  /** A native window or a browser tab. */
+  shell: "desktop" | "browser";
 }> = defineService("fathom.environment");

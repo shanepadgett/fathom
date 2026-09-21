@@ -1,0 +1,11 @@
+{
+  "name": "@example/counter",
+  "version": "0.1.0",
+  "exports": { "./contract": "./contract.ts" },
+  "lint": { "rules": { "exclude": ["no-slow-types"] } },
+  "fathom": {
+    "id": "counter",
+    "backend": "backend/mod.ts",
+    "ui": "ui/mod.tsx"
+  }
+}

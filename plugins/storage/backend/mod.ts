@@ -5,7 +5,7 @@ export default definePlugin({
   id: "storage",
   requires: { environment: AppEnvironment },
   provides: { storage: Storage },
-  start({ use, scope }) {
-    return { storage: openSqliteStorage(use.environment.home, scope) };
+  start({ environment, scope }) {
+    return { storage: openSqliteStorage(environment.home, scope) };
   },
 });

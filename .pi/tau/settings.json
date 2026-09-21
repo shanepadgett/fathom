@@ -1,6 +1,11 @@
 {
 	"$schema": "https://raw.githubusercontent.com/shanepadgett/tau-agent/refs/heads/main/packages/agent/schemas/tau.schema.json",
 	"extensions": {
+		"context": {
+			"validation": {
+				"ignoreGlobs": ["docs/plans/**"]
+			}
+		},
 		"autoCompact": {
 			"enabled": false
 		}

@@ -3,7 +3,6 @@ import type {
   TObject,
   TString,
   TArray,
-  TLiteral,
   TBoolean,
   TUnknown,
 } from "@sinclair/typebox";
@@ -12,7 +11,6 @@ export const UiArtifactSchema: TObject<{
   id: TString;
   url: TString;
   styles: TArray<TString>;
-  sdk: TLiteral<"^0.1">;
   externals: TArray<TString>;
   enabled: TBoolean;
   config: TUnknown;
@@ -20,7 +18,6 @@ export const UiArtifactSchema: TObject<{
   id: T.String(),
   url: T.String(),
   styles: T.Array(T.String()),
-  sdk: T.Literal("^0.1"),
   externals: T.Array(T.String()),
   enabled: T.Boolean(),
   config: T.Unknown(),

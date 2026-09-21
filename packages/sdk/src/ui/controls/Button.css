@@ -1,0 +1,44 @@
+/* Mirrors design/primitives/button.css; attributes replace the ds-button host. */
+@layer components {
+  .fathom-button {
+    @apply inline-flex min-h-10 items-center justify-center gap-2
+      rounded-control border border-transparent bg-action px-4 py-2 font-medium
+      text-on-action hover:enabled:opacity-80 disabled:opacity-40;
+  }
+
+  .fathom-button[data-variant="secondary"] {
+    @apply border-control-line bg-transparent text-ink;
+  }
+
+  .fathom-button[data-variant="quiet"] {
+    @apply bg-transparent px-2 text-ink;
+  }
+}
+
+@layer components {
+  .fathom-button[data-size="compact"] {
+    @apply min-h-0 gap-2 px-3 py-1 text-sm font-normal
+      hover:enabled:opacity-100;
+  }
+
+  .fathom-button[data-size="small"] {
+    @apply h-7 min-h-0 gap-2 px-0 py-0 text-sm font-normal
+      hover:enabled:opacity-100;
+  }
+
+  .fathom-button[data-icon-only] {
+    @apply w-7 text-muted hover:enabled:bg-canvas hover:enabled:text-ink;
+  }
+
+  .fathom-button[data-size="compact"][data-variant="secondary"] {
+    @apply hover:enabled:bg-canvas;
+  }
+
+  .fathom-button[data-size="compact"][data-variant="quiet"] {
+    @apply px-0 text-muted hover:enabled:text-ink;
+  }
+
+  .fathom-button[data-size="small"][data-variant="quiet"] {
+    @apply text-muted hover:enabled:text-ink;
+  }
+}

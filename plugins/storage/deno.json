@@ -2,7 +2,6 @@
   "version": "0.1.0",
   "fathom": {
     "id": "storage",
-    "sdk": "^0.1",
     "backend": "backend/mod.ts"
   }
 }

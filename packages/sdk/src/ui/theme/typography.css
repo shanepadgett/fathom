@@ -1,0 +1,37 @@
+/* Typography roles: one reference pairing each, usable through @reference. */
+
+@utility type-title {
+  @apply text-2xl font-semibold;
+}
+
+@utility type-section-title {
+  @apply text-lg font-semibold tracking-tight;
+}
+
+@utility type-eyebrow {
+  @apply font-mono text-micro tracking-wide text-muted;
+}
+
+@utility type-label {
+  @apply text-sm font-medium;
+}
+
+@utility type-description {
+  @apply text-dense text-muted;
+}
+
+@utility type-dense {
+  @apply text-dense;
+}
+
+@utility type-micro {
+  @apply text-micro text-muted;
+}
+
+@utility type-code {
+  @apply font-mono text-base;
+}
+
+@utility type-wordmark {
+  @apply font-bold tracking-tight whitespace-nowrap;
+}

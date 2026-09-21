@@ -1,16 +1,14 @@
-import "./PluginManagerPanel.css";
 import type { KernelControlApi } from "@fathom/sdk";
+import { SettingsSection } from "@fathom/sdk/ui";
 import { RuntimeControls } from "./RuntimeControls.tsx";
 
 export function PluginManagerPanel(props: { control: KernelControlApi }) {
   return (
-    <section class="plugin-section">
-      <details>
-        <summary>
-          <h2>Plugin runtime</h2>
-        </summary>
-        <RuntimeControls control={props.control} />
-      </details>
-    </section>
+    <SettingsSection
+      title="Plugins"
+      description="Enable, disable, and reload runtime plugins. Plugin recovery stays available even if you disable this view or the shell."
+    >
+      <RuntimeControls control={props.control} />
+    </SettingsSection>
   );
 }

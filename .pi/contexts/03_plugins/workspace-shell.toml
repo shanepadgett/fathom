@@ -1,0 +1,28 @@
+[replaceable-workspace-shell]
+description = "Maintain the replaceable workspace shell, navigation, settings frame, sidebars, and general appearance settings"
+read = [
+  "plugins/workspace/deno.json",
+  "plugins/workspace/ui/WorkspaceShell.tsx",
+  "plugins/workspace/ui/WorkspaceHeader.tsx",
+  "plugins/workspace/ui/SettingsPage.tsx",
+  "plugins/workspace/ui/GeneralSettings.tsx",
+  "plugins/workspace/ui/create-workspace-navigation.ts",
+  "plugins/workspace/ui/mod.tsx",
+]
+show = []
+outline = []
+references = [
+  "packages/sdk/src/ui/application-slots.ts",
+  "packages/sdk/src/ui/Slot.tsx",
+  "packages/sdk/src/ui/create-slot-entries.ts",
+  "packages/sdk/src/ui/appearance.ts",
+  "packages/sdk/src/ui/controls/Button.tsx",
+  "packages/sdk/src/ui/controls/EmptyState.tsx",
+  "packages/sdk/src/ui/controls/IconButton.tsx",
+  "packages/sdk/src/ui/controls/NavItem.tsx",
+  "packages/sdk/src/ui/controls/ResizableSidebar.tsx",
+  "packages/sdk/src/ui/controls/Select.tsx",
+  "packages/sdk/src/ui/controls/SettingRow.tsx",
+  "packages/sdk/src/ui/controls/StatusDot.tsx",
+  "packages/sdk/src/ui/controls/Switch.tsx",
+]

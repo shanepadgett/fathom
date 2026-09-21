@@ -26,6 +26,16 @@ export type OwnedRegistries<T extends Tokens> = {
   ]: T[K] extends RegistryToken<infer E> ? Registry<E> : never;
 };
 
+/** `scope` and `handoff` are always present, so dependencies cannot use those keys. */
+export type ReservedKeys = "scope" | "handoff";
+
+export type StartContext<R extends Tokens, P extends Tokens> = Resolved<R> &
+  OwnedRegistries<P> & {
+    scope: Scope;
+    /** Reload state from the previous generation; undefined when absent or rejected. */
+    handoff: unknown;
+  };
+
 export interface PluginDef {
   id: string;
   requires: Tokens;
@@ -33,17 +43,18 @@ export interface PluginDef {
   config: TSchema;
   handoff?: TSchema;
   start(
-    ctx: { use: Record<string, unknown>; scope: Scope; handoff: unknown },
+    ctx: Record<string, unknown> & { scope: Scope; handoff: unknown },
     config: unknown,
   ): unknown;
 }
 
 /**
  * Declare dependencies and startup behavior for the kernel.
- * Return exactly the provided services; owned registries arrive through `use`.
- * Function-valued services are factories called with the consumer's scope.
- * Register cleanup with `scope`, including resources acquired before startup fails.
- * Reload handoff is undefined when absent or rejected by the receiving schema.
+ * Each `requires` key and each owned registry arrives on the start context under
+ * its own name, beside `scope` and `handoff`. Return exactly the provided
+ * services. Function-valued services are factories called with the consumer's
+ * scope. Register cleanup with `scope`, including resources acquired before
+ * startup fails.
  */
 export function definePlugin<
   R extends Tokens = Record<never, never>,
@@ -51,16 +62,12 @@ export function definePlugin<
   C extends TSchema = ReturnType<typeof T.Object>,
 >(def: {
   id: string;
-  requires?: R;
-  provides?: P;
+  requires?: { [K in keyof R]: K extends ReservedKeys ? never : R[K] };
+  provides?: { [K in keyof P]: K extends ReservedKeys ? never : P[K] };
   config?: C;
   handoff?: TSchema;
   start(
-    ctx: {
-      use: Resolved<R> & OwnedRegistries<P>;
-      scope: Scope;
-      handoff: unknown;
-    },
+    ctx: StartContext<R, P>,
     config: Static<C>,
   ): keyof Services<P> extends never
     ? void | Promise<void>
