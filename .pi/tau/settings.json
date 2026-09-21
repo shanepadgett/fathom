@@ -3,11 +3,17 @@
 	"extensions": {
 		"context": {
 			"validation": {
-				"ignoreGlobs": ["docs/plans/**"]
+				"enabled": false
+			},
+			"sync": {
+				"enabled": false
 			}
 		},
 		"autoCompact": {
 			"enabled": false
+		},
+		"subagent": {
+			"disabled": ["scout", "webresearch", "context-sync"]
 		}
 	}
 }

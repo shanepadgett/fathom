@@ -51,11 +51,10 @@
     "dev": "deno run -A scripts/dev.ts",
     "dev:browser": "deno run -A scripts/dev.ts --browser",
     "desktop:build": "deno task build:ui && deno desktop -A --exclude-unused-npm --include dist/app --include dist/plugins --include plugins --exclude plugins/*/node_modules -o dist/Fathom apps/desktop/main.ts",
-    "check": "deno check apps/desktop/main.ts apps/desktop/page/main.tsx packages/sdk/src/mod.ts packages/sdk/src/ui/mod.ts scripts/build-ui.ts scripts/install-plugin.ts plugins/*/backend/mod.ts plugins/*/ui/mod.tsx scripts/new-plugin.ts examples/*/backend/mod.ts examples/*/ui/mod.tsx scripts/dev.ts scripts/docs.ts",
+    "check": "deno check apps/desktop/main.ts apps/desktop/page/main.tsx packages/sdk/src/mod.ts packages/sdk/src/ui/mod.ts scripts/build-ui.ts scripts/install-plugin.ts plugins/*/backend/mod.ts plugins/*/ui/mod.tsx scripts/new-plugin.ts examples/*/backend/mod.ts examples/*/ui/mod.tsx scripts/dev.ts",
     "plugin:add": "deno run -A scripts/install-plugin.ts add",
     "plugin:remove": "deno run -A scripts/install-plugin.ts remove",
-    "new": "deno run -A scripts/new-plugin.ts",
-    "docs": "deno run -A scripts/docs.ts"
+    "new": "deno run -A scripts/new-plugin.ts"
   },
   "exclude": ["docs", "**/dist/", ".pi", "node_modules"],
   "desktop": {

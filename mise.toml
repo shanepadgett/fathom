@@ -39,15 +39,11 @@ run = "deno lint"
 description = "Type-check the Deno workspace"
 run = "deno task check"
 
-[tasks."docs:check"]
-description = "Fail when the generated reference docs are stale"
-run = "deno task docs --check"
-
 [tasks."publish:check"]
 description = "Dry-run the JSR publish of the SDK"
 dir = "{{config_root}}/packages/sdk"
 run = "deno publish --dry-run --allow-dirty"
 
 [tasks.check]
-description = "Check formatting, lint, types, and generated docs"
-depends = ["fmt:check", "lint", "lint:deno", "typecheck", "docs:check"]
+description = "Check formatting, lint, and types"
+depends = ["fmt:check", "lint", "lint:deno", "typecheck"]

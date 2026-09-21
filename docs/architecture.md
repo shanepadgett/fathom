@@ -135,9 +135,9 @@ packages/
   renderer/            Internal. Page runtime.
 plugins/               Bundled plugins. Each is exactly what a third party would write.
 examples/counter       The hero plugin the guides walk through; registered with plugin:add.
-scripts/               dev.ts, build-ui.ts, new-plugin.ts, install-plugin.ts, docs.ts, bundling/
+scripts/               dev.ts, build-ui.ts, new-plugin.ts, install-plugin.ts, bundling/
 design/                Visual reference. Read, never reorganized.
-docs/                  quickstart, concepts, guides/, reference/, this file, plans/, standards/
+docs/                  concepts, guides/, standards/, plans/, this file
 ```
 
 Dependency direction, enforced by review:
@@ -150,8 +150,7 @@ nothing ──▶ plugins (the harness discovers them, never imports them)
 
 ## Roadmap
 
-Every remaining harness feature is a plugin with its own plan: sessions, tools,
+Every remaining feature is a plugin with its own plan: sessions, tools,
 approvals, coding tools, agent loop, conversation UI, composer and drafts. Each
-exports a `contract` so the next plugin, or a replacement, builds on it. See
-[plugin roadmap](plans/plugins/README.md). The native window is the one piece of
-non-plugin work left; see [desktop shell](plans/desktop-shell.md).
+exports a `contract` so the next plugin, or a replacement, builds on it. See the
+[roadmap](plans/README.md), which also lists deferred foundation work.
