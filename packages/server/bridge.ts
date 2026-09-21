@@ -42,10 +42,12 @@ export function bridge(
       },
     });
 
+  let host = "";
+
   const server = listen(async (req) => {
     const url = new URL(req.url);
 
-    if (url.host !== new URL(server.origin).host) {
+    if (url.host !== host) {
       return json({ error: "Invalid host" }, 403);
     }
 
@@ -161,6 +163,8 @@ export function bridge(
       );
     }
   }, environment.port);
+
+  host = new URL(server.origin).host;
 
   scope.defer(async () => {
     events.close();

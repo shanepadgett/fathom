@@ -625,9 +625,11 @@ export class Kernel {
   }
 
   private emit() {
+    const status = this.plugins();
+
     for (const fn of this.listeners) {
       try {
-        fn(this.plugins());
+        fn(status);
       } catch {
         // Observers cannot break lifecycle changes.
       }

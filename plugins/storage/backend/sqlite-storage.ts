@@ -1,6 +1,8 @@
 import { DatabaseSync } from "node:sqlite";
 import type { Scope, StorageNamespace } from "@fathom/sdk";
 
+const MAX_VALUE_TEXT_LENGTH = 1_000_000;
+
 export function openSqliteStorage(home: string, scope: Scope) {
   const db = new DatabaseSync(`${home}/fathom.db`);
   scope.defer(() => db.close());
@@ -33,11 +35,23 @@ export function openSqliteStorage(home: string, scope: Scope) {
         throw new Error("Stored plugin value must be JSON text");
       }
 
-      return JSON.parse(row.value);
+      try {
+        return JSON.parse(row.value);
+      } catch {
+        throw new Error(`Stored plugin value for "${key}" is not valid JSON`);
+      }
     },
 
     set(key, value) {
-      put.run(id, key, JSON.stringify(value));
+      const text = JSON.stringify(value);
+
+      if (text.length > MAX_VALUE_TEXT_LENGTH) {
+        throw new Error(
+          `Plugin value for "${key}" exceeds ${MAX_VALUE_TEXT_LENGTH} characters`,
+        );
+      }
+
+      put.run(id, key, text);
     },
 
     delete(key) {

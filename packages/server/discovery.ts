@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { decode, PluginConfigSchema, T, type Static } from "@fathom/sdk";
 
 export async function discover(
@@ -8,16 +9,16 @@ export async function discover(
 > {
   const sources: string[] = [];
 
-  for await (const dir of Deno.readDir(`${resources}/plugins`)) {
+  for await (const dir of Deno.readDir(join(resources, "plugins"))) {
     if (dir.isDirectory) {
-      sources.push(`${resources}/plugins/${dir.name}/deno.json`);
+      sources.push(join(resources, "plugins", dir.name, "deno.json"));
     }
   }
 
   try {
     const installed = decode(
       T.Array(T.String()),
-      JSON.parse(await Deno.readTextFile(`${home}/plugins.json`)),
+      JSON.parse(await Deno.readTextFile(join(home, "plugins.json"))),
     );
 
     sources.push(...installed);

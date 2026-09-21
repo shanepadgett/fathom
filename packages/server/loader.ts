@@ -1,6 +1,6 @@
 import type { Loader } from "@fathom/kernel";
 import { decode, PluginConfigSchema, type PluginDef } from "@fathom/sdk";
-import { dirname, resolve, sep } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 
 /** Load a fresh source copy so reloads also invalidate nested local modules. */
@@ -27,7 +27,13 @@ export class DenoLoader implements Loader {
       throw new Error("Entry escapes plugin directory");
     }
 
-    const target = `${this.home}/artifacts/${manifest.id}/${gen}-${crypto.randomUUID()}`;
+    const target = join(
+      this.home,
+      "artifacts",
+      manifest.id,
+      `${gen}-${crypto.randomUUID()}`,
+    );
+
     await Deno.mkdir(target, { recursive: true });
 
     async function copy(from: string, to: string) {
@@ -40,8 +46,8 @@ export class DenoLoader implements Loader {
           throw new Error("Plugin source symlinks are unsupported");
         }
 
-        const src = `${from}/${item.name}`;
-        const dest = `${to}/${item.name}`;
+        const src = join(from, item.name);
+        const dest = join(to, item.name);
 
         if (item.isDirectory) {
           await Deno.mkdir(dest);
@@ -74,14 +80,14 @@ export class DenoLoader implements Loader {
 
   async retain(definitions: PluginDef[]) {
     const keep = new Set(definitions.map((def) => this.targets.get(def)));
-    await Deno.mkdir(`${this.home}/artifacts`, { recursive: true });
+    await Deno.mkdir(join(this.home, "artifacts"), { recursive: true });
 
-    for await (const plugin of Deno.readDir(`${this.home}/artifacts`)) {
+    for await (const plugin of Deno.readDir(join(this.home, "artifacts"))) {
       if (!plugin.isDirectory) {
         continue;
       }
 
-      const directory = `${this.home}/artifacts/${plugin.name}`;
+      const directory = join(this.home, "artifacts", plugin.name);
 
       if (![...keep].some((path) => path?.startsWith(directory + "/"))) {
         await Deno.remove(directory, { recursive: true });
@@ -89,7 +95,7 @@ export class DenoLoader implements Loader {
       }
 
       for await (const generation of Deno.readDir(directory)) {
-        const path = `${this.home}/artifacts/${plugin.name}/${generation.name}`;
+        const path = join(directory, generation.name);
 
         if (generation.isDirectory && !keep.has(path)) {
           await Deno.remove(path, { recursive: true });

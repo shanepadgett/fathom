@@ -1,4 +1,5 @@
-import { discover } from "@fathom/server";
+import { discover, mintLaunchToken } from "@fathom/server";
+import { TextLineStream } from "@std/streams";
 import * as esbuild from "esbuild";
 import { dirname, resolve, sep } from "node:path";
 import {
@@ -22,7 +23,7 @@ const home = resolve(
 );
 
 const browser = Deno.args.includes("--browser");
-const token = crypto.randomUUID() + crypto.randomUUID();
+const token = mintLaunchToken();
 
 const plugins = await discover(root, home);
 let artifacts = await buildApp(root, plugins);
@@ -54,27 +55,21 @@ const origin = Promise.withResolvers<string>();
 
 // Echo the app's output and pick up the origin it announces.
 void (async () => {
-  const decoder = new TextDecoder();
-  let buffer = "";
+  const lines = child.stdout
+    .pipeThrough(new TextDecoderStream())
+    .pipeThrough(new TextLineStream());
 
-  for await (const chunk of child.stdout) {
-    buffer += decoder.decode(chunk, { stream: true });
-    let newline = buffer.indexOf("\n");
+  for await (const line of lines) {
+    console.log(line);
 
-    while (newline >= 0) {
-      const line = buffer.slice(0, newline);
-      buffer = buffer.slice(newline + 1);
-      console.log(line);
+    const match = /https?:\/\/127\.0\.0\.1:\d+/.exec(line);
 
-      const match = /https?:\/\/127\.0\.0\.1:\d+/.exec(line);
-
-      if (match) {
-        origin.resolve(match[0]);
-      }
-
-      newline = buffer.indexOf("\n");
+    if (match) {
+      origin.resolve(match[0]);
     }
   }
+
+  origin.reject(new Error("Fathom exited before announcing its origin"));
 })();
 
 async function post(path: string) {

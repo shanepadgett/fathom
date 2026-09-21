@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { decode, PluginConfigSchema, T } from "@fathom/sdk";
-import { discover } from "@fathom/server";
+import { discover, writeJsonAtomic } from "@fathom/server";
 
 const [action, directory] = Deno.args;
 
@@ -69,28 +69,7 @@ try {
     installed = installed.filter((p) => p !== source);
   }
 
-  const temp = `${path}.${crypto.randomUUID()}.tmp`;
-
-  try {
-    await Deno.writeTextFile(temp, JSON.stringify(installed, null, 2), {
-      mode: 0o600,
-    });
-
-    await Deno.rename(temp, path);
-  } catch (error) {
-    try {
-      await Deno.remove(temp);
-    } catch (e) {
-      if (!(e instanceof Deno.errors.NotFound)) {
-        throw new AggregateError(
-          [error, e],
-          "Write and temporary file cleanup failed",
-        );
-      }
-    }
-
-    throw error;
-  }
+  await writeJsonAtomic(path, installed);
 
   console.log(
     `${

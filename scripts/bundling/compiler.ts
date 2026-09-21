@@ -28,6 +28,9 @@ export function buildBrowser(
       ? [workspaceImports, solidTransform]
       : [solidTransform],
     metafile: true,
+    // Inline so a plugin artifact stays one file per asset; debugging happens
+    // in browser mode.
+    sourcemap: "inline",
     logLevel: "warning",
   });
 }

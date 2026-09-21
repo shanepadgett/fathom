@@ -119,6 +119,14 @@ export function createApiDispatch(
         return json({ error: "Use POST" }, 405);
       }
 
+      // Reject by the declared length before buffering; chunked bodies are
+      // checked after.
+      if (
+        Number(request.headers.get("content-length")) > MAX_REQUEST_TEXT_LENGTH
+      ) {
+        return json({ error: "Request too large" }, 413);
+      }
+
       const text = await request.text();
 
       if (text.length > MAX_REQUEST_TEXT_LENGTH) {

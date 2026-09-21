@@ -1,4 +1,5 @@
 import { CompositionSchema, decode, type Static } from "@fathom/sdk";
+import { writeJsonAtomic } from "./atomic-write.ts";
 
 export class CompositionStore {
   value: Static<typeof CompositionSchema> = {
@@ -46,29 +47,8 @@ export class CompositionStore {
         revision: this.value.revision + 1,
       });
 
-      const temp = `${this.path}.${crypto.randomUUID()}.tmp`;
-
-      try {
-        await Deno.writeTextFile(temp, JSON.stringify(next, null, 2), {
-          mode: 0o600,
-        });
-
-        await Deno.rename(temp, this.path);
-        this.value = next;
-      } catch (error) {
-        try {
-          await Deno.remove(temp);
-        } catch (e) {
-          if (!(e instanceof Deno.errors.NotFound)) {
-            throw new AggregateError(
-              [error, e],
-              "Write and temporary file cleanup failed",
-            );
-          }
-        }
-
-        throw error;
-      }
+      await writeJsonAtomic(this.path, next);
+      this.value = next;
     });
 
     // Keep later writes runnable; this caller still receives the original failure.

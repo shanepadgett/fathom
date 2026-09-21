@@ -1,4 +1,4 @@
-import { Api, definePlugin, Storage, T } from "@fathom/sdk";
+import { Api, decode, definePlugin, Storage, T } from "@fathom/sdk";
 import { CounterApi } from "../contract.ts";
 
 export default definePlugin({
@@ -8,7 +8,7 @@ export default definePlugin({
     step: T.Number({ default: 1, description: "How much each click adds." }),
   }),
   start({ api, storage }, config) {
-    const current = () => Number(storage.get("count") ?? 0);
+    const current = () => decode(T.Number(), storage.get("count") ?? 0);
 
     const publication = api.serve(CounterApi, {
       read: () => ({ count: current() }),

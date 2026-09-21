@@ -108,6 +108,10 @@ export class BrowserClient implements ClientApi {
 
     return () => {
       group.delete(fn);
+
+      if (!group.size) {
+        this.listeners.delete(type);
+      }
     };
   }
 

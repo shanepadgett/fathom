@@ -23,6 +23,7 @@ export const solidTransform: esbuild.Plugin = {
         ],
         babelrc: false,
         configFile: false,
+        sourceMaps: "inline",
       });
 
       return { contents: result!.code!, loader: "js" };

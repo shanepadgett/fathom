@@ -1,3 +1,5 @@
+import { concat } from "@std/bytes";
+import { encodeHex } from "@std/encoding/hex";
 import {
   UI_RUNTIME_IMPORTS,
   type PluginConfigSchema,
@@ -155,13 +157,10 @@ export async function buildPluginArtifact(
 
   const digest = await crypto.subtle.digest(
     "SHA-256",
-    new TextEncoder().encode(new TextDecoder().decode(bytes) + css),
+    concat([bytes, new TextEncoder().encode(css)]),
   );
 
-  const hash = [...new Uint8Array(digest)]
-    .map((n) => n.toString(16).padStart(2, "0"))
-    .join("")
-    .slice(0, ARTIFACT_HASH_HEX_LENGTH);
+  const hash = encodeHex(digest).slice(0, ARTIFACT_HASH_HEX_LENGTH);
 
   const prefix = `${plugin.manifest.id}/1/${hash}`;
   await Deno.mkdir(`${root}/dist/plugins/${prefix}`, { recursive: true });

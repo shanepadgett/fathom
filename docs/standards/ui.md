@@ -3,6 +3,14 @@
 UI code is Solid rendered in the page. Plugins contribute to slots; the SDK
 provides the controls and theme.
 
+## Runs in the page
+
+The SDK, kernel, renderer, and every plugin `ui/` entry are bundled for the
+page by esbuild, which resolves workspace and npm packages but not `jsr:`.
+Page-side code uses web platform APIs and the SDK only: no `@std`, and nothing
+that needs eval, since the page's content security policy forbids it. `@std`
+belongs in the server, the app, scripts, and plugin backends.
+
 ## Files
 
 - One named component per PascalCase `.tsx` file. Its stylesheet, if any, sits

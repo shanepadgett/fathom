@@ -1,4 +1,12 @@
-import { extname, resolve, sep } from "node:path";
+import { serveFile } from "@std/http/file-server";
+import { join, resolve, sep } from "node:path";
+
+const HEADERS = {
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "no-referrer",
+  "content-security-policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'",
+};
 
 export async function serveStatic(req: Request, resources: string) {
   const url = new URL(req.url);
@@ -8,8 +16,12 @@ export async function serveStatic(req: Request, resources: string) {
   }
 
   for (const mount of [
-    { prefix: "/plugins/", dir: `${resources}/dist/plugins`, immutable: true },
-    { prefix: "/", dir: `${resources}/dist/app`, immutable: false },
+    {
+      prefix: "/plugins/",
+      dir: join(resources, "dist", "plugins"),
+      immutable: true,
+    },
+    { prefix: "/", dir: join(resources, "dist", "app"), immutable: false },
   ]) {
     if (!url.pathname.startsWith(mount.prefix)) {
       continue;
@@ -38,33 +50,23 @@ export async function serveStatic(req: Request, resources: string) {
       throw e;
     }
 
+    // Symlinks may leave the mount even when the requested path did not.
     if (!real.startsWith(root + sep)) {
       return new Response("Forbidden", { status: 403 });
     }
 
-    const types: Record<string, string> = {
-      ".html": "text/html",
-      ".js": "text/javascript",
-      ".css": "text/css",
-      ".json": "application/json",
-      ".svg": "image/svg+xml",
-      ".woff2": "font/woff2",
-    };
+    const response = await serveFile(req, real);
 
-    const bytes = await Deno.readFile(real);
+    response.headers.set(
+      "cache-control",
+      mount.immutable ? "public, max-age=31536000, immutable" : "no-store",
+    );
 
-    return new Response(req.method === "HEAD" ? null : bytes, {
-      headers: {
-        "content-type": types[extname(real)] ?? "application/octet-stream",
-        "cache-control": mount.immutable
-          ? "public, max-age=31536000, immutable"
-          : "no-store",
-        "x-content-type-options": "nosniff",
-        "referrer-policy": "no-referrer",
-        "content-security-policy":
-          "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'",
-      },
-    });
+    for (const [name, value] of Object.entries(HEADERS)) {
+      response.headers.set(name, value);
+    }
+
+    return response;
   }
 
   return new Response("Not found", { status: 404 });
