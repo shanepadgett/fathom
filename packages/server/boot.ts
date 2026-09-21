@@ -1,9 +1,11 @@
+import { join } from "node:path";
 import { Kernel } from "@fathom/kernel";
 import { AppEnvironment, decode, T, UiArtifactSchema } from "@fathom/sdk";
 import { CompositionStore } from "./composition.ts";
 import { bridge } from "./bridge.ts";
 import { discover } from "./discovery.ts";
 import { DenoLoader } from "./loader.ts";
+import { openInBrowser } from "./open-browser.ts";
 
 export async function boot(options: {
   home: string;
@@ -15,13 +17,13 @@ export async function boot(options: {
 }): Promise<{ kernel: Kernel; origin: string; close(): Promise<void> }> {
   await Deno.mkdir(options.home, { recursive: true, mode: 0o700 });
 
-  const lock = await Deno.open(`${options.home}/host.lock`, {
+  const lock = await Deno.open(join(options.home, "host.lock"), {
     create: true,
     write: true,
     mode: 0o600,
   });
 
-  const state = new CompositionStore(`${options.home}/composition.json`);
+  const state = new CompositionStore(join(options.home, "composition.json"));
   let transport: ReturnType<typeof bridge> | undefined;
   let kernel: Kernel | undefined;
 
@@ -54,7 +56,7 @@ export async function boot(options: {
         T.Array(T.Omit(UiArtifactSchema, ["enabled", "config"])),
         JSON.parse(
           await Deno.readTextFile(
-            `${options.resources}/dist/app/ui-plugins.json`,
+            join(options.resources, "dist", "app", "ui-plugins.json"),
           ),
         ),
       );
@@ -91,6 +93,7 @@ export async function boot(options: {
       origin: transport.origin,
       launchToken: options.launchToken,
       shell: options.shell,
+      openExternal: openInBrowser,
     });
 
     for (const { source, manifest } of manifests) {

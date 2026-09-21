@@ -223,6 +223,16 @@ export function createLoginSessions(
       }
     },
 
+    url(id: string) {
+      const session = sessions.get(id);
+
+      if (session?.state.state !== "waiting" || !session.state.url) {
+        throw new Error("This login has no sign-in page to open");
+      }
+
+      return session.state.url;
+    },
+
     reply(id: string, value: string) {
       const session = sessions.get(id);
 

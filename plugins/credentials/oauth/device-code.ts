@@ -1,12 +1,17 @@
-import { decode, T } from "@fathom/sdk";
+import { decode, request, T } from "@fathom/sdk";
+import { delay } from "@std/async";
 import type { Credential, LoginUi } from "@fathom/credentials/contract";
-import { delay } from "@fathom/sdk";
 
 const DEFAULT_TOKEN_LIFETIME_SECONDS = 3600;
 const MIN_POLL_INTERVAL_MS = 1000;
 const DEFAULT_POLL_INTERVAL_MS = 5000;
 const SLOW_DOWN_INCREMENT_MS = 5000;
 const MAX_TIMER_DELAY_MS = 2_147_483_647;
+
+const FORM_HEADERS = {
+  accept: "application/json",
+  "content-type": "application/x-www-form-urlencoded",
+};
 
 export interface DeviceCodeConfig {
   clientId: string;
@@ -38,33 +43,33 @@ const ErrorResponse = T.Object({
   interval: T.Optional(T.Unknown()),
 });
 
-async function postForm(
-  url: string,
-  fields: Record<string, string>,
-  signal: AbortSignal,
-) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(fields),
-    signal,
-  });
-
-  let body: unknown;
-
+async function readJson(response: Response, signal: AbortSignal) {
   try {
-    body = await response.json();
+    return await response.json();
   } catch {
     signal.throwIfAborted();
     throw new Error(
       `Device authorization returned invalid JSON (HTTP ${response.status})`,
     );
   }
+}
 
-  return { ok: response.ok, status: response.status, body };
+function postForm(
+  url: string,
+  fields: Record<string, string>,
+  signal: AbortSignal,
+  retries?: number,
+) {
+  return request(
+    url,
+    {
+      method: "POST",
+      headers: FORM_HEADERS,
+      body: new URLSearchParams(fields),
+    },
+    signal,
+    retries,
+  );
 }
 
 function verificationUrl(value: string) {
@@ -118,11 +123,7 @@ export async function loginDeviceCode(
     signal,
   );
 
-  if (!response.ok) {
-    throw new Error(`Device authorization failed (HTTP ${response.status})`);
-  }
-
-  const device = decode(DeviceResponse, response.body);
+  const device = decode(DeviceResponse, await readJson(response, signal));
   const fallbackUrl = verificationUrl(device.verification_uri);
 
   const url = device.verification_uri_complete
@@ -153,27 +154,34 @@ export async function loginDeviceCode(
 
   try {
     while (Date.now() < deadline) {
-      await delay(Math.min(interval, deadline - Date.now()), pollingSignal);
+      await delay(Math.min(interval, deadline - Date.now()), {
+        signal: pollingSignal,
+      });
 
       if (Date.now() >= deadline) {
         break;
       }
 
-      const result = await postForm(
-        config.tokenUrl,
-        {
+      // RFC 8628 reports pending, slow_down, and denial as HTTP 400 bodies,
+      // so the poll reads the body instead of going through request().
+      const result = await fetch(config.tokenUrl, {
+        method: "POST",
+        headers: FORM_HEADERS,
+        body: new URLSearchParams({
           grant_type: "urn:ietf:params:oauth:grant-type:device_code",
           client_id: config.clientId,
           device_code: device.device_code,
-        },
-        pollingSignal,
-      );
+        }),
+        signal: pollingSignal,
+      });
+
+      const body = await readJson(result, pollingSignal);
 
       if (result.ok) {
-        return credentials(config, result.body);
+        return credentials(config, body);
       }
 
-      const error = decode(ErrorResponse, result.body);
+      const error = decode(ErrorResponse, body);
 
       if (error.error === "authorization_pending") {
         continue;
@@ -204,11 +212,7 @@ export async function loginDeviceCode(
       throw new Error(`Device token polling failed (HTTP ${result.status})`);
     }
   } catch (error) {
-    if (signal.aborted) {
-      throw signal.reason;
-    }
-
-    if (!lifetime.aborted) {
+    if (error !== lifetime.reason) {
       throw error;
     }
   }
@@ -229,13 +233,12 @@ export async function refreshDeviceCode(
       refresh_token: credential.refreshToken,
     },
     signal,
+    0,
   );
 
-  if (!response.ok) {
-    throw new Error(
-      `Token refresh failed (HTTP ${response.status}). Reconnect this provider.`,
-    );
-  }
-
-  return credentials(config, response.body, credential.refreshToken);
+  return credentials(
+    config,
+    await readJson(response, signal),
+    credential.refreshToken,
+  );
 }

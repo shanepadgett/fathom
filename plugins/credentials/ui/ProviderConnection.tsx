@@ -18,6 +18,7 @@ export function ProviderConnection(props: {
   onRemove: () => void;
   onReply: (id: string, value: string) => void;
   onCancel: (id: string) => void;
+  onOpen: (id: string) => void;
 }) {
   const [key, setKey] = createSignal("");
 
@@ -29,6 +30,69 @@ export function ProviderConnection(props: {
 
   const pending = () =>
     props.login?.state === "waiting" || props.login?.state === "working";
+
+  const oauth = () => props.provider.kind === "oauth";
+
+  const methods = () => (
+    <>
+      <For each={signIn()}>
+        {(method) => (
+          <div class="flex flex-wrap items-center justify-between gap-4 py-4">
+            <span class="text-sm">{method.label}</span>
+            <Button
+              variant="secondary"
+              disabled={props.busy || pending()}
+              onClick={() => props.onLogin(method.id)}
+            >
+              <Icon name="arrow-square-out" />
+              {method.label}
+            </Button>
+          </div>
+        )}
+      </For>
+      <Show when={signIn().length}>
+        <div class="my-6 flex items-center gap-3 type-micro">
+          <span class="h-px flex-1 bg-line" />
+          OR
+          <span class="h-px flex-1 bg-line" />
+        </div>
+      </Show>
+      <Show when={apiKey()}>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const value = key().trim();
+
+            if (!value || !apiKey()) {
+              return;
+            }
+
+            props.onConnect("api-key", value);
+            setKey("");
+          }}
+        >
+          <Field id="provider-api-key" label="API key">
+            <div class="flex items-center gap-3">
+              <Input
+                id="provider-api-key"
+                class="flex-1"
+                type="password"
+                autocomplete="off"
+                required
+                placeholder="Paste API key"
+                value={key()}
+                disabled={props.busy}
+                onInput={(event) => setKey(event.currentTarget.value)}
+              />
+              <Button type="submit" variant="primary" disabled={props.busy}>
+                Connect
+              </Button>
+            </div>
+          </Field>
+        </form>
+      </Show>
+    </>
+  );
 
   return (
     <SettingsSection>
@@ -47,80 +111,35 @@ export function ProviderConnection(props: {
             : "Not connected"}
         </span>
       </header>
-      <section aria-label="Connection methods">
-        <For each={signIn()}>
-          {(method) => (
-            <div class="flex flex-wrap items-center justify-between gap-4 py-4">
-              <span class="text-sm">{method.label}</span>
-              <Button
-                variant="secondary"
-                disabled={props.busy || pending()}
-                onClick={() => props.onLogin(method.id)}
-              >
-                <Icon name="arrow-square-out" />
-                {method.label}
-              </Button>
-            </div>
-          )}
-        </For>
-        <Show when={signIn().length}>
-          <div class="my-6 flex items-center gap-3 type-micro">
-            <span class="h-px flex-1 bg-line" />
-            OR
-            <span class="h-px flex-1 bg-line" />
+      <section aria-label="Connection">
+        <Show
+          when={props.provider.connected && !pending()}
+          fallback={methods()}
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 py-4">
+            <span class="text-sm">
+              {oauth() ? "Signed in with OAuth" : "Connected with an API key"}
+            </span>
+            <Button
+              variant="secondary"
+              disabled={props.busy}
+              onClick={() => props.onRemove()}
+            >
+              {oauth() ? "Sign out" : "Remove key"}
+            </Button>
           </div>
         </Show>
-        <Show when={apiKey()}>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              const value = key().trim();
-
-              if (!value || !apiKey()) {
-                return;
-              }
-
-              props.onConnect("api-key", value);
-              setKey("");
-            }}
-          >
-            <Field id="provider-api-key" label="API key">
-              <div class="flex items-center gap-3">
-                <Input
-                  id="provider-api-key"
-                  class="flex-1"
-                  type="password"
-                  autocomplete="off"
-                  required
-                  placeholder="Paste API key"
-                  value={key()}
-                  disabled={props.busy}
-                  onInput={(event) => setKey(event.currentTarget.value)}
-                />
-                <Button type="submit" variant="primary" disabled={props.busy}>
-                  {props.provider.connected ? "Replace key" : "Connect"}
-                </Button>
-                <Show when={props.provider.connected}>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={props.busy}
-                    onClick={() => props.onRemove()}
-                  >
-                    Disconnect
-                  </Button>
-                </Show>
-              </div>
-            </Field>
-          </form>
-        </Show>
-        <Show when={props.login} keyed>
+        <Show
+          when={props.login?.state === "connected" ? undefined : props.login}
+          keyed
+        >
           {(login) => (
             <LoginStatus
               login={login}
               busy={props.busy}
               onReply={(value) => props.onReply(login.id, value)}
               onCancel={() => props.onCancel(login.id)}
+              onOpen={() => props.onOpen(login.id)}
             />
           )}
         </Show>

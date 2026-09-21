@@ -1,4 +1,11 @@
-import { createSignal, onCleanup, onMount } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  onCleanup,
+  onMount,
+} from "solid-js";
+import { createStore, produce, reconcile } from "solid-js/store";
 import type { ApiClient, Static } from "@fathom/sdk";
 import type {
   CredentialsApi,
@@ -9,66 +16,103 @@ import type { ClientApi } from "@fathom/sdk/ui";
 
 type ProviderStatus = Static<typeof ProviderStatusSchema>;
 
+interface Connections {
+  providers: ProviderStatus[];
+  logins: Record<string, LoginState>;
+  /** Id of the login most recently reported for each provider. */
+  latest: Record<string, string>;
+}
+
 export function createConnections(props: {
   auth: ApiClient<typeof CredentialsApi.operations>;
   client: ClientApi;
 }) {
-  const [providers, setProviders] = createSignal<ProviderStatus[]>([]);
-  const [logins, setLogins] = createSignal<LoginState[]>([]);
-  const [error, setError] = createSignal("");
+  const [state, setState] = createStore<Connections>({
+    providers: [],
+    logins: {},
+    latest: {},
+  });
+
+  const [actionError, setActionError] = createSignal("");
   const [busy, setBusy] = createSignal("");
 
-  async function refresh() {
-    try {
-      setProviders(await props.auth.status({}));
-      setLogins(await props.auth.logins({}));
-    } catch (e) {
-      setError(String(e));
-    }
+  async function load(): Promise<Connections> {
+    const auth = props.auth;
+
+    const [providers, logins] = await Promise.all([
+      auth.status({}),
+      auth.logins({}),
+    ]);
+
+    return {
+      providers,
+      logins: Object.fromEntries(logins.map((login) => [login.id, login])),
+      latest: Object.fromEntries(
+        logins.map((login) => [login.provider, login.id]),
+      ),
+    };
   }
+
+  const [loaded, { refetch }] = createResource(load);
+
+  createEffect(() => {
+    if (loaded.state === "ready") {
+      setState(reconcile(loaded()));
+    }
+  });
+
+  const error = () =>
+    actionError() || (loaded.error ? String(loaded.error) : "");
 
   const action = async (key: string, fn: () => Promise<unknown>) => {
     setBusy(key);
-    setError("");
+    setActionError("");
 
     try {
       await fn();
-      await refresh();
+      await refetch();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setActionError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusy("");
     }
   };
 
-  const loginFor = (id: string) =>
-    logins().find(
-      (l) =>
-        l.provider === id && (l.state === "waiting" || l.state === "working"),
-    ) ?? [...logins()].reverse().find((l) => l.provider === id);
+  const loginFor = (provider: string): LoginState | undefined => {
+    const pending = Object.values(state.logins).find(
+      (login) =>
+        login.provider === provider &&
+        (login.state === "waiting" || login.state === "working"),
+    );
 
-  onMount(() => {
-    void refresh();
-  });
+    const latest = state.latest[provider];
+
+    return pending ?? (latest ? state.logins[latest] : undefined);
+  };
 
   onMount(() => {
     onCleanup(
       props.auth.changed.subscribe(() => {
-        void refresh();
+        void refetch();
       }),
     );
 
     onCleanup(
       props.auth.loginChanged.subscribe((login) => {
-        setLogins((old) => [...old.filter((l) => l.id !== login.id), login]);
+        setState(
+          produce((current) => {
+            current.logins[login.id] = login;
+            current.latest[login.provider] = login.id;
+          }),
+        );
 
         if (login.state === "connected") {
-          void refresh();
+          void refetch();
         }
       }),
     );
 
-    onCleanup(props.client.onReset(() => void refresh()));
+    onCleanup(props.client.onReset(() => void refetch()));
   });
 
   function login(provider: string, method: string) {
@@ -106,8 +150,14 @@ export function createConnections(props: {
     return action(provider, () => auth.cancel({ id }));
   }
 
+  function open(provider: string, id: string) {
+    const auth = props.auth;
+
+    return action(provider, () => auth.open({ id }));
+  }
+
   return {
-    providers,
+    providers: () => state.providers,
     error,
     busy,
     loginFor,
@@ -116,5 +166,6 @@ export function createConnections(props: {
     remove,
     reply,
     cancel,
+    open,
   };
 }

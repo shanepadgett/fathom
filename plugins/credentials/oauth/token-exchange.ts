@@ -1,3 +1,4 @@
+import { decodeBase64Url } from "@std/encoding/base64url";
 import { decode, T, request } from "@fathom/sdk";
 import type { Credential } from "../contract.ts";
 import type { OAuthConfig } from "./config.ts";
@@ -17,12 +18,11 @@ const TokenResponse = T.Object({
  */
 export function claims(token: string): Record<string, unknown> {
   try {
-    const raw = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-
-    return decode(
-      T.Record(T.String(), T.Unknown()),
-      JSON.parse(atob(raw.padEnd(Math.ceil(raw.length / 4) * 4, "="))),
+    const payload = new TextDecoder().decode(
+      decodeBase64Url(token.split(".")[1]),
     );
+
+    return decode(T.Record(T.String(), T.Unknown()), JSON.parse(payload));
   } catch {
     return {};
   }

@@ -1,15 +1,11 @@
+import { abortable } from "@std/async";
+import { encodeBase64Url } from "@std/encoding/base64url";
 import type { Credential, LoginUi } from "../contract.ts";
 import type { OAuthConfig } from "./config.ts";
 import { exchange } from "./token-exchange.ts";
 
 const VERIFIER_RANDOM_BYTES = 48;
 const STATE_RANDOM_BYTES = 32;
-
-const base64url = (bytes: Uint8Array) =>
-  btoa(String.fromCharCode(...bytes))
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
 
 /**
  * Request browser authorization and validate callback state before exchanging tokens.
@@ -23,17 +19,17 @@ export async function loginPkce(
 ): Promise<Credential> {
   signal.throwIfAborted();
 
-  const verifier = base64url(
+  const verifier = encodeBase64Url(
     crypto.getRandomValues(new Uint8Array(VERIFIER_RANDOM_BYTES)),
   );
 
-  const challenge = base64url(
+  const challenge = encodeBase64Url(
     new Uint8Array(
       await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
     ),
   );
 
-  const state = base64url(
+  const state = encodeBase64Url(
     crypto.getRandomValues(new Uint8Array(STATE_RANDOM_BYTES)),
   );
 
@@ -83,12 +79,6 @@ export async function loginPkce(
 
     return code;
   }
-
-  const aborted = new Promise<never>((_, reject) => {
-    const abort = () => reject(signal.reason);
-    signal.addEventListener("abort", abort, { once: true });
-    callback.finally(() => signal.removeEventListener("abort", abort));
-  });
 
   try {
     if (mode === "loopback") {
@@ -158,7 +148,10 @@ export async function loginPkce(
       )
       .then(parse);
 
-    const code = await Promise.race([callback, pasted, aborted]);
+    // The prompt can still reject after the callback wins; keep that from surfacing as unhandled.
+    pasted.catch(() => {});
+
+    const code = await abortable(Promise.race([callback, pasted]), signal);
 
     return await exchange(
       config,

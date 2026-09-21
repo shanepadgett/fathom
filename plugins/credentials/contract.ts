@@ -122,6 +122,11 @@ export const CredentialsApi = defineApi("fathom.credentials.api", {
     input: T.Object({ id: T.String() }, { additionalProperties: false }),
     output: Empty,
   }),
+  /** Open the login's sign-in page in the system browser, never in the app window. */
+  open: command({
+    input: T.Object({ id: T.String() }, { additionalProperties: false }),
+    output: Empty,
+  }),
   remove: command({
     input: T.Object({ provider: T.String() }, { additionalProperties: false }),
     output: Empty,

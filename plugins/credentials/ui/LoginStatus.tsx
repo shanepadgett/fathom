@@ -8,6 +8,7 @@ export function LoginStatus(props: {
   busy: boolean;
   onReply: (value: string) => void;
   onCancel: () => void;
+  onOpen: () => void;
 }) {
   const waiting = () => props.login.state === "waiting";
 
@@ -26,12 +27,7 @@ export function LoginStatus(props: {
       </Show>
       <Show when={props.login.url && waiting()}>
         <div>
-          <Button
-            variant="primary"
-            onClick={() =>
-              globalThis.open(props.login.url, "_blank", "noopener,noreferrer")
-            }
-          >
+          <Button variant="primary" onClick={() => props.onOpen()}>
             <Icon name="arrow-square-out" /> Open sign-in page
           </Button>
         </div>

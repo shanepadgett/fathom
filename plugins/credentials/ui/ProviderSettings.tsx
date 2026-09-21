@@ -70,6 +70,7 @@ export function ProviderSettings(props: {
                 void connections.reply(item.id, id, value)
               }
               onCancel={(id) => void connections.cancel(item.id, id)}
+              onOpen={(id) => void connections.open(item.id, id)}
             />
           )}
         </Show>

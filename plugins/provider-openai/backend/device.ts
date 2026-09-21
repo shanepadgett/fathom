@@ -1,4 +1,5 @@
-import { decode, delay, request, T } from "@fathom/sdk";
+import { decode, HttpError, request, T } from "@fathom/sdk";
+import { delay } from "@std/async";
 import type { Credential, LoginUi } from "@fathom/credentials/contract";
 import { exchange, type OAuthConfig } from "@fathom/credentials/oauth";
 
@@ -55,26 +56,34 @@ export async function loginOpenAIDevice(
   const until = Date.now() + DEVICE_LOGIN_TIMEOUT_MS;
 
   while (Date.now() < until) {
-    await delay(interval, signal);
+    await delay(interval, { signal });
 
-    const response = await fetch(`${base}/token`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        device_auth_id: result.device_auth_id,
-        user_code: code,
-      }),
-      signal,
-    });
+    let response: Response;
 
-    if (response.status === 403 || response.status === 404) {
-      await response.body?.cancel();
-      continue;
-    }
+    try {
+      response = await request(
+        `${base}/token`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            device_auth_id: result.device_auth_id,
+            user_code: code,
+          }),
+        },
+        signal,
+        0,
+      );
+    } catch (error) {
+      // 403 and 404 mean the user has not approved the code yet.
+      if (
+        error instanceof HttpError &&
+        (error.status === 403 || error.status === 404)
+      ) {
+        continue;
+      }
 
-    if (!response.ok) {
-      await response.body?.cancel();
-      throw new Error(`Device login failed (HTTP ${response.status})`);
+      throw error;
     }
 
     const token = decode(

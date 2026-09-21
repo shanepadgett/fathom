@@ -9,4 +9,6 @@ export const AppEnvironment: ServiceToken<{
   launchToken: string;
   /** A native window or a browser tab. */
   shell: "desktop" | "browser";
+  /** Open a URL in the user's default browser, outside the app window. */
+  openExternal(url: string): Promise<void>;
 }> = defineService("fathom.environment");

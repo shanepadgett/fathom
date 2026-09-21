@@ -1,3 +1,4 @@
+import { writeAll } from "@std/io/write-all";
 import { decode, T } from "@fathom/sdk";
 import {
   type Credential,
@@ -65,15 +66,10 @@ export async function openCredentialStore(home: string) {
         const file = await Deno.open(temp, { write: true, truncate: true });
 
         try {
-          const bytes = new TextEncoder().encode(
-            JSON.stringify(next, null, 2) + "\n",
+          await writeAll(
+            file,
+            new TextEncoder().encode(JSON.stringify(next, null, 2) + "\n"),
           );
-
-          let offset = 0;
-
-          while (offset < bytes.length) {
-            offset += await file.write(bytes.subarray(offset));
-          }
 
           await file.sync();
         } finally {

@@ -36,7 +36,13 @@ export default definePlugin({
     const publication: ApiPublication<typeof CredentialsApi.operations> =
       api.serve(
         CredentialsApi,
-        createCredentialHandlers(store, logins, access, sessions),
+        createCredentialHandlers(
+          store,
+          logins,
+          access,
+          sessions,
+          environment.openExternal,
+        ),
       );
 
     logins.watch(changed);

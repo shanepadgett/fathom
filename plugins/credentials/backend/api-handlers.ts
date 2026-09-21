@@ -9,6 +9,7 @@ export function createCredentialHandlers(
   logins: Registry<LoginFlow>,
   access: CredentialAccess,
   sessions: LoginSessions,
+  openExternal: (url: string) => Promise<void>,
 ): Handlers<typeof CredentialsApi.operations> {
   return {
     status: () =>
@@ -37,6 +38,12 @@ export function createCredentialHandlers(
 
     cancel: async ({ id }) => {
       await sessions.cancel(id);
+
+      return {};
+    },
+
+    open: async ({ id }) => {
+      await openExternal(sessions.url(id));
 
       return {};
     },
