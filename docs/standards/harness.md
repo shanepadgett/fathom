@@ -19,11 +19,16 @@ The harness is `packages/kernel`, `packages/server`, `packages/renderer`, and
   choice between native window and browser fallback. Nothing else creates
   windows or reads process arguments.
 - Package `mod.ts` files are export-only.
+- Both `deno desktop` commands, hot reload in `scripts/dev.ts` and
+  `desktop:build`, embed `plugins/` with `--include`. Workspace imports such as
+  `@fathom/credentials/contract` resolve inside the compiled graph, so plugins
+  that import another plugin's contract fail with "Module not found" without
+  it.
 
 ## Change the harness
 
-1. Restart `deno task dev` after every edit; these packages do not hot reload.
-2. Check a fresh home with `FATHOM_HOME=$(mktemp -d) deno task dev`, and the
-   packaged app with `deno task desktop:build` when you touched `apps/desktop`
+1. Restart `mise run dev` after every edit; these packages do not hot reload.
+2. Check a fresh home with `FATHOM_HOME=$(mktemp -d) mise run dev`, and the
+   packaged app with `mise run desktop:build` when you touched `apps/desktop`
    or the server's file handling.
 3. Update `docs/architecture.md` when a boundary or dependency direction moved.

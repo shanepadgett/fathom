@@ -36,6 +36,12 @@ const child = new Deno.Command(Deno.execPath(), {
         "-A",
         "--hmr",
         "--exclude-unused-npm",
+        // Workspace contracts resolve into the compiled graph, so plugin
+        // sources must be embedded even though they load from the home copy.
+        "--include",
+        "plugins",
+        "--exclude",
+        "plugins/*/node_modules",
         "apps/desktop/main.ts",
       ],
   cwd: root,
