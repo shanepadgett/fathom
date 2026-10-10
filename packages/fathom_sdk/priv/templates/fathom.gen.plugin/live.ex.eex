@@ -1,0 +1,22 @@
+defmodule <%= @mod %>Web.<%= if @ui == "page", do: "PageLive", else: "SettingsLive" %> do
+  @moduledoc false
+  use Fathom.UI, :live_view
+
+  @impl true
+  def mount(_params, %{"plugin" => plugin}, socket) do
+    {:ok, assign(socket, plugin: plugin)}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <.settings_section title="<%= @label %>" description={"Contributed by the #{@plugin} plugin."}>
+      <.card>
+        <p class="type-description">
+          Edit this view, then save. The running app reloads it in place.
+        </p>
+      </.card>
+    </.settings_section>
+    """
+  end
+end

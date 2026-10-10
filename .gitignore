@@ -10,17 +10,25 @@ Desktop.ini
 
 # Editors
 .idea/
+.elixir_ls/
+.expert/
 *.swp
 *.swo
 *~
 
-# Deno / TypeScript
-.deno/
-node_modules/
-dist/
-build/
-coverage/
-*.tsbuildinfo
+# Elixir: every Mix project builds in place
+_build/
+deps/
+erl_crash.dump
+*.ez
+
+# SQLite databases from generator runs in plugin projects
+*.db
+*.db-shm
+*.db-wal
+
+# Rust / Tauri
+target/
 
 # Env and local secrets
 .env
@@ -30,5 +38,6 @@ coverage/
 # Optional in-repo FATHOM_HOME
 /.fathom/
 
-# Local lifecycle check evidence
-.codex/verification/
+# The design reference's own tooling (design/ runs on Vite)
+node_modules/
+design/dist/

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title default="Fathom" phx-no-format>{assigns[:page_title]}</.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <link
+      id="fathom-plugins-css"
+      rel="stylesheet"
+      href={"/plugins.css?v=#{Fathom.Plugins.Local.css_version()}"}
+    />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
+    </script>
+    <script>
+      // Appearance applies before first paint. Preferences are browser-local.
+      (() => {
+        const root = document.documentElement;
+        const dark = matchMedia("(prefers-color-scheme: dark)");
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+        const theme = () => localStorage.getItem("fathom:theme") || "system";
+        const motion = () => localStorage.getItem("fathom:motion") || "system";
+
+        const apply = () => {
+          const chosen = theme();
+          root.dataset.theme = chosen === "system" ? (dark.matches ? "dark" : "light") : chosen;
+          root.dataset.reducedMotion = String(motion() === "reduce" || reduced.matches);
+        };
+
+        const save = (key, value) => {
+          value === "system" ? localStorage.removeItem(key) : localStorage.setItem(key, value);
+          apply();
+        };
+
+        window.fathomAppearance = {
+          theme,
+          motion,
+          setTheme: (value) => save("fathom:theme", value),
+          setMotion: (value) => save("fathom:motion", value),
+        };
+
+        apply();
+        dark.addEventListener("change", apply);
+        reduced.addEventListener("change", apply);
+        window.addEventListener("storage", (e) => e.key?.startsWith("fathom:") && apply());
+      })();
+    </script>
+  </head>
+  <body>
+    {@inner_content}
+  </body>
+</html>

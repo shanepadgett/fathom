@@ -1,8 +1,8 @@
 # Roadmap
 
-The baseline is complete: a native window, one published SDK, bundled plugins
-that a third party could have written, and a dev loop that reloads the edited
-half of a plugin. Finished plans are under `_archive_do_NOT_read_these/` and are
+The baseline is complete: a native window, an SDK, bundled plugins
+that a third party could have written, and a dev loop that reloads plugin
+code in place. Finished plans are under `_archive_do_NOT_read_these/` and are
 history, not instructions.
 
 ## Plugins, in order
@@ -32,12 +32,16 @@ general contract. Do not add framework features for plugins that do not exist.
 
 ## Deferred foundation work
 
+The [Elixir harness plan](elixir-harness.md) holds the open harness work:
+peer nodes, release packaging, and slot selection. The
+[plugin packages plan](plugin-packages.md) covers local plugins (built),
+sharing and installing plugins from Hex, and the definition and provider
+split.
+
 | Item | State |
 | --- | --- |
-| Repository license | Not chosen. Blocks JSR publication and keeps `publish:check` out of `check`. |
-| Slot composition settings | The composition JSON file and the revision-checked API select a shell or sidebar; no UI. |
-| WebKit rendering check | Dialog and menu transitions in the native window are unverified. If they degrade, set `"backend": "cef"` in `deno.json`. |
+| Repository license | Not chosen. Blocks publishing `fathom_sdk` to Hex. |
 | Adding a plugin directory | Requires restarting `mise run dev`; edits inside a known directory reload in place. |
-| Remote install, marketplace, updates | Not started. Local registration is an explicit trust decision. |
+| Remote install, marketplace, updates | Not started. |
 | Signing and notarization | The packaged app is ad-hoc signed. |
-| Control coverage | Not every component in `design/` has an SDK control. |
+| Control coverage | Not every component in `design/` has an SDK control. Menu, accordion, and drag-resizable sidebars from the old SDK are not ported yet. |

@@ -1,61 +1,64 @@
-# Plugins
+# Plugin standards
 
-A plugin is one directory with a `deno.json` and up to two entries. Bundled
-plugins live in `plugins/<id>/` and are exactly what a third party would write.
+Read this when changing anything under `plugins/` or `examples/`.
 
-## Layout
+## Shape
 
-```text
-plugins/<id>/
-  deno.json          name, version, exports, fathom { id, backend, ui }
-  contract.ts        tokens and schemas others import; no runtime state
-  backend/mod.ts     definePlugin: requires, provides, config, start; wiring only
-  backend/*.ts       implementations, named for their responsibility
-  ui/mod.tsx         definePlugin: requires, start; adds to slots, wiring only
-  ui/*.tsx           one PascalCase file per named component
-```
+- Generate new plugins with `mise run new -- <id>`. Do not hand-write the
+  project; extend the generator if every plugin needs something new.
+- One OTP application per plugin. Its supervision tree ends with
+  `{Fathom.Plugin.Publisher, X.Plugin}` so nothing is published before the
+  processes behind it run.
+- The root module (`lib/x.ex`) is the context: the public API other plugins
+  and the plugin's own views call. Processes and internals live under `X.*`;
+  LiveViews under `XWeb.*`.
+- The manifest (`X.Plugin`) lists every token the plugin requires or
+  provides. Contributing to a registry requires its token.
 
-Scaffold with `mise run new <id>`. Add `plugins/<id>` to the root `deno.json`
-workspace. A plugin without a UI or backend half omits that entry and folder.
+## Contracts
 
-## Rules
+- A service contract is a module with `use Fathom.Service`: a behaviour,
+  plus client functions that call `Fathom.Service.call/3`.
+- A contract other plugins use or might replace lives in a definition
+  package under `packages/` (`mix new packages/<name>`), with its structs,
+  registry tokens, provider behaviours, and pure helpers. Definitions run no
+  processes and depend only on `fathom_sdk` and other definitions.
+- The provider plugin's root module implements the behaviour and is
+  registered in `services/0`. Its management functions, used only by its own
+  views, stay in the plugin.
+- The definition owns its event topic: `subscribe/0` and the broadcast
+  helper providers call. Events specific to one provider use that provider's
+  own topic.
+- Arguments and results are plain data and pids. Never pass anonymous
+  functions through a contract; stream by sending `{tag, event}` messages to
+  a pid the caller supplies.
+- Document every message a `subscribe/0` delivers in the context's moduledoc.
+- Registry values are maps. Put `:order` on entries that render in a list.
 
-- `mod.ts` and `mod.tsx` declare dependencies and wire named implementations.
-  No feature logic, no whole views.
-- Import other plugins through their `@scope/<id>/contract` export, never by
-  relative path. The loader copies each plugin before importing it.
-- Import Fathom through `@fathom/sdk` and `@fathom/sdk/ui` only. Nothing in
-  `packages/kernel`, `packages/server`, or `packages/renderer` is a plugin
-  dependency.
-- Every value crossing runtimes has a schema: `defineApi` operations, events,
-  registry entries, `config`. Validate at the boundary and use the decoded type
-  inside.
-- `requires` keys are the names you receive on the start context. `scope` and
-  `handoff` are reserved.
-- Return exactly the services listed in `provides` from `start`.
-- Cleanup goes through `scope.defer`, background work through `scope.task`.
-  Registrations made during `start` are released for you.
-- Configuration is a `config` schema with `default` and `description` on each
-  field. The plugin manager renders it as a form. Flat objects render as
-  fields; anything else falls back to JSON.
-- State has one owner. Login sessions own their pending replies; credential
-  access owns refresh and removal. Do not spread a state across flags.
-- Providers own their authentication headers and endpoints. Protocol modules
-  own wire formats. Never add a central provider switch.
+## Dependencies
 
-## Change a plugin
+- Depend on definition packages like any library. Never depend on another
+  plugin; if you need its API, that API belongs in a definition package.
+- Bundled plugins may use the host's libraries (Phoenix, LiveView, Req,
+  Jason, NimbleOptions, Bandit, Ecto). Anything else needs a reason in the
+  plugin's README, because a second version of a library cannot load on the
+  host node.
 
-1. Edit under `plugins/<id>/`. With `mise run dev` running, UI edits rebuild
-   and reload the page half; backend edits reload the process half.
-2. Confirm in **Settings → Plugins** that the plugin is `ready`. A `blocked`
-   plugin lists the token ids it waits on; `failed` shows the error.
+## Processes
 
-## Add a bundled plugin
+- One process owns each piece of state. Serialize writes through it.
+- Long or cancellable work runs as a task under the plugin's
+  `Task.Supervisor`; cancel by stopping the task, not by checking flags.
+- Never block a GenServer on a call back into a process that may call it.
+  Store data through its owner directly instead of round-tripping.
+- Secrets never appear in `inspect/1`, logs, events, or UI state. Derive
+  `Inspect` with `only:` on structs that hold them.
 
-1. `mise run new <id>`, then add the directory to the workspace in the root
-   `deno.json`.
-2. Add `"lint": { "rules": { "exclude": ["no-slow-types"] } }` to its
-   `deno.json`. That rule applies to the SDK only.
-3. Start `mise run dev`. Bundled plugins start enabled; the counter example
-   and other external directories are added with `mise run plugin:add` and
-   start disabled.
+## UI
+
+- Views use `use Fathom.UI, :live_view` and controls from
+  `Fathom.UI.Components`. Match `design/` before inventing a control; add
+  missing controls to the SDK, not to a plugin.
+- Use `assign_registry/3` for registry-backed lists so views stay current.
+- Write icon classes in full (`"ph-plugs"`).
+- Use `start_async/3` for calls that wait on the network.

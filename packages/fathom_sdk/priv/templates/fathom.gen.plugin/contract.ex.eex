@@ -1,0 +1,9 @@
+defmodule <%= @mod %> do
+  @moduledoc """
+  The <%= @id %> context: this plugin's public API.
+
+  This plugin's views and IEx call the functions here. Processes and
+  internals live under `<%= @mod %>.*`; views live under `<%= @mod %>Web.*`.
+  A contract other plugins use belongs in a definition package instead.
+  """
+end

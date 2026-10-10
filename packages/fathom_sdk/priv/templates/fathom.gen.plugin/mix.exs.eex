@@ -1,0 +1,30 @@
+defmodule <%= @mod %>.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :<%= @app %>,
+      version: "0.1.0",
+      elixir: "~> 1.20",
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
+  end
+
+  # The harness finds the plugin through :fathom_plugin; it never imports it.
+  def application do
+    [
+      extra_applications: [:logger],
+      mod: {<%= @mod %>.Application, []},
+      env: [fathom_plugin: <%= @mod %>.Plugin]
+    ]
+  end
+
+  # Depend on definition packages for the contracts this plugin uses or
+  # implements. Never on another plugin: the kernel, not OTP, starts plugins.
+  defp deps do
+    [
+      <%= @sdk_dep %>
+    ]
+  end
+end

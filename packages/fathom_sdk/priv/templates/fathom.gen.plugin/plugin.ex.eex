@@ -1,0 +1,25 @@
+defmodule <%= @mod %>.Plugin do
+  @moduledoc false
+  use Fathom.Plugin,
+    otp_app: :<%= @app %>,
+    id: "<%= @id %>",
+    requires: [<%= case @ui do %><% "settings" -> %>Fathom.UI.SettingsSections<% "page" -> %>Fathom.UI.Pages<% "none" -> %><% end %>],
+    provides: []<%= unless @enabled do %>,
+    enabled: false<% end %>
+<%= case @ui do %><% "settings" -> %>
+  @impl true
+  def contributions do
+    [
+      {Fathom.UI.SettingsSections, "<%= @id %>",
+       %{label: "<%= @label %>", icon: "ph-puzzle-piece", order: 50, view: <%= @mod %>Web.SettingsLive}}
+    ]
+  end
+<% "page" -> %>
+  @impl true
+  def contributions do
+    [
+      {Fathom.UI.Pages, "<%= @id %>",
+       %{label: "<%= @label %>", icon: "ph-puzzle-piece", order: 50, view: <%= @mod %>Web.PageLive}}
+    ]
+  end
+<% "none" -> %><% end %>end

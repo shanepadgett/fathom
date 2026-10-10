@@ -1,0 +1,12 @@
+# <%= @id %>
+
+A Fathom plugin.
+
+- `lib/<%= @app %>.ex`: the context, this plugin's public API.
+- `lib/<%= @app %>/plugin.ex`: the manifest: what it requires, provides, and contributes.
+- `lib/<%= @app %>/application.ex`: the supervision tree, ending with the publisher.<%= if @ui != "none" do %>
+- `lib/<%= @app %>_web/`: LiveViews contributed to the application's slots.<% end %>
+
+The host discovers this project under `plugins/` or `examples/`. Run
+`mise run dev` from the repository root, then edit and save: the running app
+reloads the code in place.

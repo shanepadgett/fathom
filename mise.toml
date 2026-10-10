@@ -1,69 +1,80 @@
 [tools]
+erlang = "29.1.1"
+elixir = "1.20.4-otp-29"
+rust = "1.99.0"
+tauri-cli = "latest"
+# Only for viewing the copied design reference in design/.
 deno = "2.9.7"
-python = "3.14"
+
+[tasks.setup]
+description = "Fetch Elixir and Rust dependencies and install asset tools"
+run = [
+  "cd apps/fathom && mix setup",
+  "cargo fetch --manifest-path apps/desktop/src-tauri/Cargo.toml",
+]
+
+[tasks.dev]
+description = "Run Fathom in its native window; Elixir edits reload in place"
+dir = "{{config_root}}/apps/desktop"
+run = "cargo tauri dev"
+
+[tasks."dev:browser"]
+description = "Run the host in IEx and open Fathom in a browser tab"
+dir = "{{config_root}}/apps/fathom"
+run = "iex -S mix phx.server --open"
+
+[tasks.new]
+description = "Generate a plugin under plugins/: mise run new -- <id> [--ui settings|page|none]"
+dir = "{{config_root}}/apps/fathom"
+run = "mix fathom.gen.plugin --into ../../plugins"
+
+[tasks.fmt]
+description = "Format Elixir (host, SDK, plugins) and Rust"
+run = [
+  "cd apps/fathom && mix format",
+  "cargo fmt --manifest-path apps/desktop/src-tauri/Cargo.toml",
+]
+
+[tasks."fmt:check"]
+description = "Check formatting without changing files"
+run = [
+  "cd apps/fathom && mix format --check-formatted",
+  "cargo fmt --check --manifest-path apps/desktop/src-tauri/Cargo.toml",
+]
+
+[tasks."compile:check"]
+description = "Compile the host, every package, and every plugin with warnings as errors"
+dir = "{{config_root}}/apps/fathom"
+run = [
+  "mix compile --warnings-as-errors --force",
+  # Path dependencies ignore the host's flag; fail on any warning they print.
+  "! mix deps.compile $(elixir -r bundled_plugins.exs -e 'IO.puts Enum.join(Fathom.BundledPlugins.libraries() ++ Fathom.BundledPlugins.apps(), \" \")') --force 2>&1 | tee /dev/stderr | grep -q 'warning:'",
+]
+
+[tasks."rust:check"]
+description = "Lint the desktop shell"
+run = "cargo clippy --manifest-path apps/desktop/src-tauri/Cargo.toml -- -D warnings"
+
+[tasks.check]
+description = "Check formatting, Elixir warnings, and the Rust shell"
+depends = ["fmt:check", "compile:check", "rust:check"]
+
+[tasks."desktop:build"]
+description = "Build the Elixir release and package dist/Fathom.app"
+run = [
+  # A fresh release directory: --overwrite keeps libraries from earlier builds.
+  "cd apps/fathom && rm -rf _build/prod/rel/fathom && MIX_ENV=prod mix do compile + assets.deploy + release --overwrite",
+  """cd apps/desktop && cargo tauri build --config '{"bundle":{"resources":{"../../fathom/_build/prod/rel/fathom/":"fathom/"}}}'""",
+]
+
+[tasks."desktop:open"]
+description = "Open the built Fathom.app; set FATHOM_HOME to use a throwaway home"
+run = """
+app="{{config_root}}/apps/desktop/src-tauri/target/release/bundle/macos/Fathom.app"
+if [ -n "$FATHOM_HOME" ]; then open -n --env FATHOM_HOME="$FATHOM_HOME" "$app"; else open -n "$app"; fi
+"""
 
 [tasks.design]
 description = "Open the local design system"
 dir = "{{config_root}}/design"
 run = "deno task dev --open"
-
-[tasks.dev]
-description = "Build the UI and open Fathom in its native window with hot reload"
-run = "deno task dev"
-
-[tasks."dev:browser"]
-description = "Build the UI and run Fathom in a browser tab for DevTools"
-run = "deno task dev:browser"
-
-[tasks."build:ui"]
-description = "Build the app shell and plugin UI bundles"
-run = "deno task build:ui"
-
-[tasks."desktop:build"]
-description = "Package the native app as dist/Fathom.app"
-run = "deno task desktop:build"
-
-[tasks.new]
-description = "Scaffold a plugin under plugins/"
-run = "deno task new"
-
-[tasks."plugin:add"]
-description = "Register a plugin outside the repo; starts disabled"
-run = "deno task plugin:add"
-
-[tasks."plugin:remove"]
-description = "Unregister a plugin outside the repo"
-run = "deno task plugin:remove"
-
-[tasks.fmt]
-description = "Format source and project configuration with Oxfmt"
-run = "deno run -A oxfmt --write ."
-
-[tasks."fmt:check"]
-description = "Check formatting without changing files"
-run = "deno run -A oxfmt --check ."
-
-[tasks.lint]
-description = "Lint TypeScript and Solid code with Oxlint"
-run = "deno run -A oxlint --deny-warnings apps packages plugins"
-
-[tasks."lint:fix"]
-description = "Apply safe Oxlint fixes"
-run = "deno run -A oxlint --fix apps packages plugins"
-
-[tasks."lint:deno"]
-description = "Check Deno code and JSR public types"
-run = "deno lint"
-
-[tasks.typecheck]
-description = "Type-check the Deno workspace"
-run = "deno task check"
-
-[tasks."publish:check"]
-description = "Dry-run the JSR publish of the SDK"
-dir = "{{config_root}}/packages/sdk"
-run = "deno publish --dry-run --allow-dirty"
-
-[tasks.check]
-description = "Check formatting, lint, and types"
-depends = ["fmt:check", "lint", "lint:deno", "typecheck"]
