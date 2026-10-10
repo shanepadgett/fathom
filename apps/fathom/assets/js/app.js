@@ -23,6 +23,7 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/fathom"
+import {hooks as pluginHooks} from "./plugin_hooks"
 import topbar from "../vendor/topbar"
 import {FathomAppearance} from "./hooks/appearance"
 
@@ -30,7 +31,7 @@ const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks, FathomAppearance},
+  hooks: {...colocatedHooks, ...pluginHooks, FathomAppearance},
 })
 
 // Show progress bar on live navigation and form submits

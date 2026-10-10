@@ -15,7 +15,8 @@ defmodule Fathom.Host.Plugin do
       Fathom.UI.HeaderActions,
       Fathom.UI.StatusItems,
       Fathom.UI.LeftSidebar,
-      Fathom.UI.RightSidebar
+      Fathom.UI.RightSidebar,
+      Fathom.UI.Docks
     ]
 
   @impl true

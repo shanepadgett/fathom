@@ -78,7 +78,7 @@ defmodule Mix.Tasks.Fathom.Gen.Plugin do
     Mix.shell().info("""
 
     Your plugin is ready at #{Path.relative_to_cwd(path)}.
-    Fathom builds plugins in ~/.fathom/plugins/ as you save. Bundled plugins
+    Plugins in ~/.fathom/plugins/ build when you press Reload in Fathom. Bundled plugins
     under plugins/ and examples/ are picked up on the next `mise run dev`.
     """)
   end

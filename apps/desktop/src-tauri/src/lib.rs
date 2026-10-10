@@ -1,10 +1,13 @@
-//! The desktop shell. It owns the window, menu, and process lifecycle, and
+//! The desktop shell. It owns the window, menu, process lifecycle, native
+//! dialogs, and the native webviews behind browser tabs (`browser`), and
 //! nothing else: every feature lives in the Elixir host and its plugins.
 //!
 //! The shell starts the host with `FATHOM_DESKTOP=1`, waits for the line
 //! `FATHOM_READY <url>` on its stdout, and points the window at that URL,
 //! which carries a one-time launch token. The host's stdin stays open for the
 //! shell's lifetime; closing it on exit tells the host to stop.
+
+mod browser;
 
 use std::io::{BufRead, BufReader};
 use std::process::{Child, ChildStdin, Command, Stdio};
@@ -110,6 +113,13 @@ fn stop_host(app: &AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
+        // The native folder picker for choosing where an agent works.
+        .plugin(tauri_plugin_dialog::init())
+        .manage(browser::Browser::default())
+        .invoke_handler(tauri::generate_handler![
+            browser::browser,
+            browser::browser_message
+        ])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(

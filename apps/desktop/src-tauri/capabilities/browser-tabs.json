@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "browser-tabs",
+  "description": "Pages in browser tabs may send messages to the Fathom page. The shell passes a message on only from the tab the Fathom page is listening to.",
+  "webviews": ["browser-*"],
+  "remote": {
+    "urls": ["http://*:*/*", "https://*:*/*"]
+  },
+  "permissions": ["allow-browser-message"]
+}

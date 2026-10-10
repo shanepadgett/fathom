@@ -40,6 +40,13 @@ defmodule FathomProviderOpenAI do
         do: "https://chatgpt.com/backend-api/codex",
         else: "https://api.openai.com/v1"
 
-    %{base_url: base_url, headers: headers}
+    # Reasoning models need their encrypted reasoning replayed when requests
+    # are not stored. Codex serves only reasoning models.
+    body =
+      if credential.kind == :oauth,
+        do: %{include: ["reasoning.encrypted_content"], reasoning: %{summary: "auto"}},
+        else: %{}
+
+    %{base_url: base_url, headers: headers, provider: id(), body: body}
   end
 end

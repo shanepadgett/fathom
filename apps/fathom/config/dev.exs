@@ -11,7 +11,7 @@ config :fathom, FathomWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "ZiLMtyRQDdSb4zHgHTvNWYuu5nYfL5y63ZBNZge0D14xEZtVYhF7mtTBhMNKWYqj",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:fathom, ~w(--sourcemap=inline --watch)]},
+    esbuild: {Mix.Tasks.Fathom.PluginHooks, :watch, [~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:fathom, ~w(--watch)]}
   ]
 

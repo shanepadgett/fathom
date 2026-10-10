@@ -117,9 +117,14 @@ defmodule Fathom.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind fathom", "esbuild fathom"],
+      "assets.setup": [
+        "tailwind.install --if-missing",
+        "esbuild.install --if-missing",
+        "cmd npm ci --prefix assets --no-audit --no-fund"
+      ],
+      "assets.build": ["compile", "fathom.plugin_hooks", "tailwind fathom", "esbuild fathom"],
       "assets.deploy": [
+        "fathom.plugin_hooks",
         "tailwind fathom --minify",
         "esbuild fathom --minify",
         "phx.digest"

@@ -321,6 +321,9 @@ defmodule Fathom.Plugins.Local do
       {"MIX_LOCKFILE", nil},
       {"MIX_TARGET", nil},
       {"FATHOM_PARENT_STDIN", nil},
+      # A node name meant for the app would collide in the builder.
+      {"ELIXIR_ERL_OPTIONS", nil},
+      {"ERL_AFLAGS", nil},
       # The elixir script finds erl on PATH: use the running Erlang's.
       {"PATH", Enum.join([Path.join(:code.root_dir(), "bin"), System.get_env("PATH", "")], ":")}
     ]

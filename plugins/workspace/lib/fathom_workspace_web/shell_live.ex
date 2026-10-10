@@ -2,20 +2,28 @@ defmodule FathomWorkspaceWeb.ShellLive do
   @moduledoc """
   The application shell. Navigation lives in this view's state: the
   workspace with a selected page, or settings with a selected section.
+
+  Docks slide in from the right edge. The last opened dock stays mounted
+  while closed, so its state (a browser's tabs, say) survives closing it.
+  Its view finds the pane through `data-dock-pane` and `data-open`.
   """
   use Fathom.UI, :live_view
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Fathom.Events.subscribe(Fathom.UI.Docks.topic())
+
     {:ok,
      socket
      |> assign(area: :workspace, page: nil, section: nil, sidebar_open: true)
+     |> assign(dock: nil, dock_open: false)
      |> assign_registry(:pages, Fathom.UI.Pages)
      |> assign_registry(:sections, Fathom.UI.SettingsSections)
      |> assign_registry(:header, Fathom.UI.HeaderActions)
      |> assign_registry(:status, Fathom.UI.StatusItems)
      |> assign_registry(:left, Fathom.UI.LeftSidebar)
-     |> assign_registry(:right, Fathom.UI.RightSidebar)}
+     |> assign_registry(:right, Fathom.UI.RightSidebar)
+     |> assign_registry(:docks, Fathom.UI.Docks)}
   end
 
   @impl true
@@ -28,6 +36,18 @@ defmodule FathomWorkspaceWeb.ShellLive do
 
   def handle_event("toggle_sidebar", _params, socket),
     do: {:noreply, update(socket, :sidebar_open, &(!&1))}
+
+  def handle_event("dock", %{"id" => id}, socket) do
+    %{dock: dock, dock_open: open?} = socket.assigns
+    {:noreply, assign(socket, dock: id, dock_open: not (open? and dock == id))}
+  end
+
+  @impl true
+  def handle_info({:fathom_docks, {:open, key}}, socket),
+    do: {:noreply, assign(socket, area: :workspace, dock: key, dock_open: true)}
+
+  def handle_info({:fathom_docks, :close}, socket),
+    do: {:noreply, assign(socket, dock_open: false)}
 
   # The selection falls back to the first entry when its plugin goes away.
   defp selected(entries, key) do
@@ -70,7 +90,10 @@ defmodule FathomWorkspaceWeb.ShellLive do
   end
 
   def render(assigns) do
-    assigns = assign(assigns, :current, selected(assigns.pages, assigns.page))
+    assigns =
+      assigns
+      |> assign(:current, selected(assigns.pages, assigns.page))
+      |> assign(:dock_current, selected(assigns.docks, assigns.dock))
 
     ~H"""
     <div class="relative flex h-dvh min-w-workspace-minimum flex-col bg-canvas text-ink">
@@ -88,6 +111,17 @@ defmodule FathomWorkspaceWeb.ShellLive do
         </div>
         <div class="flex h-full items-center">
           <.slot_view socket={@socket} entries={@header} />
+          <.icon_button
+            :for={entry <- @docks}
+            id={"dock-toggle-#{entry.key}"}
+            class="ml-3"
+            icon={entry.value[:icon] || "ph-sidebar-simple"}
+            label={entry.value.label}
+            toolbar
+            aria-pressed={to_string(@dock_open and entry.key == @dock_current)}
+            phx-click="dock"
+            phx-value-id={entry.key}
+          />
           <.icon_button class="mx-3" icon="ph-gear" label="Settings" toolbar phx-click="settings" />
         </div>
       </header>
@@ -122,6 +156,29 @@ defmodule FathomWorkspaceWeb.ShellLive do
           data-side="right"
         >
           <.slot_view socket={@socket} entries={@right} mode="single" />
+        </aside>
+        <aside
+          :if={@docks != []}
+          id="dock-pane"
+          aria-label="Dock"
+          aria-hidden={to_string(not @dock_open)}
+          data-dock-pane
+          data-open={to_string(@dock_open)}
+          class={[
+            "relative shrink-0 overflow-hidden bg-surface [--dock-width:clamp(420px,46vw,960px)]",
+            "transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none",
+            if(@dock_open, do: "w-(--dock-width) border-l border-line", else: "w-0")
+          ]}
+        >
+          <div class="absolute inset-y-0 left-0 flex w-(--dock-width) flex-col">
+            <.slot_view
+              :if={@dock_current}
+              socket={@socket}
+              entries={@docks}
+              mode="keyed"
+              selected={@dock_current}
+            />
+          </div>
         </aside>
       </div>
       <footer class="flex min-h-12 shrink-0 items-center gap-4 border-t border-line bg-surface px-4 text-sm">

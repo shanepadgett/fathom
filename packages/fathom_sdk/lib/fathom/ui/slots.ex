@@ -31,6 +31,30 @@ defmodule Fathom.UI.LeftSidebar do
   use Fathom.Registry
 end
 
+defmodule Fathom.UI.Docks do
+  @moduledoc """
+  Panes docked to the right of the workspace, each opened by a header
+  button. The shell keeps a dock's view mounted while it is closed.
+  Value: `%{label:, icon:, view:}`.
+
+  Code can open a dock too, so an agent can show what it is doing.
+  """
+  use Fathom.Registry
+
+  @topic "fathom:docks"
+
+  @doc "Messages: `{:fathom_docks, {:open, key}}` and `{:fathom_docks, :close}`."
+  def topic, do: @topic
+
+  @doc "Opens the dock contributed under `key`."
+  @spec open(String.t()) :: :ok
+  def open(key), do: Fathom.Events.broadcast(@topic, {:fathom_docks, {:open, key}})
+
+  @doc "Closes the open dock."
+  @spec close() :: :ok
+  def close, do: Fathom.Events.broadcast(@topic, {:fathom_docks, :close})
+end
+
 defmodule Fathom.UI.RightSidebar do
   @moduledoc "Right sidebar content; the shell shows one. Value: `%{label:, view:}`."
   use Fathom.Registry

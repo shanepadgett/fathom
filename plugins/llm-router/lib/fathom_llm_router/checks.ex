@@ -73,7 +73,7 @@ defmodule FathomLlmRouter.Checks do
 
     case find(state, ref) do
       nil -> {:noreply, state}
-      id -> {:noreply, finish(state, id, if(result == :ok, do: :done, else: result))}
+      id -> {:noreply, finish(state, id, if(match?({:ok, _}, result), do: :done, else: result))}
     end
   end
 

@@ -64,7 +64,8 @@ defmodule FathomCredentialsLocal.Access do
   defp start_refresh(provider, credential, from, state) do
     flow = Logins.flow(provider)
 
-    if flow && function_exported?(flow, :refresh, 1) do
+    # function_exported?/3 is false for a module not loaded yet.
+    if flow && Code.ensure_loaded?(flow) && function_exported?(flow, :refresh, 1) do
       task =
         Task.Supervisor.async_nolink(FathomCredentialsLocal.TaskSupervisor, fn ->
           flow.refresh(credential)

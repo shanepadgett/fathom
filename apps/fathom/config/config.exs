@@ -42,7 +42,19 @@ config :esbuild,
     args:
       ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/* --alias:@=.),
     cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
+    # Colocated hooks compile under _build, so bare imports resolve through
+    # NODE_PATH: Hex packages, colocated manifests, and assets/node_modules.
+    env: %{
+      "NODE_PATH" =>
+        Enum.join(
+          [
+            Path.expand("../deps", __DIR__),
+            Mix.Project.build_path(),
+            Path.expand("../assets/node_modules", __DIR__)
+          ],
+          ":"
+        )
+    }
   ]
 
 # Configure tailwind (the version is required). Fathom.Plugins.Tailwind pins

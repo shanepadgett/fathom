@@ -14,7 +14,12 @@ defmodule FathomLlmRouter do
   @impl true
   def stream(%{provider: provider} = request, reply_to, ref) do
     with {:ok, module, credential} <- resolve(provider) do
-      module.stream(Map.take(request, [:model, :prompt]), credential, reply_to, ref)
+      request =
+        request
+        |> Map.take([:provider, :model, :system, :tools, :cache_key])
+        |> Map.put(:messages, FathomLlm.messages(request))
+
+      module.stream(request, credential, reply_to, ref)
     end
   end
 

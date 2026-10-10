@@ -1,0 +1,74 @@
+/* Rendered Markdown, such as a model's reply. Server-rendered HTML has no
+   utility classes, so the styles key off its elements. */
+
+@layer components {
+  .fathom-prose {
+    @apply text-dense leading-relaxed text-ink;
+    overflow-wrap: anywhere;
+
+    & > * + * {
+      @apply mt-3;
+    }
+
+    & h1,
+    & h2,
+    & h3,
+    & h4 {
+      @apply mt-5 font-semibold tracking-tight first:mt-0;
+    }
+
+    & h1 {
+      @apply text-lg;
+    }
+
+    & h2 {
+      @apply text-base;
+    }
+
+    & ul {
+      @apply list-disc pl-5;
+    }
+
+    & ol {
+      @apply list-decimal pl-5;
+    }
+
+    & li + li {
+      @apply mt-1;
+    }
+
+    & a {
+      @apply text-action underline underline-offset-2 dark:text-teal-200;
+    }
+
+    & code {
+      @apply rounded-sm bg-canvas px-1 py-0.5 font-mono text-[0.92em];
+      font-variant-ligatures: none;
+    }
+
+    & pre {
+      @apply overflow-x-auto rounded-control border border-line bg-canvas p-3 font-mono text-xs leading-normal;
+
+      & code {
+        @apply bg-transparent p-0;
+      }
+    }
+
+    & blockquote {
+      @apply border-l-2 border-line pl-3 text-muted;
+    }
+
+    & table {
+      @apply w-full border-collapse text-xs;
+    }
+
+    & th,
+    & td {
+      @apply border border-line px-2 py-1 text-left;
+    }
+
+    & hr {
+      @apply border-line;
+    }
+  }
+}

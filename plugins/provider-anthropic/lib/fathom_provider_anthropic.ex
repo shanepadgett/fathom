@@ -36,6 +36,7 @@ defmodule FathomProviderAnthropic do
     do: %{
       base_url: @base_url,
       headers: [@api_version | ClaudeCode.headers(token)],
-      system: ClaudeCode.system()
+      system: ClaudeCode.system(),
+      tool_name: &ClaudeCode.tool_name/1
     }
 end

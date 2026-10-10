@@ -21,7 +21,7 @@ defmodule FathomProviderXAI do
   def stream(request, credential, reply_to, ref),
     do:
       Responses.stream(
-        %{base_url: @base_url, headers: headers(credential)},
+        %{base_url: @base_url, headers: headers(credential), provider: id()},
         request,
         reply_to,
         ref

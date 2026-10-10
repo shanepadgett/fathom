@@ -41,4 +41,9 @@
   .fathom-button[data-size="small"][data-variant="quiet"] {
     @apply text-muted hover:enabled:text-ink;
   }
+
+  /* Last, so it wins over the size and variant colors above. */
+  .fathom-button[data-icon-only][aria-pressed="true"] {
+    @apply bg-info/15 text-info hover:enabled:bg-info/20 hover:enabled:text-info;
+  }
 }

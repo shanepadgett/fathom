@@ -8,14 +8,19 @@ defmodule FathomProviderAnthropic.ClaudeCode do
   Keep `@version` at the latest Claude Code release:
   https://www.npmjs.com/package/@anthropic-ai/claude-code
 
-  When Fathom sends tools, subscription requests must also use Claude
-  Code's tool names (`Read`, `Bash`, …) and map them back on the way in.
-  That mapping belongs here.
+  Subscription requests also send tools under Claude Code's names (`Read`,
+  `Bash`, …); `tool_name/1` maps Fathom's names. The Messages protocol maps
+  replies back to the request's tools.
   """
 
   @version "2.1.296"
   @betas ["claude-code-20250219", "oauth-2025-04-20"]
   @identity "You are Claude Code, Anthropic's official CLI for Claude."
+
+  # Claude Code's built-in tools. To update: https://github.com/badlogic/cchistory
+  @tools ~w(Read Write Edit Bash Grep Glob AskUserQuestion EnterPlanMode ExitPlanMode
+            KillShell NotebookEdit Skill Task TaskOutput TodoWrite WebFetch WebSearch)
+  @tool_names Map.new(@tools, &{String.downcase(&1), &1})
 
   @doc "OAuth scopes Claude Code requests at sign-in."
   def scope,
@@ -34,6 +39,10 @@ defmodule FathomProviderAnthropic.ClaudeCode do
       {"x-app", "cli"}
     ]
   end
+
+  @doc "A tool name in Claude Code's casing when it names a Claude Code tool."
+  @spec tool_name(String.t()) :: String.t()
+  def tool_name(name), do: Map.get(@tool_names, String.downcase(name), name)
 
   @doc "System blocks that precede any system prompt Fathom sends."
   @spec system() :: [map()]

@@ -5,6 +5,15 @@ that a third party could have written, and a dev loop that reloads plugin
 code in place. Finished plans are under `_archive_do_NOT_read_these/` and are
 history, not instructions.
 
+## Prototype
+
+The [agent and editor prototype](agent-editor-prototype.md) built rough
+versions of sessions, tools, coding tools, the agent, the conversation UI,
+and an editor with language servers, to validate the whole product before a
+production build-out. Its plan lists what was checked and what was not. The
+plugins below are the production plan; each starts from what the prototype
+learned.
+
 ## Plugins, in order
 
 Plan one plugin before implementing it. Each plan names its public contracts,

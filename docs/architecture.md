@@ -38,7 +38,7 @@ Harness (apps/fathom and apps/desktop; not replaceable)
   registries  Fathom.Services (unique) and Fathom.Contributions (duplicate), Elixir Registry
   host        Fathom.Host.Plugin (harness services and slots), Environment, Launch
   renderer    FathomWeb.AppLive, the recovery panel, the root layout and appearance hook
-  shell       apps/desktop: Tauri window, menu, host process lifecycle
+  shell       apps/desktop: Tauri window, menu, host process lifecycle, browser tab webviews
                                     │
 Runtime                             ▼
   BEAM (OTP applications, processes, ports)   │   WebKit page (LiveView client)
@@ -97,9 +97,10 @@ provider drops in by providing the same token while the original is disabled.
 
 | Definition (`packages/`) | Bundled provider | Consumers |
 | --- | --- | --- |
-| `fathom_sdk`: `Fathom.Storage`, `Fathom.Environment`, `Fathom.KernelControl`, UI slots | `storage-sqlite`; the harness for the rest | counter; every plugin with UI |
+| `fathom_sdk`: `Fathom.Storage`, `Fathom.Environment`, `Fathom.KernelControl`, `Fathom.Folder`, `Fathom.Shell`, UI slots | `storage-sqlite`; the harness for the rest | counter; every plugin with UI |
 | `fathom_credentials`: `FathomCredentials`, `Credential`, `LoginFlow`, `Logins`, `OAuth`, `DeviceCode` | `credentials-local` | llm-router; provider plugins contribute login flows |
-| `fathom_llm`: `FathomLlm`, `Provider`, `Providers`, `Protocols.*` | `llm-router` | provider plugins contribute providers |
+| `fathom_llm`: `FathomLlm`, `Provider`, `Providers`, `Protocols.*` | `llm-router` | agent; provider plugins contribute providers |
+| `fathom_agent`: `FathomAgent`, `Tool`, `Tools` | `agent` | browser (Send to agent); coding-tools contributes tools |
 
 ## Seams
 
@@ -125,9 +126,98 @@ contexts directly and subscribe with `Fathom.Events` or a context's
 `packages/fathom_sdk/priv/css`. Icons are Phosphor classes written in full
 (`"ph-gear"`) so the stylesheet build finds them.
 
-JavaScript is limited to the harness: the LiveView client and the
-`FathomAppearance` hook behind `appearance_control/1`, because appearance is
-browser-local.
+JavaScript is limited to the harness and to colocated hooks in bundled
+plugins. The harness has the LiveView client and the `FathomAppearance` hook
+behind `appearance_control/1`, because appearance is browser-local. A bundled
+plugin that needs a hook adds `compilers: [:phoenix_live_view] ++
+Mix.compilers()` to its `mix.exs`; `mix fathom.plugin_hooks` collects every
+plugin's colocated hooks into `assets/js/plugin_hooks.js` for `app.js`, so
+the host never names a plugin. Local plugins cannot ship hooks yet.
+
+Hooks import JavaScript libraries the host ships, as it ships Jason to
+Elixir plugins: `apps/fathom/assets/package.json` (CodeMirror today),
+installed by `mix setup` and resolved through esbuild's `NODE_PATH`.
+
+### Docks and the browser
+
+`Fathom.UI.Docks` contributions get a header button; the workspace shell
+slides the dock in from the right and keeps its view mounted while closed.
+`Fathom.UI.Docks.open/1` opens one from code.
+
+The `browser` plugin is a dock. Its tab state lives in `FathomBrowser.Tabs`;
+each tab with a page is a native webview that the Tauri shell lays over the
+dock's viewport (`apps/desktop/src-tauri/src/browser.rs`, using Tauri's
+`unstable` multi-webview API). The view's hook calls the shell's one command,
+`browser`, with which tab shows and where, every frame the layout moves; the
+shell sends page loads, titles, and new-window requests back as DOM events.
+Only the Fathom page may call `browser` (`capabilities/host-page.json`). In a
+plain browser tab (`mise run dev:browser`) the dock shows that it needs the
+desktop app.
+
+The shell stays generic: the page can give a script that runs in every new
+tab before the tab's own scripts, run more script in a tab, and listen to one
+tab. Tab pages may call only `browser_message`
+(`capabilities/browser-tabs.json`), and the shell passes a message on only
+from the tab the page is listening to.
+
+Annotating is built on that. The browser plugin's `priv/annotator.js` runs in
+every tab and does nothing until the dock starts it in the active tab. Then
+hovering outlines elements, a click opens a panel in a shadow root for a note
+and live style edits, and Add sends the element's selector, HTML, box, style
+changes, and source location (Phoenix `debug_heex_annotations`, React,
+Svelte, Vue development builds) to `FathomBrowser.Annotations`, which numbers
+the note. The dock lists the notes and copies them as Markdown with
+`FathomBrowser.annotations_prompt/0`; pins on the page follow the list.
+Everything in a note but the comment and style values comes from the page,
+so it is untrusted input to an agent.
+
+## Agent and editor
+
+`FathomLlm.stream/3` takes a conversation: a system prompt, messages, and
+tools. It streams text, reasoning summaries, and finished tool calls to
+`reply_to` and returns the whole reply. Assistant messages keep the
+provider's own record (`native`); the Responses protocol replays it to the
+same model, which keeps OpenAI's encrypted reasoning with `store: false`, and
+rebuilds messages from other models from `content`. With a Claude sign-in,
+tools go out under Claude Code's names.
+
+```text
+Chat page ── FathomAgent ──▶ Session (one GenServer per session)
+                               │ record, partial reply, session file
+                               └─▶ Loop (task): FathomLlm.stream ──▶ provider
+                                     └─▶ tools in FathomAgent.Tools ──▶ coding-tools
+```
+
+The `agent` plugin provides `FathomAgent` and owns the `FathomAgent.Tools`
+registry. A session's record is the conversation plus notices, saved to
+`<home>/sessions/<id>.json` after every entry; a run interrupted by a stop or
+a restart gets error results for its unanswered calls, so the conversation
+stays valid. The session coalesces stream fragments and numbers its events
+(`seq`), so a view that subscribes and then takes a snapshot skips
+duplicates. Stopping kills the loop task; the bash tool's watcher then kills
+the command's process tree.
+
+`coding-tools` contributes `read`, `write`, `edit`, and `bash` with Pi's
+argument shapes and limits. Commands run in the login shell with
+`Fathom.Shell.env/0`: the terminal's `PATH`, without Fathom's own `RELEASE_*`,
+Erlang, and launch variables. Tools run without approval.
+
+`Fathom.Folder` is the folder the person works in: chats start there and the
+editor shows it. `Fathom.Folder.open_file/2` asks whatever shows files to
+show one, so tool cards link to the editor without knowing it exists. Paths
+are real paths (`/tmp` is `/private/tmp` on macOS), because language servers
+report real paths.
+
+The `editor` plugin is a dock: the folder's tree, tabs in
+`FathomEditor.Tabs` (with unsaved text, so it survives the dock unmounting),
+and one CodeMirror view per open file in a colocated hook. A folder watcher
+reloads clean files an agent changed and asks before replacing unsaved text.
+Language servers run per editor view over stdio (`FathomEditor.LanguageServer`),
+relayed through the LiveView to `@codemirror/lsp-client`. Elixir uses Expert,
+downloaded once into `<home>/tools` and checked by SHA-256; other languages
+use a server on the login shell's `PATH`. Fathom answers the server requests
+CodeMirror's client does not implement and sends `didSave` and
+`didChangeWatchedFiles`, which Expert needs to rebuild.
 
 ## Local plugins
 
@@ -193,7 +283,9 @@ nothing ──▶ plugins (the host lists them in config; the kernel never names
 
 ## Roadmap
 
-Every remaining feature is a plugin with its own plan: sessions, tools,
-approvals, coding tools, agent loop, conversation UI, composer and drafts.
+The [agent and editor prototype](plans/agent-editor-prototype.md) covers
+sessions, tools, coding tools, the agent loop, and the conversation UI in
+prototype form. Approvals, drafts, and a production build-out each get a
+plan.
 See the [roadmap](plans/README.md) and the
 [Elixir harness plan](plans/elixir-harness.md) for open foundation work.

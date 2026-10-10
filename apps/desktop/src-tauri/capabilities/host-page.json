@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "host-page",
+  "description": "The Fathom page served by the Elixir host on loopback may drive browser tabs and open a folder picker. Tab webviews get only browser-tabs.",
+  "webviews": ["main"],
+  "remote": {
+    "urls": ["http://127.0.0.1:*/*"]
+  },
+  "permissions": ["allow-browser", "dialog:allow-open"]
+}
