@@ -1,0 +1,7 @@
+[tools]
+deno = "2.9.7"
+
+[tasks.design]
+description = "Run the design viewer at http://127.0.0.1:5175"
+dir = "{{config_root}}/design"
+run = "deno task dev --open"
