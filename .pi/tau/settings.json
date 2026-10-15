@@ -1,19 +1,11 @@
 {
 	"$schema": "https://raw.githubusercontent.com/shanepadgett/tau-agent/refs/heads/main/packages/agent/schemas/tau.schema.json",
 	"extensions": {
-		"context": {
-			"validation": {
-				"enabled": false
-			},
-			"sync": {
-				"enabled": false
-			}
-		},
-		"autoCompact": {
+		"decisions": {
 			"enabled": false
 		},
-		"subagent": {
-			"disabled": ["scout", "webresearch", "context-sync"]
+		"toolApproval": {
+			"enabled": false
 		}
 	}
 }
