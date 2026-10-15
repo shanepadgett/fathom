@@ -8,6 +8,8 @@ export interface Chat {
   id: string;
   title: string;
   projectId?: string;
+  /** Workspace folders the session has changed, by folder name. */
+  folders?: string[];
   branch?: string;
   time: string;
   status?: string;

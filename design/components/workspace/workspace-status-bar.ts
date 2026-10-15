@@ -15,7 +15,7 @@ export class WorkspaceStatusBarElement extends DesignElement {
   };
 
   declare system: SystemStatus;
-  declare context: ContextUsage;
+  declare context: ContextUsage | undefined;
   declare contextOpen: boolean;
 
   constructor() {
@@ -25,7 +25,8 @@ export class WorkspaceStatusBarElement extends DesignElement {
   }
 
   override render() {
-    if (!this.context) {
+    // A new tab has no session, so it shows agent activity without context.
+    if (!this.system) {
       return nothing;
     }
     const { system, context } = this;
@@ -42,8 +43,9 @@ export class WorkspaceStatusBarElement extends DesignElement {
             : "All quiet"}
           .tone=${system.runningAgents ? "success" : "neutral"}
         ></run-status>
-        <context-usage .data=${context} .open=${this
-          .contextOpen}></context-usage>
+        ${context
+          ? html`<context-usage .data=${context} .open=${this.contextOpen}></context-usage>`
+          : nothing}
       </footer>
     `;
   }

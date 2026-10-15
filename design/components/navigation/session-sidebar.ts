@@ -16,6 +16,7 @@ export class SessionSidebarElement extends DesignElement {
     projects: { attribute: false },
     selected: { type: String },
     pinned: { attribute: false },
+    scope: { type: String },
   };
 
   declare chats: Chat[];
@@ -23,6 +24,8 @@ export class SessionSidebarElement extends DesignElement {
   declare mode: "agent" | "chat";
   declare selected: string;
   declare pinned: string[];
+  /** Filter label: projects across Fathom, or folders inside a workspace. */
+  declare scope: string;
 
   constructor() {
     super();
@@ -31,6 +34,7 @@ export class SessionSidebarElement extends DesignElement {
     this.mode = "agent";
     this.selected = "";
     this.pinned = [];
+    this.scope = "All projects";
   }
 
   private readonly updateScrollState = () => {
@@ -74,9 +78,7 @@ export class SessionSidebarElement extends DesignElement {
           </div>
           ${this.mode === "chat"
             ? nothing
-            : html`<div class="mx-2 mb-2">${
-              projectSelector("All projects")
-            }</div>`}
+            : html`<div class="mx-2 mb-2">${projectSelector(this.scope)}</div>`}
         </div>
         ${pinnedChats.length
           ? html`

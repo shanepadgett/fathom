@@ -78,6 +78,12 @@ export const viewerNavigation = () =>
   }${
     section("Screens", "#/screens", [
       group(
+        "Workspaces",
+        screens.filter((entry) => entry.id.startsWith("workspace-")),
+        "screens",
+        true,
+      ),
+      group(
         "Agent focus",
         screens.filter((entry) => entry.id.startsWith("agent-")),
         "screens",

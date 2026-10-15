@@ -6,6 +6,10 @@ frontend. Lit renders the designs; it does not choose the production framework.
 See the [agent chat design inventory](chat-design-inventory.md) for conversation
 components, content types, and states to explore.
 
+See [workspaces](workspaces.md) for the multi-folder workspace exploration,
+its options, and open questions. Its screens are under **Screens →
+Workspaces**.
+
 In the viewer, **Components → Messages** contains the first nine studies from
 that inventory, each on its own page. Components are grouped by subject in the
 sidebar and component index. Examples remain beside their owning components;

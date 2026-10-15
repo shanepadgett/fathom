@@ -5,7 +5,7 @@ import { html, nothing } from "lit";
 import { DesignElement } from "../../foundation/design-element.ts";
 import { icon } from "../../primitives/icon.ts";
 import { branchIdentity } from "./branch-identity.ts";
-import { projectIdentity } from "./project-identity.ts";
+import { foldersIdentity, projectIdentity } from "./project-identity.ts";
 
 function sessionStatus(chat: Chat, selected: boolean) {
   const unread = chat.unread && !selected;
@@ -97,10 +97,16 @@ export class ChatListItemElement extends DesignElement {
         </div>
       `;
     }
-    if (!this.project) {
+    // Workspace sessions name the folders they changed instead of a project.
+    const identity = this.chat.folders
+      ? foldersIdentity(this.chat.folders)
+      : this.project
+      ? projectIdentity(this.project.name)
+      : undefined;
+    if (!identity) {
       return nothing;
     }
-    const { chat, project, selected } = this;
+    const { chat, selected } = this;
     return html`
       <div
         tabindex="0"
@@ -112,8 +118,7 @@ export class ChatListItemElement extends DesignElement {
         aria-current=${selected ? "true" : nothing}
       >
         <div class="flex items-center justify-between gap-1.5 text-micro text-muted">
-          ${projectIdentity(project.name)}<span class="shrink-0">${chat
-            .time}</span>
+          ${identity}<span class="shrink-0">${chat.time}</span>
         </div>
         <p
           class="mt-1 truncate text-dense ${selected
